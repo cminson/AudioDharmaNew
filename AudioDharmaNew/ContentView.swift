@@ -135,6 +135,8 @@ struct ContentView: View {
     
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
+
+        TheDataModel.loadAllData()
     }
 
     let albums = [

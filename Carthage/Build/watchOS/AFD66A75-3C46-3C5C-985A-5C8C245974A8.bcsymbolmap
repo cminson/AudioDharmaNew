@@ -1,0 +1,297 @@
+BCSymbolMap Version: 2.0
+Apple LLVM version 9.0.0 (clang-900.0.37)
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/hmac.c
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive
+hmac_sha
+hmac_sha_end
+hmac_sha_data
+hmac_sha_key
+hmac_sha_begin
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/pwd2key.c
+derive_key
+_encr_data
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/fileenc.c
+fcrypt_end
+fcrypt_decrypt
+encr_data
+fcrypt_encrypt
+fcrypt_init
++[SSZipArchive isFilePasswordProtectedAtPath:]
++[SSZipArchive isPasswordValidForArchiveAtPath:password:error:]
++[SSZipArchive unzipFileAtPath:toDestination:]
++[SSZipArchive unzipFileAtPath:toDestination:overwrite:password:error:]
++[SSZipArchive unzipFileAtPath:toDestination:delegate:]
++[SSZipArchive unzipFileAtPath:toDestination:overwrite:password:error:delegate:]
++[SSZipArchive unzipFileAtPath:toDestination:overwrite:password:progressHandler:completionHandler:]
++[SSZipArchive unzipFileAtPath:toDestination:progressHandler:completionHandler:]
++[SSZipArchive unzipFileAtPath:toDestination:preserveAttributes:overwrite:password:error:delegate:]
++[SSZipArchive unzipFileAtPath:toDestination:preserveAttributes:overwrite:password:error:delegate:progressHandler:completionHandler:]
++[SSZipArchive createZipFileAtPath:withFilesAtPaths:]
++[SSZipArchive createZipFileAtPath:withContentsOfDirectory:]
++[SSZipArchive createZipFileAtPath:withContentsOfDirectory:keepParentDirectory:]
++[SSZipArchive createZipFileAtPath:withFilesAtPaths:withPassword:]
++[SSZipArchive createZipFileAtPath:withContentsOfDirectory:withPassword:]
++[SSZipArchive createZipFileAtPath:withContentsOfDirectory:keepParentDirectory:withPassword:]
++[SSZipArchive createZipFileAtPath:withContentsOfDirectory:keepParentDirectory:withPassword:andProgressHandler:]
+-[SSZipArchive init]
+-[SSZipArchive initWithPath:]
+-[SSZipArchive open]
+-[SSZipArchive zipInfo:setDate:]
+-[SSZipArchive writeFolderAtPath:withFolderName:withPassword:]
+-[SSZipArchive writeFile:withPassword:]
+-[SSZipArchive writeFileAtPath:withFileName:withPassword:]
+-[SSZipArchive writeData:filename:withPassword:]
+-[SSZipArchive close]
++[SSZipArchive _temporaryPathForDiscardableFile]
+___48+[SSZipArchive _temporaryPathForDiscardableFile]_block_invoke
++[SSZipArchive _gregorian]
+___26+[SSZipArchive _gregorian]_block_invoke
++[SSZipArchive _dateWithMSDOSFormat:]
+-[SSZipArchive .cxx_destruct]
+-[NSData(SSZipArchive) _base64RFC4648]
+-[NSData(SSZipArchive) _hexString]
+_OBJC_IVAR_$_SSZipArchive._path
+_OBJC_IVAR_$_SSZipArchive._zip
+__temporaryPathForDiscardableFile.discardableFilePath
+__temporaryPathForDiscardableFile.onceToken
+___block_descriptor_tmp
+___block_literal_global
+__gregorian.gregorian
+__gregorian.onceToken
+___block_descriptor_tmp.252
+___block_literal_global.253
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/SSZipArchive.m
+__26+[SSZipArchive _gregorian]_block_invoke
+_dispatch_once
+/Applications/Xcode.app/Contents/Developer/Platforms/WatchOS.platform/Developer/SDKs/WatchOS4.0.sdk/usr/include/dispatch/once.h
+__48+[SSZipArchive _temporaryPathForDiscardableFile]_block_invoke
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/aestab.c
+aes_init
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/sha1.c
+sha1
+sha1_begin
+sha1_end
+sha1_hash
+sha1_compile
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/aes_ni.c
+_unzOpenInternal
+_unzGetCurrentFileInfoInternal
+_unzGoToNextDisk
+_unzReadUInt32
+_unzReadUInt16
+_unzReadUInt64
+_unzReadUInt8
+_unzGetCurrentFileInfoField
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/unzip.c
+unzGetCurrentFileInfoField
+unzReadUInt8
+unzReadUInt64
+unzReadUInt16
+unzReadUInt32
+unzEndOfFile
+unzSeek64
+unzSeek
+unzTell64
+unzTell
+unzSetOffset64
+unzSetOffset
+unzGetOffset64
+unzGetOffset
+unzGoToFilePos64
+unzGoToFilePos
+unzGetFilePos64
+unzGetFilePos
+unzLocateFile
+unzGoToFirstFile2
+unzGoToNextFile
+unzGoToNextFile2
+unzGoToFirstFile
+unzGetLocalExtrafield
+unzGoToNextDisk
+unzReadCurrentFile
+unzOpenCurrentFile2
+unzOpenCurrentFilePassword
+unzOpenCurrentFile
+unzOpenCurrentFile3
+unzCheckCurrentFileCoherencyHeader
+unzGetCurrentFileInfo64
+unzGetCurrentFileInfoInternal
+unzGetCurrentFileInfo
+unzGetGlobalComment
+unzGetGlobalInfo64
+unzGetGlobalInfo
+unzCloseCurrentFile
+unzClose
+unzOpen64
+unzOpen
+unzOpen2_64
+unzOpenInternal
+unzSearchCentralDir64
+unzSearchCentralDir
+unzOpen2
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/ioapi_mem.c
+fill_memory_filefunc
+ferror_mem_func
+fclose_mem_func
+fseek_mem_func
+ftell_mem_func
+fwrite_mem_func
+fread_mem_func
+fopendisk_mem_func
+fopen_mem_func
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/minishared.c
+display_zpos64
+is_large_file
+get_file_handle
+check_file_exists
+makedir
+dosdate_to_tm
+dosdate_to_raw_tm
+invalid_date
+dosdate_to_time_t
+change_file_date
+tm_to_dosdate
+get_file_date
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/ioapi_buf.c
+fill_buffer_filefunc64
+fill_buffer_filefunc
+ferror_buf_func
+fclose_buf_func
+fseek64_buf_func
+fseek_buf_func
+fseek_buf_internal_func
+ftell64_buf_func
+ftell_buf_internal_func
+ftell_buf_func
+fwrite_buf_func
+fread_buf_func
+fflush_buf
+fopendisk64_buf_func
+fopen_buf_internal_func
+fopendisk_buf_func
+fopen64_buf_func
+fopen_buf_func
+print_buf_internal
+_zipReadUInt32
+_zipReadUInt16
+_zipReadUInt64
+_add_data_in_datablock
+_zipWriteValue
+_zipGoToNextDisk
+_zipFlushWriteBuffer
+_zipReadUInt8
+_zipGoToSpecificDisk
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/zip.c
+zipGoToSpecificDisk
+zipReadUInt8
+zipClose2_64
+free_linkedlist
+free_datablock
+zipCloseFileInZip
+zipCloseFileInZipRaw
+zipClose_64
+zipClose
+zipCloseFileInZipRaw64
+zipWriteValueToMemory
+zipWriteValueToMemoryAndMove
+zipFlushWriteBuffer
+zipGetDiskSizeAvailable
+zipWriteInFileInZip
+zipOpenNewFileInZip
+zipOpenNewFileInZip64
+zipOpenNewFileInZip2_64
+zipOpenNewFileInZip2
+zipOpenNewFileInZip3_64
+zipOpenNewFileInZip3
+zipOpenNewFileInZip4
+zipGoToNextDisk
+zipWriteValue
+zipOpenNewFileInZip4_64
+zipOpen64
+zipOpen3
+zipOpen
+zipOpen3_64
+zipOpen2_64
+zipOpen2
+add_data_in_datablock
+allocate_new_datablock
+zipReadUInt64
+zipReadUInt16
+zipReadUInt32
+zipOpen4
+zipGoToFirstDisk
+zipSearchCentralDir64
+zipSearchCentralDir
+init_linkedlist
+_cryptrand.calls
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/crypt.c
+crypthead
+update_keys
+decrypt_byte
+cryptrand
+init_keys
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/aescrypt.c
+aes_decrypt
+aes_encrypt
+_fopen_file_func
+_fopendisk_file_func
+_fread_file_func
+_fwrite_file_func
+_ftell_file_func
+_fseek_file_func
+_fclose_file_func
+_ferror_file_func
+_fopen64_file_func
+_fopendisk64_file_func
+_ftell64_file_func
+_fseek64_file_func
+_file_build_ioposix
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/ioapi.c
+file_build_ioposix
+fseek64_file_func
+ftell64_file_func
+fopendisk64_file_func
+fopen64_file_func
+fill_fopen64_filefunc
+ferror_file_func
+fclose_file_func
+fseek_file_func
+ftell_file_func
+fwrite_file_func
+fread_file_func
+fopendisk_file_func
+fopen_file_func
+fill_fopen_filefunc
+fill_zlib_filefunc64_32_def_from_filefunc32
+call_ztell64
+call_zseek64
+call_zopendisk64
+call_zopen64
+_update_pool
+_prng_mix
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/prng.c
+prng_end
+prng_rand
+prng_mix
+update_pool
+prng_init
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/minizip/aes/aeskey.c
+aes_decrypt_key
+aes_encrypt_key
+aes_decrypt_key256
+aes_decrypt_key192
+aes_decrypt_key128
+aes_encrypt_key256
+aes_encrypt_key192
+aes_encrypt_key128
+__swift_FORCE_LOAD_$_swiftFoundation_$_ZipArchive
+__swift_FORCE_LOAD_$_swiftObjectiveC_$_ZipArchive
+__swift_FORCE_LOAD_$_swiftDarwin_$_ZipArchive
+__swift_FORCE_LOAD_$_swiftDispatch_$_ZipArchive
+__swift_FORCE_LOAD_$_swiftCoreFoundation_$_ZipArchive
+___swift_reflection_version
+-emit-bc /Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/SSZipArchive+Swift.swift -target armv7k-apple-watchos2.0 -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/WatchOS.platform/Developer/SDKs/WatchOS4.0.sdk -I /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Products/Release-watchos -F /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Products/Release-watchos -application-extension -g -import-underlying-module -module-cache-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/ModuleCache -swift-version 3 -serialize-debugging-options -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/ZipArchive-generated-files.hmap -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/ZipArchive-own-target-headers.hmap -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/ZipArchive-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/all-product-headers.yaml -Xcc -iquote -Xcc /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/ZipArchive-project-headers.hmap -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Products/Release-watchos/include -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/DerivedSources/armv7k -Xcc -I/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/DerivedSources -Xcc -ivfsoverlay -Xcc /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/unextended-module-overlay.yaml -Xcc -working-directory/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive -emit-module-doc-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/ZipArchive.swiftdoc -serialize-diagnostics-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/SSZipArchive+Swift.dia -O -parse-as-library -module-name ZipArchive -emit-module-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/ZipArchive.swiftmodule -emit-objc-header-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/ZipArchive-Swift.h -emit-dependencies-path /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/SSZipArchive+Swift.d -num-threads 4 -o /Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/Objects-normal/armv7k/SSZipArchive+Swift.bc -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift
+<swift-imported-modules>
+Apple Swift version 4.0 effective-3.2 (swiftlang-900.0.65 clang-900.0.37)
+/Users/antoinecoeur/Development/ZipArchive/SwiftExample/Carthage/Checkouts/ZipArchive/SSZipArchive/SSZipArchive+Swift.swift
+/Users/antoinecoeur/Library/Caches/org.carthage.CarthageKit/DerivedData/9.0_9A235/ZipArchive/v2.0.8/Build/Intermediates.noindex/ZipArchive.build/Release-watchos/ZipArchive-watchos.build/DerivedSources/ZipArchive_vers.c

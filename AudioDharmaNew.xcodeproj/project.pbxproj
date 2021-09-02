@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; };
+		8361D60B26E126500073CC83 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */; };
 		83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4C026E0415700F8B531 /* ContentView.swift */; };
 		83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C226E0415900F8B531 /* Assets.xcassets */; };
@@ -21,7 +23,22 @@
 		83A2E4DE26E0438500F8B531 /* UserDownloadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4DD26E0438500F8B531 /* UserDownloadData.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		8361D60C26E126500073CC83 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				8361D60B26E126500073CC83 /* ZipArchive.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		8361D60926E126500073CC83 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = Carthage/Build/iOS/ZipArchive.framework; sourceTree = "<group>"; };
 		83A2E4BB26E0415700F8B531 /* AudioDharmaNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDharmaNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDharmaNewApp.swift; sourceTree = "<group>"; };
 		83A2E4C026E0415700F8B531 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -43,6 +60,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -97,6 +115,7 @@
 		83A2E4DF26E0461200F8B531 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8361D60926E126500073CC83 /* ZipArchive.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -111,6 +130,8 @@
 				83A2E4B726E0415700F8B531 /* Sources */,
 				83A2E4B826E0415700F8B531 /* Frameworks */,
 				83A2E4B926E0415700F8B531 /* Resources */,
+				8361D60C26E126500073CC83 /* Embed Frameworks */,
+				8361D60D26E1266E0073CC83 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -164,6 +185,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		8361D60D26E1266E0073CC83 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/ZipArchive.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		83A2E4B726E0415700F8B531 /* Sources */ = {
@@ -314,6 +356,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = AudioDharmaNew/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -329,6 +372,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = NO;
 			};
 			name = Debug;
 		};
@@ -344,6 +388,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
 				);
 				INFOPLIST_FILE = AudioDharmaNew/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -359,6 +404,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = NO;
 			};
 			name = Release;
 		};

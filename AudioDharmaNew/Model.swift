@@ -11,7 +11,7 @@ import UIKit
 import Foundation
 import SystemConfiguration
 import os.log
-//import ZipArchive
+import ZipArchive
 
 
 
@@ -503,6 +503,22 @@ class Model {
         
     }
     
+    func getFileData(filePath: String) -> [UInt8]? {
+        // See if the file exists.
+        
+        let url = URL(fileURLWithPath: filePath)
+        
+        do {
+            // Get the raw data from the file.
+            let rawData: Data = try Data(contentsOf: url)
+
+            // Return the raw data as an array of bytes.
+            return [UInt8](rawData)
+        } catch {
+            // Couldn't read the file.
+            return nil
+        }
+    }
     
     
     // MARK: Configuration
@@ -562,16 +578,17 @@ class Model {
             //print("Unzipping: ", configZipPath)
             //let time1 = Date.timeIntervalSinceReferenceDate
             /*
+            zipData = getFileData()
             do {
-                let compressedData = try (yourData as NSData).compressed(using: .lzfse)
+                let compressedData = try (zipData as NSData).decom(using: .lzfse)
                 // use your compressed data
             } catch {
                 print(error.localizedDescription)
             }
  */
+
             
-            /*
-            
+            //CJM DEV
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
                 print("Failed UnZip: \(configZipPath)")
                 HTTPResultCode = 404
@@ -582,7 +599,7 @@ class Model {
 
                 return
             }
- */
+
              
 
             //let time2 = Date.timeIntervalSinceReferenceDate
