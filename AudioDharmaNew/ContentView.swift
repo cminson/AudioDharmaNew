@@ -8,15 +8,14 @@
 
 import SwiftUI
 
+
 struct AlbumView: View {
     let name: String
     @State var isActive  = false
 
     
     let albums = [
-        Album(name: "All Talks"),
-        Album(name: "All Talks"),
-        Album(name: "HERE")
+        AlbumData(title: "All Talks", content:"", section: "", image: "", date: ""),
     ]
     
     func clicked() {
@@ -44,13 +43,15 @@ struct AlbumView: View {
     }
 }
 
-struct Album: Identifiable {
+/*
+struct AlbumData: Identifiable {
     let id = UUID()
-    let name: String
+    let Title: String
 }
+ */
 
 struct AlbumRow: View {
-    var album: Album
+    var album: AlbumData
 
     var body: some View {
         
@@ -61,7 +62,7 @@ struct AlbumRow: View {
             .frame(width:50, height:50)
             .background(Color.red)
             .padding(.leading, -15)
-        Text("\(album.name)")
+        Text("\(album.Title)")
             .font(.system(size: 20))
             .background(Color.white)
         Spacer()
@@ -76,7 +77,7 @@ struct AlbumRow: View {
 }
 
 struct TalkRow: View {
-    var album: Album
+    var album: AlbumData
 
     var body: some View {
         
@@ -87,7 +88,7 @@ struct TalkRow: View {
             .frame(width:50, height:50)
             .background(Color.red)
             .padding(.leading, -15)
-        Text("\(album.name)")
+        Text("\(album.Title)")
             .font(.system(size: 20))
             .background(Color.white)
         Spacer()
@@ -98,7 +99,6 @@ struct TalkRow: View {
 }
 
 struct TestRow: View {
-    var album: Album
     
     var body: some View {
             HStack {
@@ -114,13 +114,13 @@ struct TestRow: View {
 }
 
 struct SectionRow: View {
-    var album: Album
+    var album: AlbumData
 
     var body: some View {
         
         VStack(alignment: .leading) {
 
-        Text("\(album.name)")
+        Text("\(album.Title)")
             .font(.system(size: 20))
         }
         .frame(height:40)
@@ -131,21 +131,20 @@ struct SectionRow: View {
 }
 
 
+
+
 struct ContentView: View {
     @State var isActive  = false
     
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
-
-        TheDataModel.loadAllData()
     }
+    
 
-    let albums = [
-        Album(name: "All Talks"),
-        Album(name: "Recommended Talks"),
-        Album(name: "Talks by Series"),
-        Album(name: "Talks by Seriesxx"),
-        Album(name: "Talks by Seriesxx")
+    let TEST = [
+        AlbumData(title: "All Talks", content:"", section: "", image: "", date: ""),
+        AlbumData(title: "Talk by Series", content:"", section: "", image: "", date: "")
+
     ]
     
     func clicked() {
@@ -155,9 +154,9 @@ struct ContentView: View {
     var body: some View {
 
         NavigationView {
-            List(albums) { album in
+            List(TheDataModel.RootAlbums) { album in
             
-                if album.name != "Talks by Series" {
+                if album.Title != "Talks by Series" {
                     AlbumRow(album: album)
                     .onTapGesture {
                     print("Tap seen \(isActive)")
@@ -167,7 +166,7 @@ struct ContentView: View {
                 }
             }
             else {
-                TestRow(album: album)
+                TestRow()
                 
             }
     
@@ -177,8 +176,9 @@ struct ContentView: View {
         }
 
     }
-
 }
+ 
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {

@@ -20,6 +20,8 @@ let TheDataModel = Model()
 var TheUserLocation = UserLocation()
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
+let ModelLoadedSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
+
 
 // all possible web config points
 let HostAccessPoints: [String] = [
@@ -387,66 +389,6 @@ class Model {
 
     }
     
-    func downloadSuggestedData(talkFileName: String) {
-        
-        let config = URLSessionConfiguration.default
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        config.urlCache = nil
-        let session = URLSession.init(configuration: config)
-        
-        let path = URL_GET_SUGGESTED + DEVICE_ID
-        let requestURL : URL? = URL(string: path)
-        let urlRequest = URLRequest(url : requestURL!)
-        
-        let task = session.dataTask(with: urlRequest) {
-            (data, response, error) -> Void in
-            
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-                HTTPResultCode = httpResponse.statusCode
-            } else {
-                HTTPResultCode = 404
-            }
-            
-            if let responseData = data {
-                if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    HTTPResultCode = 404
-                }
-            }
-            else {
-                HTTPResultCode = 404
-            }
-            
-            if HTTPResultCode == 200 {
-                
-                var talks = [TalkData] ()
-                
-                do {
-                    let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
-                    for suggestedTalk in jsonDict["DATA02"] as? [AnyObject] ?? [] {
-                        
-                        let filename = suggestedTalk["filename"] as? String ?? ""
-                        
-                        if let talk = self.FileNameToTalk[filename] {
-                            talks.append(talk)
-                        }
-                    }
-                    
-                    self.KeyToTalks[KEY_SUGGESTED_TALKS] = talks
-                    
-                }
-                catch {
-                    print(error)
-                }
-            }
-            
-            //TheDataModel.refreshAllControllers()
-        }
-        task.resume()
-        
-    }
-    
     
     
     func setHelpPage() {
@@ -573,20 +515,6 @@ class Model {
                     return
                 }
             }
-
-            // unzip zipped config back into json
-            //print("Unzipping: ", configZipPath)
-            //let time1 = Date.timeIntervalSinceReferenceDate
-            /*
-            zipData = getFileData()
-            do {
-                let compressedData = try (zipData as NSData).decom(using: .lzfse)
-                // use your compressed data
-            } catch {
-                print(error.localizedDescription)
-            }
- */
-
             
             //CJM DEV
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
@@ -624,7 +552,7 @@ class Model {
                 self.loadConfig(jsonDict: jsonDict)
                 self.loadTalks(jsonDict: jsonDict)
                 self.loadAlbums(jsonDict: jsonDict)
-                self.downloadSanghaActivity()
+                //self.downloadSanghaActivity()
             }
             catch {
                 print(error)
@@ -668,7 +596,9 @@ class Model {
             self.computeShareHistoryStats()
 
             
+            print("Model Signaling Loaded")
             ModelUpdateSemaphore.signal()
+            ModelLoadedSemaphore.signal()
             // END CRITICAL SECTION
             
             //self.RootController?.reportModelLoaded()
@@ -704,6 +634,7 @@ class Model {
     
     func loadTalks(jsonDict: [String: AnyObject]) {
         
+        print("loadTalks")
         var talkCount = 0
         var totalSeconds = 0
         
@@ -828,6 +759,8 @@ class Model {
     }
     
     func loadAlbums(jsonDict: [String: AnyObject]) {
+        
+        print("loadAlbums")
     
         var prevAlbumSection = ""
 
@@ -847,6 +780,7 @@ class Model {
                 }
             
                 self.RootAlbums.append(albumData)
+                print("Appending: ", albumData)
 
     
                 // get the optional talk array for this Album
@@ -858,7 +792,6 @@ class Model {
                 for talk in talkList {
                     
                     var URL = talk["url"] as? String ?? ""
-                    var VURL = talk["url"] as? String ?? ""
 
                     let terms = URL.components(separatedBy: "/")
                     let fileName = terms.last ?? ""
@@ -948,6 +881,10 @@ class Model {
     func downloadSanghaActivity() {
         
         print("downloadSanghaActivity")
+        //CJM DEV
+        return
+        
+        
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
