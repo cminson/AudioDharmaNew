@@ -660,7 +660,7 @@ class Model {
                 let seconds = self.convertDurationToSeconds(duration: duration)
                 totalSeconds += seconds
             
-                let talkData =  TalkData(title: title,
+                var talkData =  TalkData(title: title,
                                          url: URL,
                                          fileName: fileName,
                                          date: date,
@@ -824,7 +824,7 @@ class Model {
                     let totalSeconds = self.convertDurationToSeconds(duration: durationDisplay)
                     
                     
-                    let talkData =  TalkData(title: title,
+                    var talkData =  TalkData(title: title,
                                              url: URL,
                                              fileName: fileName,
                                              date: date,

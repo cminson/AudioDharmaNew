@@ -8,6 +8,47 @@
 
 import SwiftUI
 
+//CJM DEV
+/*
+struct AlbumData: Identifiable {
+    let id = UUID()
+    let Title: String
+}
+ 
+ struct TalkData: Identifiable {
+     let id = UUID()
+     let Title: String
+ }
+
+ */
+
+
+struct AlbumRow: View {
+    var album: AlbumData
+
+    var body: some View {
+        
+        VStack(alignment: .leading) {
+        HStack() {
+        Image("albumdefault")
+            .resizable()
+            .frame(width:50, height:50)
+            .background(Color.red)
+            .padding(.leading, -15)
+        Text("\(album.Title)")
+            .font(.system(size: 14))
+            .background(Color.white)
+        Spacer()
+        Text("42")
+            .background(Color.white)
+            .padding(.trailing, -10)
+            .font(.system(size: 10))
+        }
+    }
+    .frame(height:40)
+    }
+}
+
 
 struct AlbumView: View {
     let name: String
@@ -38,46 +79,12 @@ struct AlbumView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
-
-
     }
 }
 
-/*
-struct AlbumData: Identifiable {
-    let id = UUID()
-    let Title: String
-}
- */
-
-struct AlbumRow: View {
-    var album: AlbumData
-
-    var body: some View {
-        
-        VStack(alignment: .leading) {
-        HStack() {
-        Image("albumdefault")
-            .resizable()
-            .frame(width:50, height:50)
-            .background(Color.red)
-            .padding(.leading, -15)
-        Text("\(album.Title)")
-            .font(.system(size: 20))
-            .background(Color.white)
-        Spacer()
-        Text("42")
-            .background(Color.white)
-            .padding(.trailing, -10)
-            .font(.system(size: 10))
-        }
-    }
-    .frame(height:40)
-    }
-}
 
 struct TalkRow: View {
-    var album: AlbumData
+    var talk: TalkData
 
     var body: some View {
         
@@ -88,8 +95,8 @@ struct TalkRow: View {
             .frame(width:50, height:50)
             .background(Color.red)
             .padding(.leading, -15)
-        Text("\(album.Title)")
-            .font(.system(size: 20))
+        Text("\(talk.Title)")
+            .font(.system(size: 14))
             .background(Color.white)
         Spacer()
         }
@@ -97,6 +104,42 @@ struct TalkRow: View {
     .frame(height:40)
     }
 }
+
+struct TalkView: View {
+    @State var isActive  = false
+
+    init() {
+        for talk in TheDataModel.AllTalks {
+            print(talk.Title)
+        }
+    }
+
+        
+    func clicked() {
+        isActive = true
+    }
+
+    var body: some View {
+
+        List(TheDataModel.AllTalks) { talk in
+            TalkRow(talk: talk)
+                .onTapGesture {
+                    print("Tap seen \(isActive)")
+                    clicked()
+                }
+        }
+        .background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
+
+        .navigationBarTitle("All Talks", displayMode: .inline)
+        .navigationBarHidden(false)
+
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+}
+
+
+
+
 
 struct TestRow: View {
     
@@ -113,31 +156,19 @@ struct TestRow: View {
         }
 }
 
-struct SectionRow: View {
-    var album: AlbumData
-
-    var body: some View {
-        
-        VStack(alignment: .leading) {
-
-        Text("\(album.Title)")
-            .font(.system(size: 20))
-        }
-        .frame(height:40)
-
-
-        }
-
-}
-
 
 
 
 struct ContentView: View {
-    @State var isActive  = false
+    @State var selection: String?  = nil
     
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
+        
+        print("TALKS")
+        for talk in TheDataModel.AllTalks {
+            print(talk.Title)
+        }
     }
     
 
@@ -147,9 +178,6 @@ struct ContentView: View {
 
     ]
     
-    func clicked() {
-        isActive = true
-    }
     
     var body: some View {
 
@@ -159,10 +187,7 @@ struct ContentView: View {
                 if album.Title != "Talks by Series" {
                     AlbumRow(album: album)
                     .onTapGesture {
-                    print("Tap seen \(isActive)")
-                    //isActive.toggle()
-                    print("new value \(isActive)")
-                    isActive = true
+                        selection = "ALL_TALKS"
                 }
             }
             else {
@@ -171,7 +196,8 @@ struct ContentView: View {
             }
     
          }  // end List(albums)
-            .background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
+            //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkView(), tag: "ALL_TALKS", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
         }
 
