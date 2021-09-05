@@ -22,6 +22,16 @@ struct AlbumData: Identifiable {
 
  */
 
+var SelectedTalk : TalkData = TalkData(title: "",
+                                       url: "",
+                                       fileName: "",
+                                       date: "",
+                                       durationDisplay: "",
+                                       speaker: "",
+                                       section: "",
+                                       durationInSeconds: 1,
+                                       pdf: "")
+
 
 struct AlbumRow: View {
     var album: AlbumData
@@ -105,8 +115,8 @@ struct TalkRow: View {
     }
 }
 
-struct TalkView: View {
-    @State var isActive  = false
+struct TalksView: View {
+    @State var selection: String?  = nil
 
     init() {
         for talk in TheDataModel.AllTalks {
@@ -114,21 +124,17 @@ struct TalkView: View {
         }
     }
 
-        
-    func clicked() {
-        isActive = true
-    }
-
     var body: some View {
 
         List(TheDataModel.AllTalks) { talk in
             TalkRow(talk: talk)
                 .onTapGesture {
-                    print("Tap seen \(isActive)")
-                    clicked()
+                    print("talk selected")
+                    selection = "PLAY_TALK"
+                    SelectedTalk = talk
                 }
         }
-        .background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayer(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle("All Talks", displayMode: .inline)
         .navigationBarHidden(false)
@@ -137,6 +143,33 @@ struct TalkView: View {
     }
 }
 
+
+struct TalkPlayer: View {
+    var talk: TalkData
+
+    var body: some View {
+        
+        Text("X")
+        Button("Play Talk") {
+            print("Button tapped!")
+                        
+            let pathMP3 = URL_MP3_HOST + talk.URL
+            //let pathMP3 = "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3"
+            if let talkURL = URL(string: pathMP3) {
+                
+                print("URL \(pathMP3)")
+
+                AudioPlayer = MP3Player()
+                AudioPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
+            }
+        }
+
+    }
+        //.navigationBarTitle("Play Talk", displayMode: .inline)
+        //.navigationBarHidden(false)
+
+    
+}
 
 
 
@@ -197,7 +230,7 @@ struct ContentView: View {
     
          }  // end List(albums)
             //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: TalkView(), tag: "ALL_TALKS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalksView(), tag: "ALL_TALKS", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
         }
 

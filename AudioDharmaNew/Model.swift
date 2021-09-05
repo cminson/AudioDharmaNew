@@ -179,6 +179,8 @@ var SCREEN_TYPE  = SCREEN_TYPES.SMALL
 
 var SIMILAR_MENU_ITEM = "Similar"   // displayed in Talk menus, adjusted at load time based off screen size
 
+var AudioPlayer: MP3Player!
+
 class Model {
     
     //MARK: Properties
@@ -208,6 +210,7 @@ class Model {
 
     
     var DownloadInProgress = false
+    
     
     let CurrentLanguage = Locale.current.languageCode
 

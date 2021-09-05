@@ -9,17 +9,15 @@
 /* Begin PBXBuildFile section */
 		8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; };
 		8361D60B26E126500073CC83 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1226E3ECAE000F9848 /* StoredData.swift */; };
+		8376AB1726E3EE11000F9848 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8376AB1626E3EE11000F9848 /* AVFoundation.framework */; };
+		8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */; };
 		83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */; };
 		83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4C026E0415700F8B531 /* ContentView.swift */; };
 		83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C226E0415900F8B531 /* Assets.xcassets */; };
 		83A2E4C626E0415900F8B531 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */; };
 		83A2E4CE26E0418900F8B531 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4CD26E0418900F8B531 /* Model.swift */; };
-		83A2E4D626E0427100F8B531 /* TalkHistoryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4D526E0427100F8B531 /* TalkHistoryData.swift */; };
-		83A2E4D826E042D700F8B531 /* UserAlbumData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4D726E042D700F8B531 /* UserAlbumData.swift */; };
-		83A2E4DA26E0434800F8B531 /* UserNoteData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4D926E0434800F8B531 /* UserNoteData.swift */; };
-		83A2E4DC26E0435100F8B531 /* UserFavoriteData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4DB26E0435100F8B531 /* UserFavoriteData.swift */; };
-		83A2E4DE26E0438500F8B531 /* UserDownloadData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4DD26E0438500F8B531 /* UserDownloadData.swift */; };
-		83D65D5526E2D18200751527 /* Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D65D5426E2D18200751527 /* Data.swift */; };
+		83D65D5526E2D18200751527 /* SessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D65D5426E2D18200751527 /* SessionData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +36,9 @@
 
 /* Begin PBXFileReference section */
 		8361D60926E126500073CC83 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = Carthage/Build/iOS/ZipArchive.framework; sourceTree = "<group>"; };
+		8376AB1226E3ECAE000F9848 /* StoredData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredData.swift; sourceTree = "<group>"; };
+		8376AB1626E3EE11000F9848 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayer.swift; sourceTree = "<group>"; };
 		83A2E4BB26E0415700F8B531 /* AudioDharmaNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDharmaNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDharmaNewApp.swift; sourceTree = "<group>"; };
 		83A2E4C026E0415700F8B531 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -45,12 +46,7 @@
 		83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		83A2E4C726E0415900F8B531 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83A2E4CD26E0418900F8B531 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		83A2E4D526E0427100F8B531 /* TalkHistoryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkHistoryData.swift; sourceTree = "<group>"; };
-		83A2E4D726E042D700F8B531 /* UserAlbumData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAlbumData.swift; sourceTree = "<group>"; };
-		83A2E4D926E0434800F8B531 /* UserNoteData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNoteData.swift; sourceTree = "<group>"; };
-		83A2E4DB26E0435100F8B531 /* UserFavoriteData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFavoriteData.swift; sourceTree = "<group>"; };
-		83A2E4DD26E0438500F8B531 /* UserDownloadData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDownloadData.swift; sourceTree = "<group>"; };
-		83D65D5426E2D18200751527 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
+		83D65D5426E2D18200751527 /* SessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8376AB1726E3EE11000F9848 /* AVFoundation.framework in Frameworks */,
 				8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -87,16 +84,13 @@
 			children = (
 				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
 				83A2E4C026E0415700F8B531 /* ContentView.swift */,
+				8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */,
+				83A2E4CD26E0418900F8B531 /* Model.swift */,
+				83D65D5426E2D18200751527 /* SessionData.swift */,
+				8376AB1226E3ECAE000F9848 /* StoredData.swift */,
 				83A2E4C226E0415900F8B531 /* Assets.xcassets */,
-				83D65D5426E2D18200751527 /* Data.swift */,
 				83A2E4C726E0415900F8B531 /* Info.plist */,
 				83A2E4C426E0415900F8B531 /* Preview Content */,
-				83A2E4CD26E0418900F8B531 /* Model.swift */,
-				83A2E4D926E0434800F8B531 /* UserNoteData.swift */,
-				83A2E4DD26E0438500F8B531 /* UserDownloadData.swift */,
-				83A2E4DB26E0435100F8B531 /* UserFavoriteData.swift */,
-				83A2E4D726E042D700F8B531 /* UserAlbumData.swift */,
-				83A2E4D526E0427100F8B531 /* TalkHistoryData.swift */,
 			);
 			path = AudioDharmaNew;
 			sourceTree = "<group>";
@@ -112,6 +106,7 @@
 		83A2E4DF26E0461200F8B531 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				8376AB1626E3EE11000F9848 /* AVFoundation.framework */,
 				8361D60926E126500073CC83 /* ZipArchive.framework */,
 			);
 			name = Frameworks;
@@ -209,15 +204,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				83A2E4D626E0427100F8B531 /* TalkHistoryData.swift in Sources */,
-				83A2E4DE26E0438500F8B531 /* UserDownloadData.swift in Sources */,
-				83A2E4DC26E0435100F8B531 /* UserFavoriteData.swift in Sources */,
-				83D65D5526E2D18200751527 /* Data.swift in Sources */,
-				83A2E4D826E042D700F8B531 /* UserAlbumData.swift in Sources */,
+				83D65D5526E2D18200751527 /* SessionData.swift in Sources */,
+				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83A2E4CE26E0418900F8B531 /* Model.swift in Sources */,
-				83A2E4DA26E0434800F8B531 /* UserNoteData.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
+				8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
