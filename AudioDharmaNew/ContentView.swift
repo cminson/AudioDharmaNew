@@ -22,14 +22,14 @@ struct AlbumData: Identifiable {
 
  */
 
-var SelectedTalk : TalkData = TalkData(title: "",
-                                       url: "",
-                                       fileName: "",
-                                       date: "",
-                                       durationDisplay: "",
-                                       speaker: "",
+var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
+                                       url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
+                                       fileName: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
+                                       date: "2021.09.01",
+                                       durationDisplay: "16:47",
+                                       speaker: "Kim Allen",
                                        section: "",
-                                       durationInSeconds: 1,
+                                       durationInSeconds: 1007,
                                        pdf: "")
 
 
@@ -144,26 +144,65 @@ struct TalksView: View {
 }
 
 
+/*
+ * TalkPlayer
+ */
 struct TalkPlayer: View {
     var talk: TalkData
+    @State private var isTalkActive = false
 
+    func playTalk() {
+        
+        //let pathMP3 = URL_MP3_HOST + talk.URL
+        let pathMP3 = "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3"
+        if let talkURL = URL(string: pathMP3) {
+        
+            print("URL \(pathMP3)")
+
+            AudioPlayer = MP3Player()
+            AudioPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
+        }
+        
+    }
+    
+    //CJM TO DO
+    //UISlider, UIActivityIndicatorView, MPVolumeView
     var body: some View {
         
-        Text("X")
-        Button("Play Talk") {
-            print("Button tapped!")
-                        
-            let pathMP3 = URL_MP3_HOST + talk.URL
-            //let pathMP3 = "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3"
-            if let talkURL = URL(string: pathMP3) {
-                
-                print("URL \(pathMP3)")
+        ZStack {Color(.orange).opacity(0.2).edgesIgnoringSafeArea(.all)
+        VStack(alignment: .center, spacing: 10) {
 
-                AudioPlayer = MP3Player()
-                AudioPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
+            Text(talk.Title)
+                .background(Color.blue)
+                .padding(.trailing, 0)
+                .font(.system(size: 20))
+            Spacer()
+                .frame(height: 10)
+            Text(talk.Speaker)
+                .background(Color.blue)
+                .padding(.trailing, 0)
+                .font(.system(size: 20))
+            Spacer()
+            Button(action: {
+                print("button pressed")
+                print(isTalkActive)
+                isTalkActive = true
+                playTalk()
+            }) {
+                //Image("tri_right")
+                Image(isTalkActive ? "blacksquare" : "tri_right")
+                    .resizable()
+                    .frame(width: 60, height: 60)
             }
-        }
+            
 
+ 
+            Spacer()
+            Spacer()
+        }  // VStack
+        .foregroundColor(Color.black.opacity(0.7))
+        .padding(.trailing, 0)
+        } // ZStack
     }
         //.navigationBarTitle("Play Talk", displayMode: .inline)
         //.navigationBarHidden(false)
@@ -190,9 +229,7 @@ struct TestRow: View {
 }
 
 
-
-
-struct ContentView: View {
+struct RootView: View {
     @State var selection: String?  = nil
     
     init() {
@@ -236,11 +273,36 @@ struct ContentView: View {
 
     }
 }
- 
+
+
+
 
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        //RootView()
+        TalkPlayer(talk: SelectedTalk)
     }
 }
+
+/*
+ let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)
+
+ volumeView.showsRouteButton = true
+
+ let iconBlack = UIImage(named: "routebuttonblack")
+ let iconGreen = UIImage(named: "routebuttongreen")
+ 
+ volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.normal)
+ volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.disabled)
+ volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.highlighted)
+ volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.selected)
+
+ volumeView.tintColor = MAIN_FONT_COLOR
+ 
+ 
+ 
+ let point = CGPoint(x: MPVolumeParentView.frame.size.width  / 2,y : (MPVolumeParentView.frame.size.height / 2) + 5)
+ volumeView.center = point
+ MPVolumeParentView.addSubview(volumeView)
+ */

@@ -11,6 +11,33 @@ import UIKit
 import AVFoundation
 import CoreMedia
 
+// MARK: Constants
+
+enum TalkStates {                   // all possible states of the talk player
+    case INITIAL
+    case LOADING
+    case PLAYING
+    case PAUSED
+    case STOPPED
+    case FINISHED
+    case ALBUMFINISHED
+}
+
+// MARK: Properties
+var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
+var CurrentTalkRow : Int = 0
+var OriginalTalkRow : Int = 0
+var PlayEntireAlbum: Bool = false
+var PlayingDownloadedTalk: Bool = false
+var ResumingLastTalk: Bool = false
+
+var TalkList : [TalkData]!
+var CurrentTalk : TalkData!
+var CurrentTalkTime : Int = 0
+var TalkTimer : Timer?
+var MP3TalkPlayer : MP3Player!
+
+
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation
 
 
@@ -34,8 +61,6 @@ class MP3Player : NSObject {
         
         print("startTalk")
         print(talkURL)
-        //let testURL = URL(string: "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3")!
-        //PlayerItem  = AVPlayerItem(url: testURL)
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
@@ -71,6 +96,8 @@ class MP3Player : NSObject {
     
     func stop() {
         
+        TalkPlayerStatus = .STOPPED
+
         Player.pause()
         Player.seek(to: CMTime.zero)
     }
@@ -82,10 +109,17 @@ class MP3Player : NSObject {
 
     @objc func talkHasCompleted() {
         
-        //print("Talk Completed")
-        //CJM
-        //Delegate.talkHasCompleted()     // inform our owner that a talk is done
+       print("Talk Completed")
+        //CJM DEV
     }
+    
+    func toggleFavorite(_ sender: UIBarButtonItem) {
+        
+        //CJM DEV
+        //TheDataModel.toggleTalkAsFavorite(talk: CurrentTalk, controller: self)
+        
+    }
+
     
     func seekToTime(seconds: Int64) {
         
@@ -105,6 +139,12 @@ class MP3Player : NSObject {
                 Player.seek(to: CMTimeMake(value: durationTimeInSeconds, timescale: 1))
             }
         }
+        
+        //CJM DEV
+        if getCurrentTimeInSeconds() >= getDurationInSeconds() {
+            talkHasCompleted()
+        }
+
     }
     
     func seekFastBackward() {

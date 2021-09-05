@@ -12,17 +12,18 @@ import SwiftUI
 struct AudioDharmaNewApp: App {
     
     init() {
-
+/*
         TheDataModel.loadAllData()
         print("Model Loading")
         ModelLoadedSemaphore.wait()
         print("Model Loaded")
+ */
 
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TalkPlayer(talk: SelectedTalk)
         }
     }
 }
