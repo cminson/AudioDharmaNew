@@ -23,7 +23,7 @@ struct AudioDharmaNewApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TalkPlayer(talk: SelectedTalk)
+            TalkPlayerView(talk: SelectedTalk)
         }
     }
 }

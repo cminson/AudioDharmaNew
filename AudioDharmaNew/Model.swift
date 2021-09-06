@@ -179,7 +179,7 @@ var SCREEN_TYPE  = SCREEN_TYPES.SMALL
 
 var SIMILAR_MENU_ITEM = "Similar"   // displayed in Talk menus, adjusted at load time based off screen size
 
-var AudioPlayer: MP3Player!
+var TheTalkPlayer: TalkPlayer!
 
 class Model {
     
@@ -613,8 +613,10 @@ class Model {
     
     func loadConfig(jsonDict: [String: AnyObject]) {
         
+       // if let config = jsonDict["config"] {
         if let config = jsonDict["config"] {
-            print("URL_MP3_HOST: ", config["URL_MP3_HOST"] as? String )
+
+            print("URL_MP3_HOST: ", config["URL_MP3_HOST"] as? String ?? "ERROR URL_MP3_HOST")
 
             URL_MP3_HOST = config["URL_MP3_HOST"] as? String ?? URL_MP3_HOST
             print("URL_MP3_HOST: ", URL_MP3_HOST)
@@ -805,7 +807,6 @@ class Model {
                     var speaker = ""
                     var date = ""
                     var durationDisplay = ""
-                    var keys = ""
                     var pdf = ""
                     
                     
@@ -886,7 +887,7 @@ class Model {
         print("downloadSanghaActivity")
         //CJM DEV
         return
-        
+        /*
         
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -932,7 +933,7 @@ class Model {
                 let json =  try JSONSerialization.jsonObject(with: responseData) as! [String: AnyObject]
                 for talkJSON in json["sangha_history"] as? [AnyObject] ?? [] {
                     
-                    var fileName = talkJSON["filename"] as? String ?? ""
+                    let fileName = talkJSON["filename"] as? String ?? ""
                     let datePlayed = talkJSON["date"] as? String ?? ""
                     let timePlayed = talkJSON["time"] as? String ?? ""
                     let city = talkJSON["city"] as? String ?? ""
@@ -1025,6 +1026,7 @@ class Model {
 
         }
         task.resume()
+ */
     }
     
     func downloadMP3(talk: TalkData) {
@@ -1475,6 +1477,25 @@ class Model {
             KeyToAlbumStats[dataContent] = stats
         }
     }
+    
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentsDirectory = paths[0]
+        return documentsDirectory
+    }
+
+    func storeUserData()  {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let pathDataStorage = paths[0]
+        
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserAlbums, requiringSecureCoding: false)
+            try data.write(to: pathDataStorage)
+        } catch {
+            print("Couldn't write file")
+        }
+
+    }
 
 
     // MARK: Persistant API
@@ -1484,6 +1505,15 @@ class Model {
     func saveUserAlbumData() {
         
         NSKeyedArchiver.archiveRootObject(TheDataModel.UserAlbums, toFile: UserAlbumData.ArchiveURL.path)
+        /*
+        let pathDataStorage = getDocumentsDirectory().appendingPathComponent(UserAlbumData.ArchiveURL.path)
+        do {
+            let data = try NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserAlbums, requiringSecureCoding: false)
+            try data.write(to: pathDataStorage)
+        } catch {
+            print("Couldn't write file")
+        }
+         */
     }
     
     func saveUserNoteData() {
@@ -2163,11 +2193,12 @@ class Model {
         
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = NumberFormatter.Style.decimal
-        let hoursStr = numberFormatter.string(from: NSNumber(value:hours)) ?? "0"
+        //let hoursStr = numberFormatter.string(from: NSNumber(value:hours)) ?? "0"
         
+        let hoursStr = String(format: "%02d", hours)
+
         let minutesStr = String(format: "%02d", minutes)
         let secondsStr = String(format: "%02d", seconds)
-        
         return hoursStr + ":" + minutesStr + ":" + secondsStr
     }
     

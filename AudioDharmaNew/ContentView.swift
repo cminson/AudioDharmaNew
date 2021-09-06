@@ -7,6 +7,9 @@
 //
 
 import SwiftUI
+import MediaPlayer
+import UIKit
+
 
 //CJM DEV
 /*
@@ -134,7 +137,7 @@ struct TalksView: View {
                     SelectedTalk = talk
                 }
         }
-        .background(NavigationLink(destination: TalkPlayer(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle("All Talks", displayMode: .inline)
         .navigationBarHidden(false)
@@ -145,11 +148,34 @@ struct TalksView: View {
 
 
 /*
+ ******************************************************************************
  * TalkPlayer
+ * UI for talk player console
+ ******************************************************************************
  */
-struct TalkPlayer: View {
+
+struct VolumeSlider: UIViewRepresentable {
+    
+   func makeUIView(context: Context) -> MPVolumeView {
+      MPVolumeView(frame: .zero)
+   }
+
+   func updateUIView(_ view: MPVolumeView, context: Context) {}
+}
+
+struct TalkPlayerView: View {
     var talk: TalkData
     @State private var isTalkActive = false
+    //@State private var elapsedTime: Double = 0
+    @State private var displayedElapsedTime: String = "00:00:00"
+    
+    @State private var  elapsedTime: Double = 0 {
+      willSet {
+        print("WILLSET")
+
+        print(newValue)
+      }
+    }
 
     func playTalk() {
         
@@ -159,19 +185,95 @@ struct TalkPlayer: View {
         
             print("URL \(pathMP3)")
 
-            AudioPlayer = MP3Player()
-            AudioPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
+            TheTalkPlayer = TalkPlayer()
+            TheTalkPlayer.talkPlayerView = self
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
         }
-        
     }
     
-    //CJM TO DO
-    //UISlider, UIActivityIndicatorView, MPVolumeView
+    func pauseTalk () {
+        
+        TheTalkPlayer.pause()
+    }
+    
+    func talkHasCompleted () {
+        
+        print("talkHasCompleted")
+
+        /*
+            TalkPlayerStatus = .FINISHED
+
+            MP3TalkPlayer.stop()
+            CurrentTalkTime = 0
+            resetTalkDisplay()
+
+            // if option is enabled, play the next talk in the current series
+            if PlayEntireAlbum == true {
+
+                // create a new MP3 player.  just to ensure state is fully cleared
+                MP3TalkPlayer = MP3Player()
+                MP3TalkPlayer.Delegate = self
+
+                // and then play next talk in SECONDS_TO_NEXT_TALK seconds
+                Timer.scheduledTimer(timeInterval: SECONDS_TO_NEXT_TALK, target: self, selector: #selector(PlayTalkController.playNextTalk), userInfo: nil, repeats: false)
+            }
+            updateTitleDisplay()
+ */
+    }
+    
+    func updateView(){
+
+        print("updateView")
+        CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
+        if CurrentTalkTime > 0 {
+            elapsedTime = Double(CurrentTalkTime)
+            displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
+         
+        }
+        
+
+            // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
+        /*
+            CurrentTalkTime = MP3TalkPlayer.getCurrentTimeInSeconds()
+            if CurrentTalkTime > 0 {
+
+                TalkPlayerStatus = .PLAYING
+
+                disableActivityIcons()
+                enableScanButtons()
+
+                // show current talk time and actual talk duration
+                // note these may be different from what is stated in the (often inaccurate) config!
+                let currentTime = MP3TalkPlayer.getCurrentTimeInSeconds()
+                let duration = MP3TalkPlayer.getDurationInSeconds()
+
+                let fractionTimeCompleted = Float(currentTime) / Float(duration)
+                talkProgressSlider.value = fractionTimeCompleted
+
+                updateTitleDisplay()
+
+                // if play time exceeds reporting threshold and not previously reported, report it
+                if CurrentTalkTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: CurrentTalk) == false {
+
+                    TheDataModel.addToTalkHistory(talk: CurrentTalk)
+                    TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
+                }
+                //MARKPLAYED_TALK_THRESHOLD
+
+                UserDefaults.standard.set(CurrentTalkTime, forKey: "CurrentTalkTime")
+                UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
+
+            }
+ */
+    }
+
+
     var body: some View {
         
         ZStack {Color(.orange).opacity(0.2).edgesIgnoringSafeArea(.all)
         VStack(alignment: .center, spacing: 10) {
 
+            Group {
             Text(talk.Title)
                 .background(Color.blue)
                 .padding(.trailing, 0)
@@ -182,23 +284,37 @@ struct TalkPlayer: View {
                 .background(Color.blue)
                 .padding(.trailing, 0)
                 .font(.system(size: 20))
+            
             Spacer()
+            Text(displayedElapsedTime)
+            Spacer()
+                .frame(height: 10)
             Button(action: {
                 print("button pressed")
                 print(isTalkActive)
-                isTalkActive = true
-                playTalk()
-            }) {
-                //Image("tri_right")
+                isTalkActive = (isTalkActive ? false : true)
+                if isTalkActive {playTalk()} else {pauseTalk()}
+            })
+            {
                 Image(isTalkActive ? "blacksquare" : "tri_right")
                     .resizable()
                     .frame(width: 60, height: 60)
             }
+            .buttonStyle(PlainButtonStyle())
+            }  //end group 1
             
-
- 
             Spacer()
+                .frame(height: 30)
+            Slider(value: $elapsedTime, in: 0...Double(talk.DurationInSeconds))
+                .padding(.trailing, 20)
+                .padding(.leading, 20)
+                .frame(height: 30)
             Spacer()
+           
+            VolumeSlider()
+               .frame(height: 40)
+               .padding(.horizontal)
+  
         }  // VStack
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
@@ -228,7 +344,12 @@ struct TestRow: View {
         }
 }
 
-
+/*
+ ******************************************************************************
+ * RootView
+ * UI for the top-level display of albums
+ ******************************************************************************
+ */
 struct RootView: View {
     @State var selection: String?  = nil
     
@@ -277,11 +398,10 @@ struct RootView: View {
 
 
 
-
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         //RootView()
-        TalkPlayer(talk: SelectedTalk)
+        TalkPlayerView(talk: SelectedTalk)
     }
 }
 

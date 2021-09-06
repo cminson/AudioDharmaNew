@@ -35,17 +35,16 @@ var TalkList : [TalkData]!
 var CurrentTalk : TalkData!
 var CurrentTalkTime : Int = 0
 var TalkTimer : Timer?
-var MP3TalkPlayer : MP3Player!
 
 
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation
 
 
-class MP3Player : NSObject {
+class TalkPlayer : NSObject {
     
     // MARK: Properties
     //CJM
-    //var Delegate: PlayTalkController!
+    var talkPlayerView: TalkPlayerView!
     var Player : AVPlayer = AVPlayer()
     var PlayerItem : AVPlayerItem?
     
@@ -75,6 +74,8 @@ class MP3Player : NSObject {
 
         Player.play()
         Player.seek(to: CMTimeMake(value: Int64(startAtTime), timescale: 1))
+        
+        startTalkTimer()
     
     }
     
@@ -100,17 +101,49 @@ class MP3Player : NSObject {
 
         Player.pause()
         Player.seek(to: CMTime.zero)
+        
+        //CJM DEV
+        stopTalkTimer()
+
     }
     
     func pause() {
         
         Player.pause()
+        
+        //CJM DEV
+        stopTalkTimer()
     }
 
     @objc func talkHasCompleted() {
         
        print("Talk Completed")
         //CJM DEV
+    }
+    
+    func startTalkTimer() {
+
+            // stop  previous timer, if any
+            stopTalkTimer()
+
+            // start a new timer.  this calls a method to update the views once each second
+            TalkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerUpdate), userInfo: nil, repeats: true)
+
+    }
+
+    func stopTalkTimer(){
+
+            if let timer = TalkTimer {
+
+                timer.invalidate()
+                TalkTimer = nil
+            }
+        }
+    
+    @objc func timerUpdate() {
+        
+        print("timerUpdate")
+        talkPlayerView.updateView()
     }
     
     func toggleFavorite(_ sender: UIBarButtonItem) {
