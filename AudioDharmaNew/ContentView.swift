@@ -7,36 +7,8 @@
 //
 
 import SwiftUI
-import MediaPlayer
 import UIKit
 
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
-        }
-
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
-}
 
 var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
                                        url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
@@ -47,130 +19,6 @@ var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
                                        section: "",
                                        durationInSeconds: 1007,
                                        pdf: "")
-
-
-struct AlbumRow: View {
-    var album: AlbumData
-
-    var body: some View {
-        
-        VStack(alignment: .leading) {
-        HStack() {
-        Image("albumdefault")
-            .resizable()
-            .frame(width:50, height:50)
-            .background(Color.red)
-            .padding(.leading, -15)
-        Text("\(album.Title)")
-            .font(.system(size: 14))
-            .background(Color.white)
-        Spacer()
-        Text("42")
-            .background(Color.white)
-            .padding(.trailing, -10)
-            .font(.system(size: 10))
-        }
-    }
-    .frame(height:40)
-    }
-}
-
-
-struct AlbumView: View {
-    var title: String = ""
-    var contentKey: String = ""
-    @State var selection: String?  = ""
-    @State var newTitle: String?  = ""
-    @State var newContentKey: String?  = ""
-
-
-
-    var body: some View {
-
-
-        List(TheDataModel.getAlbumData(key: contentKey)) { album in
-            AlbumRow(album: album)
-                .onTapGesture {
-                    if album.Content.contains("ALBUM") {
-                        print("HERE", album.Content)
-                        selection = "ALBUMS"
-                    } else {
-                        selection = "TALKS"
-                    }
-                    
-                    newContentKey = album.Content
-                    newTitle = album.Title
-
-                }
-        }
-        .background(NavigationLink(destination: TalksView(title: newTitle!,  contentKey: newContentKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: AlbumView(title: newTitle!, contentKey: newContentKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-
-        .navigationBarTitle(title, displayMode: .inline)
-        .navigationBarHidden(false)
-
-        .navigationViewStyle(StackNavigationViewStyle())
-    }
-}
-
-
-struct TalkRow: View {
-    var talk: TalkData
-
-    var body: some View {
-        
-        VStack(alignment: .leading) {
-        HStack() {
-        Image("albumdefault")
-            .resizable()
-            .frame(width:50, height:50)
-            .background(Color.red)
-            .padding(.leading, -15)
-        Text("\(talk.Title)")
-            .font(.system(size: 14))
-            .background(Color.white)
-        Spacer()
-        }
-    }
-    .frame(height:40)
-    }
-}
-
-struct TalksView: View {
-    var title: String = ""
-    var contentKey: String = ""
-    @State var selection: String?  = nil
-
-    /*
-    init() {
-        for talk in TheDataModel.AllTalks {
-            print(talk.Title)
-        }
-    }
- */
- 
-
-    var body: some View {
-
-        List(TheDataModel.getTalkData(key: contentKey)) { talk in
-            TalkRow(talk: talk)
-                .onTapGesture {
-                    print("talk selected")
-                    selection = "PLAY_TALK"
-                    SelectedTalk = talk
-                }
-        }
-        .background(NavigationLink(destination: TalkPlayerView(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-
-        .navigationBarTitle("All Talks", displayMode: .inline)
-        .navigationBarHidden(false)
-
-        .navigationViewStyle(StackNavigationViewStyle())
-    }
-}
-
-
-
 
 
 struct TestRow: View {
@@ -281,8 +129,8 @@ struct RootView: View {
             }  // end List(albums)
             .environment(\.defaultMinListRowHeight, 20)
             //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: TalksView(title: title, contentKey: contentKey), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: AlbumView(title: title, contentKey: contentKey), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkListView(title: title, contentKey: contentKey), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: AlbumListView(title: title, contentKey: contentKey), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
         }
 

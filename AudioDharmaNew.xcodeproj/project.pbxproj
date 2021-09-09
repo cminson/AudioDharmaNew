@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		831B775926E9207A0028B88E /* TalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831B775826E9207A0028B88E /* TalkView.swift */; };
+		8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924526EA4ECF00F9A006 /* TalkListView.swift */; };
+		8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924726EA4F6000F9A006 /* AlbumListView.swift */; };
 		8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; };
 		8361D60B26E126500073CC83 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1226E3ECAE000F9848 /* StoredData.swift */; };
@@ -37,6 +39,8 @@
 
 /* Begin PBXFileReference section */
 		831B775826E9207A0028B88E /* TalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkView.swift; sourceTree = "<group>"; };
+		8327924526EA4ECF00F9A006 /* TalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkListView.swift; sourceTree = "<group>"; };
+		8327924726EA4F6000F9A006 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
 		8361D60926E126500073CC83 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = Carthage/Build/iOS/ZipArchive.framework; sourceTree = "<group>"; };
 		8376AB1226E3ECAE000F9848 /* StoredData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredData.swift; sourceTree = "<group>"; };
 		8376AB1626E3EE11000F9848 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -86,6 +90,8 @@
 			children = (
 				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
 				83A2E4C026E0415700F8B531 /* ContentView.swift */,
+				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
+				8327924526EA4ECF00F9A006 /* TalkListView.swift */,
 				831B775826E9207A0028B88E /* TalkView.swift */,
 				8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */,
 				83A2E4CD26E0418900F8B531 /* Model.swift */,
@@ -207,7 +213,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */,
 				83D65D5526E2D18200751527 /* SessionData.swift in Sources */,
+				8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */,
 				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83A2E4CE26E0418900F8B531 /* Model.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */,
