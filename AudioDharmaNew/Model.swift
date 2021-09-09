@@ -100,12 +100,9 @@ enum ACTIVITIES {          // all possible activities that are reported back to 
 // App Global Constants
 // talk and album display states.  these are used throughout the app to key on state
 let KEY_HELP = "KEY_HELP"
-let KEY_ALBUMROOT = "KEY_ALBUMROOT"
-let KEY_TALKS = "KEY_TALKS"
+let KEY_ALBUMROOT = "Audio Dharma"
+let KEY_ALL_TALKS = "KEY_ALL_TALKS"
 
-//CJM DEV
-//let KEY_ALLTALKS = "KEY_ALLTALKS"
-let KEY_ALLTALKS = "EN_ALL_TALKS"
 
 let KEY_SIMILAR_TALKS = "KEY_SIMILARTALKS"
 let KEY_SUGGESTED_TALKS = "KEY_SUGGESTEDTALKS"
@@ -189,7 +186,11 @@ class Model {
     var SeriesAlbums: [AlbumData] = []     // array of Albums for all series
     var RecommendedAlbums: [AlbumData] = []     // array of recommended Albums
 
-    var KeyToTalks : [String: [TalkData]] = [:]  // dictionary keyed by content, value is array of talks
+    //CJM DEV
+    var KeyToAlbums : [String: [AnyObject]] = [:]  // where all albums are stored.  dictionary keyed by content, value is array of albums
+    var KeyToTalks : [String: [TalkData]] = [:]  // where all talks are stored.  dictionary keyed by content, value is array of talks
+    
+    
     var KeyToAlbumStats: [String: AlbumStats] = [:] // dictionary keyed by content, value is stat struct for Albums
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
 
@@ -206,7 +207,7 @@ class Model {
     var SangaShareHistoryAlbum: [TalkHistoryData] = []          // history of shares for sangha
     var SanghaShareHistoryStats: AlbumStats!
     
-    var AllTalks: [TalkData] = []
+    //var AllTalks: [TalkData] = []
 
     
     var DownloadInProgress = false
@@ -237,6 +238,7 @@ class Model {
         RecommendedAlbums = []
         
         KeyToTalks  = [:]
+        KeyToAlbums = [:]
         
         KeyToAlbumStats = [:]
         FileNameToTalk = [String: TalkData] ()
@@ -245,9 +247,7 @@ class Model {
         
         SangaTalkHistoryAlbum = []
         SangaShareHistoryAlbum = []
-        
-        AllTalks = []
-        
+                
         DownloadInProgress = false
         
         UpdatedTalksJSON = [String: AnyObject] ()
@@ -278,7 +278,6 @@ class Model {
         SangaTalkHistoryAlbum  = []
         SangaShareHistoryAlbum = []
 
-        AllTalks = []
         
         HTTPResultCode = 0
         URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
@@ -554,7 +553,11 @@ class Model {
                 let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
                 self.loadConfig(jsonDict: jsonDict)
                 self.loadTalks(jsonDict: jsonDict)
-                self.loadAlbums(jsonDict: jsonDict)
+                
+                let albumList = jsonDict["albums"] as? [AnyObject] ?? []
+                self.loadAlbums(albumList: albumList, content: KEY_ALBUMROOT)
+
+                //self.loadAlbums(jsonDict: jsonDict])
                 //self.downloadSanghaActivity()
             }
             catch {
@@ -683,7 +686,12 @@ class Model {
                 
                 // add this talk to  list of all talks
                 // Note: there is only one talk section for KEY_ALLTALKS.  all talks are stored in that section
-                self.AllTalks.append(talkData)
+                //self.AllTalks.append(talkData)
+                if self.KeyToTalks[KEY_ALL_TALKS] == nil {
+                    self.KeyToTalks[KEY_ALL_TALKS] = [TalkData] ()
+                }
+                self.KeyToTalks[KEY_ALL_TALKS]?.append(talkData)
+
                 
                 // add talk to the list of talks for this speaker
                 // Note: there is only one talk section for speaker. talks for this speaker are stored in that section
@@ -726,7 +734,7 @@ class Model {
         let durationDisplay = self.secondsToDurationDisplay(seconds: totalSeconds)
 
         let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-        self.KeyToAlbumStats[KEY_ALLTALKS] = stats
+        self.KeyToAlbumStats[KEY_ALL_TALKS] = stats
         
         
         //
@@ -734,7 +742,7 @@ class Model {
         //
         self.SpeakerAlbums = self.SpeakerAlbums.sorted(by: { $0.Content < $1.Content })
         self.SeriesAlbums = self.SeriesAlbums.sorted(by: { $0.Date > $1.Date })
-        self.AllTalks = self.AllTalks.sorted(by: { $0.Date > $1.Date })
+        //self.AllTalks = self.AllTalks.sorted(by: { $0.Date > $1.Date })
         
         // CJM DEV
         /*
@@ -763,37 +771,33 @@ class Model {
         
     }
     
-    func loadAlbums(jsonDict: [String: AnyObject]) {
-        
+    func loadAlbums(albumList: [AnyObject], content: String) {
+
         print("loadAlbums")
     
-        var prevAlbumSection = ""
+        for Album in albumList {
 
-        for Album in jsonDict["albums"] as? [AnyObject] ?? [] {
-            
                 let albumSection = Album["section"] as? String ?? ""
                 let title = Album["title"] as? String ?? ""
-                let albumContent = Album["content"] as? String ?? ""
                 let image = Album["image"] as? String ?? ""
+                let albumContent = Album["content"] as? String ?? ""
+            
+                let albumList = Album["albums"] as? [AnyObject] ?? []
                 let talkList = Album["talks"] as? [AnyObject] ?? []
+
                 let albumData =  AlbumData(title: title, content: albumContent, section: albumSection, image: image, date: "")
             
-                if ((albumSection != "") && (albumSection != prevAlbumSection)) {
-                    let albumSectionHeader = AlbumData(title: SECTION_HEADER, content: albumContent, section: albumSection, image: image, date: "")
-                    self.RootAlbums.append(albumSectionHeader)
-                    prevAlbumSection = albumSection
-                }
+                print("Appending: ", albumData, content)
+                if (self.KeyToAlbums[content] == nil) { self.KeyToAlbums[content] = [AnyObject] () }
+                self.KeyToAlbums[content]?.append(albumData as AnyObject)
             
-                self.RootAlbums.append(albumData)
-                print("Appending: ", albumData)
+                loadAlbums(albumList: albumList, content: albumContent)
+ 
 
-    
                 // get the optional talk array for this Album
                 // if exists, store off all the talks in keyToTalks keyed by 'content' id
                 // the value for this key is an array of talks
-                var currentSeries = "_"
-                var prevTalkSection = ""
-
+ 
                 for talk in talkList {
                     
                     var URL = talk["url"] as? String ?? ""
@@ -801,7 +805,6 @@ class Model {
                     let terms = URL.components(separatedBy: "/")
                     let fileName = terms.last ?? ""
                     
-                    var talkSection = talk["section"] as? String ?? "_"
                     let series = talk["series"] as? String ?? ""
                     let title = talk["title"] as? String ?? ""
                     var speaker = ""
@@ -809,11 +812,6 @@ class Model {
                     var durationDisplay = ""
                     var pdf = ""
                     
-                    
-                    // DEV NOTE: remove placeholder.  this code might not be necessary long-term
-                    if talkSection == "_" || talkSection == "__" {
-                        talkSection = ""
-                    }
                     
                     // fill in these fields from talk data.  must do this as these fields are not stored in config json (to make things
                     // easier for config reading)
@@ -834,7 +832,7 @@ class Model {
                                              date: date,
                                              durationDisplay: durationDisplay,
                                              speaker: speaker,
-                                             section: talkSection,
+                                             section: "",
                                              durationInSeconds: totalSeconds,
                                              pdf: pdf)
                     
@@ -842,45 +840,32 @@ class Model {
                         talkData.Title = talkData.Title + " [transcript]"
                     }
                     
-                    // if a series is specified create a series album if not already there.  then add talk to it
-                    // otherwise, just add the talk directly to the parent album
-                    if series.count > 1 {
-                        
-                        if series != currentSeries {
-                            currentSeries = series
-                        }
-                        let seriesKey = "RECOMMENDED" + series
-                        
-                        // create the album if not there already
-                        if self.KeyToTalks[seriesKey] == nil {
-                            
-                            self.KeyToTalks[seriesKey] = [TalkData] ()
-                            let albumData =  AlbumData(title: series, content: seriesKey, section: "", image: "albumdefault", date: date)
-                           //let albumData =  AlbumData(title: series, content: seriesKey, section: "", image: speaker, date: date)
-
-                            self.RecommendedAlbums.append(albumData)
-                            self.SeriesAlbums.append(albumData)
-                        }
-                        
-                        if ((talkSection != "") && (talkSection != prevTalkSection)) {
-                            let talk = TalkData(title: SECTION_HEADER, url: "", fileName: "", date: "", durationDisplay: "",  speaker: "defaultPhoto", section: talkSection, durationInSeconds: 0, pdf: "")
-                            self.KeyToTalks[seriesKey]?.append(talk)
-                            prevTalkSection = talkSection
-                        }
-                        
-                        // now add talk to this series album
-                        self.KeyToTalks[seriesKey]?.append(talkData)
-                        
-                        
-                    } else {
-                        
-                        if (self.KeyToTalks[albumContent] == nil) { self.KeyToTalks[albumContent] = [TalkData] () }
-                        self.KeyToTalks[albumContent]?.append(talkData)
-                    }
+                         
+                    if (self.KeyToTalks[albumContent] == nil) { self.KeyToTalks[albumContent] = [TalkData] () }
+                    self.KeyToTalks[albumContent]?.append(talkData)
+                 
                 }
         } // end Album loop
     }
     
+    func getAlbumData(key: String) -> [AlbumData] {
+       
+        print("getAlbumdata: ", key)
+        let listAlbums = KeyToAlbums[key] as? [AlbumData] ?? []
+        
+        print(listAlbums)
+        return listAlbums
+    }
+    
+    func getTalkData(key: String) -> [TalkData] {
+       
+        print("getTalkData: ", key)
+        let listTalks = KeyToTalks[key] as? [TalkData] ?? []
+        
+        print(listTalks)
+        return listTalks
+    }
+
     
     func downloadSanghaActivity() {
         
@@ -1762,8 +1747,11 @@ class Model {
         case KEY_DHARMETTES:    // Dharmettes are just a Series that we've promoted to top level
             talkList = KeyToTalks["SERIESDharmettes"] ?? [TalkData]()
         
-        case KEY_ALLTALKS:
-            talkList =  AllTalks
+        case KEY_ALL_TALKS:
+            //talkList =  AllTalks
+            //CJM
+            talkList = KeyToTalks["SERIESDharmettes"] ?? [TalkData]()
+
             
         case KEY_SUGGESTED_TALKS:
             var talks = [TalkData] ()
@@ -1839,7 +1827,7 @@ class Model {
         
         switch content {
         
-        case KEY_ALLTALKS:
+        case KEY_ALL_TALKS:
             stats = KeyToAlbumStats[content] ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
         
         case KEY_SANGHA_TALKHISTORY:

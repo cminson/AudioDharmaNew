@@ -11,19 +11,32 @@ import MediaPlayer
 import UIKit
 
 
-//CJM DEV
-/*
-struct AlbumData: Identifiable {
-    let id = UUID()
-    let Title: String
-}
- 
- struct TalkData: Identifiable {
-     let id = UUID()
-     let Title: String
- }
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
 
- */
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}
 
 var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
                                        url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
@@ -64,31 +77,36 @@ struct AlbumRow: View {
 
 
 struct AlbumView: View {
-    let name: String
-    @State var isActive  = false
+    var title: String = ""
+    var contentKey: String = ""
+    @State var selection: String?  = ""
+    @State var newTitle: String?  = ""
+    @State var newContentKey: String?  = ""
 
-    
-    let albums = [
-        AlbumData(title: "All Talks", content:"", section: "", image: "", date: ""),
-    ]
-    
-    func clicked() {
-        isActive = true
-    }
+
 
     var body: some View {
 
 
-        List(albums) { album in
+        List(TheDataModel.getAlbumData(key: contentKey)) { album in
             AlbumRow(album: album)
                 .onTapGesture {
-                    print("Tap seen \(isActive)")
-                    clicked()
+                    if album.Content.contains("ALBUM") {
+                        print("HERE", album.Content)
+                        selection = "ALBUMS"
+                    } else {
+                        selection = "TALKS"
+                    }
+                    
+                    newContentKey = album.Content
+                    newTitle = album.Title
+
                 }
         }
-        .background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalksView(title: newTitle!,  contentKey: newContentKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: AlbumView(title: newTitle!, contentKey: newContentKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
 
-        .navigationBarTitle("All Talks", displayMode: .inline)
+        .navigationBarTitle(title, displayMode: .inline)
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
@@ -119,17 +137,22 @@ struct TalkRow: View {
 }
 
 struct TalksView: View {
+    var title: String = ""
+    var contentKey: String = ""
     @State var selection: String?  = nil
 
+    /*
     init() {
         for talk in TheDataModel.AllTalks {
             print(talk.Title)
         }
     }
+ */
+ 
 
     var body: some View {
 
-        List(TheDataModel.AllTalks) { talk in
+        List(TheDataModel.getTalkData(key: contentKey)) { talk in
             TalkRow(talk: talk)
                 .onTapGesture {
                     print("talk selected")
@@ -147,191 +170,15 @@ struct TalksView: View {
 }
 
 
-/*
- ******************************************************************************
- * TalkPlayer
- * UI for talk player console
- ******************************************************************************
- */
-
-struct VolumeSlider: UIViewRepresentable {
-    
-   func makeUIView(context: Context) -> MPVolumeView {
-      MPVolumeView(frame: .zero)
-   }
-
-   func updateUIView(_ view: MPVolumeView, context: Context) {}
-}
-
-struct TalkPlayerView: View {
-    var talk: TalkData
-    @State private var isTalkActive = false
-    //@State private var elapsedTime: Double = 0
-    @State private var displayedElapsedTime: String = "00:00:00"
-    
-    @State private var  elapsedTime: Double = 0 {
-      willSet {
-        print("WILLSET")
-
-        print(newValue)
-      }
-    }
-
-    func playTalk() {
-        
-        //let pathMP3 = URL_MP3_HOST + talk.URL
-        let pathMP3 = "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3"
-        if let talkURL = URL(string: pathMP3) {
-        
-            print("URL \(pathMP3)")
-
-            TheTalkPlayer = TalkPlayer()
-            TheTalkPlayer.talkPlayerView = self
-            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
-        }
-    }
-    
-    func pauseTalk () {
-        
-        TheTalkPlayer.pause()
-    }
-    
-    func talkHasCompleted () {
-        
-        print("talkHasCompleted")
-
-        /*
-            TalkPlayerStatus = .FINISHED
-
-            MP3TalkPlayer.stop()
-            CurrentTalkTime = 0
-            resetTalkDisplay()
-
-            // if option is enabled, play the next talk in the current series
-            if PlayEntireAlbum == true {
-
-                // create a new MP3 player.  just to ensure state is fully cleared
-                MP3TalkPlayer = MP3Player()
-                MP3TalkPlayer.Delegate = self
-
-                // and then play next talk in SECONDS_TO_NEXT_TALK seconds
-                Timer.scheduledTimer(timeInterval: SECONDS_TO_NEXT_TALK, target: self, selector: #selector(PlayTalkController.playNextTalk), userInfo: nil, repeats: false)
-            }
-            updateTitleDisplay()
- */
-    }
-    
-    func updateView(){
-
-        print("updateView")
-        CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
-        if CurrentTalkTime > 0 {
-            elapsedTime = Double(CurrentTalkTime)
-            displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
-         
-        }
-        
-
-            // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
-        /*
-            CurrentTalkTime = MP3TalkPlayer.getCurrentTimeInSeconds()
-            if CurrentTalkTime > 0 {
-
-                TalkPlayerStatus = .PLAYING
-
-                disableActivityIcons()
-                enableScanButtons()
-
-                // show current talk time and actual talk duration
-                // note these may be different from what is stated in the (often inaccurate) config!
-                let currentTime = MP3TalkPlayer.getCurrentTimeInSeconds()
-                let duration = MP3TalkPlayer.getDurationInSeconds()
-
-                let fractionTimeCompleted = Float(currentTime) / Float(duration)
-                talkProgressSlider.value = fractionTimeCompleted
-
-                updateTitleDisplay()
-
-                // if play time exceeds reporting threshold and not previously reported, report it
-                if CurrentTalkTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: CurrentTalk) == false {
-
-                    TheDataModel.addToTalkHistory(talk: CurrentTalk)
-                    TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
-                }
-                //MARKPLAYED_TALK_THRESHOLD
-
-                UserDefaults.standard.set(CurrentTalkTime, forKey: "CurrentTalkTime")
-                UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
-
-            }
- */
-    }
-
-
-    var body: some View {
-        
-        ZStack {Color(.orange).opacity(0.2).edgesIgnoringSafeArea(.all)
-        VStack(alignment: .center, spacing: 10) {
-
-            Group {
-            Text(talk.Title)
-                .background(Color.blue)
-                .padding(.trailing, 0)
-                .font(.system(size: 20))
-            Spacer()
-                .frame(height: 10)
-            Text(talk.Speaker)
-                .background(Color.blue)
-                .padding(.trailing, 0)
-                .font(.system(size: 20))
-            
-            Spacer()
-            Text(displayedElapsedTime)
-            Spacer()
-                .frame(height: 10)
-            Button(action: {
-                print("button pressed")
-                print(isTalkActive)
-                isTalkActive = (isTalkActive ? false : true)
-                if isTalkActive {playTalk()} else {pauseTalk()}
-            })
-            {
-                Image(isTalkActive ? "blacksquare" : "tri_right")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-            }
-            .buttonStyle(PlainButtonStyle())
-            }  //end group 1
-            
-            Spacer()
-                .frame(height: 30)
-            Slider(value: $elapsedTime, in: 0...Double(talk.DurationInSeconds))
-                .padding(.trailing, 20)
-                .padding(.leading, 20)
-                .frame(height: 30)
-            Spacer()
-           
-            VolumeSlider()
-               .frame(height: 40)
-               .padding(.horizontal)
-  
-        }  // VStack
-        .foregroundColor(Color.black.opacity(0.7))
-        .padding(.trailing, 0)
-        } // ZStack
-    }
-        //.navigationBarTitle("Play Talk", displayMode: .inline)
-        //.navigationBarHidden(false)
-
-    
-}
-
 
 
 
 struct TestRow: View {
     
     var body: some View {
+        Text("Test Row")
+
+        /*
             HStack {
                 Spacer()
               Text("Hello SwiftUI!")
@@ -342,6 +189,46 @@ struct TestRow: View {
             .font(.headline)
             .frame(height:30)
         }
+ */
+    }
+}
+
+struct TaskRow: View {
+    var body: some View {
+        Text("Task data goes here")
+            .frame(height:40)
+    }
+}
+
+struct SectionRow: View {
+    var body: some View {
+        VStack(spacing: 0){
+        HStack {
+            Spacer()
+            Text("Section")
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.trailing, 0)
+                .font(.system(size: 15))
+
+            Spacer()
+    }.frame(height:30)
+        //.background(Color.black)
+        .background(Color(hex: "333333"))
+
+        
+    }
+    .padding(.leading, -15)
+    .padding(.trailing, -15)
+        .background(Color(hex: "ff0000"))
+
+}
+}
+
+struct TestData: Identifiable {
+    var id = UUID()
+    var title: String
+    var items: [String]
 }
 
 /*
@@ -351,16 +238,14 @@ struct TestRow: View {
  ******************************************************************************
  */
 struct RootView: View {
-    @State var selection: String?  = nil
-    
+    @State var selection: String?  = ""
+    @State var contentKey: String  = ""
+    @State var title: String  = ""
+
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         
-        print("TALKS")
-        for talk in TheDataModel.AllTalks {
-            print(talk.Title)
-        }
-    }
+     }
     
 
     let TEST = [
@@ -369,30 +254,123 @@ struct RootView: View {
 
     ]
     
+    let TEST_SECTIONS = [
+        TestData(title: "Numbers", items: ["1","2","3"]),
+        TestData(title: "Letters", items: ["A","B","C"]),
+        TestData(title: "Symbols", items: ["€","%","&"])
+    ]
+
     
+
     var body: some View {
 
         NavigationView {
-            List(TheDataModel.RootAlbums) { album in
-            
-                if album.Title != "Talks by Series" {
-                    AlbumRow(album: album)
+            List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT)) { album in
+                AlbumRow(album: album)
                     .onTapGesture {
-                        selection = "ALL_TALKS"
-                }
-            }
-            else {
-                TestRow()
-                
-            }
-    
-         }  // end List(albums)
+                        if album.Content.contains("ALBUM") {
+                            print("HERE", album.Content)
+                            selection = "ALBUMS"
+                        } else {
+                            selection = "TALKS"
+                        }
+                        contentKey = album.Content
+                        title = album.Title
+                    }
+         
+            }  // end List(albums)
+            .environment(\.defaultMinListRowHeight, 20)
             //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: TalksView(), tag: "ALL_TALKS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalksView(title: title, contentKey: contentKey), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: AlbumView(title: title, contentKey: contentKey), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
         }
 
     }
+    
+
+/*
+        var body: some View {
+            List {
+                ForEach(TEST_SECTIONS) { section in
+                    Section(header: Text(section.title)) {
+                        
+                        ForEach(TEST) { item in
+                            
+                            AlbumRow(album: item)
+                        }
+                         
+
+                    }
+                }
+                
+                ForEach(TEST_SECTIONS) { section in
+                    Section(header: Text(section.title)) {
+                        
+                        ForEach(TEST) { item in
+                            
+                            AlbumRow(album: item)
+                        }
+                         
+
+                    }
+                }
+
+            }
+        }
+    */
+    
+    /*
+    var body: some View {
+        List {
+                TaskRow()
+                TaskRow()
+                SectionRow()
+                TaskRow()
+
+                TaskRow()
+                TaskRow()
+                TaskRow()
+            
+        }.environment(\.defaultMinListRowHeight, 20)
+    }
+ */
+
+    /*
+    var body: some View {
+        List {
+            Section(header: Text("Important tasks"))
+            {
+                TaskRow()
+                TaskRow()
+                TaskRow()
+            }
+            
+
+            Section(header: Text("Other tasks")) {
+                Group {
+                TaskRow()
+                TaskRow()
+                TaskRow()
+                TaskRow()
+                TaskRow()
+                TaskRow()
+                }
+
+                TaskRow()
+                TaskRow()
+                TaskRow()
+
+                TaskRow()
+                TaskRow()
+                TaskRow()
+
+            }
+        }.environment(\.defaultMinListRowHeight, 10)
+    }
+ 
+ */
+     
 }
 
 
@@ -400,29 +378,12 @@ struct RootView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        //RootView()
-        TalkPlayerView(talk: SelectedTalk)
+        RootView()
+        //TalkPlayerView(talk: SelectedTalk)
     }
 }
 
-/*
- let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)
 
- volumeView.showsRouteButton = true
 
- let iconBlack = UIImage(named: "routebuttonblack")
- let iconGreen = UIImage(named: "routebuttongreen")
- 
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.normal)
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.disabled)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.highlighted)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.selected)
 
- volumeView.tintColor = MAIN_FONT_COLOR
- 
- 
- 
- let point = CGPoint(x: MPVolumeParentView.frame.size.width  / 2,y : (MPVolumeParentView.frame.size.height / 2) + 5)
- volumeView.center = point
- MPVolumeParentView.addSubview(volumeView)
- */
+

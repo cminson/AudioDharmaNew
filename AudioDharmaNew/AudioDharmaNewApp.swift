@@ -12,18 +12,23 @@ import SwiftUI
 struct AudioDharmaNewApp: App {
     
     init() {
-/*
+
+        
         TheDataModel.loadAllData()
         print("Model Loading")
         ModelLoadedSemaphore.wait()
         print("Model Loaded")
- */
+ 
+        for album in TheDataModel.getAlbumData(key: KEY_ALBUMROOT) {
+            print("ALBUM: ", album)
+        }
 
     }
 
     var body: some Scene {
         WindowGroup {
-            TalkPlayerView(talk: SelectedTalk)
+            //TalkPlayerView(talk: SelectedTalk)
+            RootView()
         }
     }
 }
