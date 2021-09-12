@@ -2,7 +2,7 @@
 //  ListTalksView.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 9/8/21.
+//  Created by Christopher Minson on 9/8/21.
 //
 
 import SwiftUI

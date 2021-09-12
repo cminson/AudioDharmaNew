@@ -2,7 +2,7 @@
 //  AudioDharmaNewApp.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 9/1/21.
+//  Created by Christopher Minson on 9/1/21.
 //
 
 import SwiftUI
@@ -19,8 +19,8 @@ struct AudioDharmaNewApp: App {
         ModelLoadedSemaphore.wait()
         print("Model Loaded")
  
-        for album in TheDataModel.getAlbumData(key: KEY_ALBUMROOT) {
-            print("ALBUM: ", album)
+        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS) {
+           //print("ALBUM: ", album)
         }
 
     }

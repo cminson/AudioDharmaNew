@@ -8,30 +8,99 @@
 import SwiftUI
 import UIKit
 
+var TEST : TalkData? = nil
+
 struct TalkRow: View {
     var talk: TalkData
+    
+    init(talk: TalkData) {
+            
+        self.talk = talk
+    }
 
     func getImage(name: String) -> Image {
         
-        print("getimage: ", name)
+        //print("getimage: ", name)
         return Image(name)
+        
     }
-     
+    
+    func test(talk: TalkData) {
+        print(talk)
+        print("TEST")
+        
+    }
+    
+    func getSimilar(talk: TalkData) {
+        print(talk)
+    }
+
+    func markFavorite(talk: TalkData) {
+        print(talk)
+    }
+
+    func makeNote(talk: TalkData) {
+        print(talk)
+    }
+    
+    func share(talk: TalkData) {
+        print(talk)
+    }
+    
+    func download(talk: TalkData) {
+        print(talk)
+    }
+
     var body: some View {
         
         VStack(alignment: .leading) {
-        HStack() {
-            getImage(name: talk.Speaker)
-            .resizable()
-            .frame(width:50, height:50)
-            .background(Color.red)
-            .padding(.leading, -15)
-        Text("\(talk.Title)")
-            .font(.system(size: 14))
-            .background(Color.white)
-        Spacer()
+            HStack() {
+                getImage(name: talk.Speaker)
+                    .resizable()
+                    .frame(width:50, height:50)
+                    .clipShape(Circle())
+                    //.shadow(radius: 10)
+                    //.overlay(Circle().stroke(APP_ICON_COLOR, lineWidth: 2))
+                    .background(Color.white)
+                    .padding(.leading, -15)
+                Spacer()
+                    .frame(width: 6)
+                Text("\(talk.Title)")
+                    .font(.system(size: 14))
+                    .background(Color.white)
+                Spacer()
+                VStack() {
+                    Text(String(talk.Date))
+                        .background(Color.white)
+                        .padding(.trailing, -10)
+                        .font(.system(size: 10))
+                    Spacer()
+                        .frame(height: 8)
+                    Text(talk.DurationDisplay)
+                        .background(Color.white)
+                        .padding(.trailing, -10)
+                        .font(.system(size: 10))
+                }
+                .padding(.trailing, -10)
+                .contextMenu {
+                    Button("Get Similar Talks") {
+                         getSimilar(talk: talk)
+                    }
+                    Button("Favorite Talk") {
+                        markFavorite(talk: talk)
+                    }
+                    Button("Make Note") {
+                        makeNote(talk: talk)
+                    }
+                    Button("Share Talk") {
+                        share(talk: talk)
+                    }
+                    Button("Download Talk") {
+                        download(talk: talk)
+                    }
+                }
+            }
         }
-    }
     .frame(height:40)
     }
 }

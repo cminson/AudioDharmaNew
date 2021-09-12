@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  Test01
 //
-//  Created by Christopher on 8/31/21.
+//  Created by Christopher Minson on 8/31/21.
 //
 //
 
@@ -95,12 +95,13 @@ struct RootView: View {
         
      }
     
-
+/*
     let TEST = [
         AlbumData(title: "All Talks", content:"", section: "", image: "", date: ""),
         AlbumData(title: "Talk by Series", content:"", section: "", image: "", date: "")
 
     ]
+ */
     
     let TEST_SECTIONS = [
         TestData(title: "Numbers", items: ["1","2","3"]),
@@ -113,16 +114,16 @@ struct RootView: View {
     var body: some View {
 
         NavigationView {
-            List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT)) { album in
+            List(TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS)) { album in
                 AlbumRow(album: album)
                     .onTapGesture {
-                        if album.Content.contains("ALBUM") {
-                            print("HERE", album.Content)
+                        if album.Key.contains("ALBUM") {
+                            print("HERE", album.Key)
                             selection = "ALBUMS"
                         } else {
                             selection = "TALKS"
                         }
-                        contentKey = album.Content
+                        contentKey = album.Key
                         title = album.Title
                     }
          
@@ -167,57 +168,6 @@ struct RootView: View {
             }
         }
     */
-    
-    /*
-    var body: some View {
-        List {
-                TaskRow()
-                TaskRow()
-                SectionRow()
-                TaskRow()
-
-                TaskRow()
-                TaskRow()
-                TaskRow()
-            
-        }.environment(\.defaultMinListRowHeight, 20)
-    }
- */
-
-    /*
-    var body: some View {
-        List {
-            Section(header: Text("Important tasks"))
-            {
-                TaskRow()
-                TaskRow()
-                TaskRow()
-            }
-            
-
-            Section(header: Text("Other tasks")) {
-                Group {
-                TaskRow()
-                TaskRow()
-                TaskRow()
-                TaskRow()
-                TaskRow()
-                TaskRow()
-                }
-
-                TaskRow()
-                TaskRow()
-                TaskRow()
-
-                TaskRow()
-                TaskRow()
-                TaskRow()
-
-            }
-        }.environment(\.defaultMinListRowHeight, 10)
-    }
- 
- */
      
 }
 

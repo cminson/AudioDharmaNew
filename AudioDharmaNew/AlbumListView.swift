@@ -2,7 +2,7 @@
 //  AlbumListView.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 9/9/21.
+//  Created by Christopher Minson on 9/9/21.
 //
 
 import SwiftUI
@@ -12,6 +12,13 @@ import UIKit
 
 struct AlbumRow: View {
     var album: AlbumData
+    
+    init(album: AlbumData) {
+            
+        self.album = album
+        print("ALBUM: ", album)
+    }
+
     
     func getImage(name: String) -> Image {
         
@@ -23,23 +30,32 @@ struct AlbumRow: View {
     var body: some View {
         
         VStack(alignment: .leading) {
-        HStack() {
-            getImage(name: album.Image)
-            .resizable()
-            .frame(width:50, height:50)
-            .background(Color.red)
-            .padding(.leading, -15)
-        Text("\(album.Title)")
-            .font(.system(size: 14))
-            .background(Color.white)
-        Spacer()
-        Text("42")
-            .background(Color.white)
-            .padding(.trailing, -10)
-            .font(.system(size: 10))
+            HStack() {
+                getImage(name: album.Image)
+                    .resizable()
+                    .frame(width:50, height:50)
+                    .background(Color.white)
+                    .padding(.leading, -15)
+                Text("\(album.Title)")
+                    .font(.system(size: 14))
+                    .background(Color.white)
+                    .padding(.leading, 0)
+                Spacer()
+                VStack() {
+                    Text(String(album.TalkCount))
+                        .background(Color.white)
+                        .padding(.trailing, -10)
+                        .font(.system(size: 10))
+                    Spacer()
+                        .frame(height: 8)
+                    Text(album.DisplayedDuration)
+                        .background(Color.white)
+                        .padding(.trailing, -10)
+                        .font(.system(size: 10))
+                }
+            }
         }
-    }
-    .frame(height:40)
+        .frame(height:40)
     }
 }
 
@@ -58,14 +74,14 @@ struct AlbumListView: View {
         List(TheDataModel.getAlbumData(key: contentKey)) { album in
             AlbumRow(album: album)
                 .onTapGesture {
-                    if album.Content.contains("ALBUM") {
-                        print("HERE", album.Content)
+                    if album.Key.contains("ALBUM") {
+                        print("HERE", album.Key)
                         selection = "ALBUMS"
                     } else {
                         selection = "TALKS"
                     }
                     
-                    newContentKey = album.Content
+                    newContentKey = album.Key
                     newTitle = album.Title
 
                 }

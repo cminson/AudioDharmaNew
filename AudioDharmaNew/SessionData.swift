@@ -2,7 +2,7 @@
 //  Data.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 9/3/21.
+//  Created by Christopher Minson on 9/3/21.
 //
 
 import Foundation
@@ -17,21 +17,28 @@ struct AlbumData: Identifiable {
     //MARK: Properties
     let id = UUID()
     var Title: String
-    var Content: String
+    var Key: String
     var Section: String
     var Image: String
-    var Date: String
+    var Duration: Int
+    var TalkCount: Int
+    var DisplayedDuration: String
     
-    
-    init(title: String, content: String, section: String, image: String, date: String) {
+    init(title: String, key: String, section: String, image: String,  duration: Int, talkCount: Int, displayedDuration: String) {
         
         Title = title
-        Content = content
+        Key = key
         Section = section
         Image = image
-        Date = date
+        Duration = duration
+        TalkCount = talkCount
+        DisplayedDuration = "HERE"
     }
     
+    mutating func setDuration(duration: Int) {self.Duration = duration}
+    mutating func setDisplayedDuration(displayedDuration: String) {self.DisplayedDuration = displayedDuration}
+    mutating func setTalkCount(talkCount: Int) {self.TalkCount = talkCount}
+
 }
 
 

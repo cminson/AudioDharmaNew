@@ -3,16 +3,16 @@
 //  Model.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 6/22/17.
+//  Created by Christopher Minson on 6/22/17.
 //  Copyright © 2017 Christopher Minson. All rights reserved.
 //
 
+import SwiftUI
 import UIKit
 import Foundation
 import SystemConfiguration
 import os.log
 import ZipArchive
-
 
 
 // MARK: Global Constants and Vars
@@ -35,8 +35,8 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 //let CONFIG_JSON_NAME = "CONFIG00.JSON"
 //let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 
-let CONFIG_JSON_NAME = "DEV.JSON"
-let CONFIG_ZIP_NAME = "DEV.ZIP"
+let CONFIG_JSON_NAME = "TEST.JSON"
+let CONFIG_ZIP_NAME = "TEST.ZIP"
 
 
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
@@ -100,7 +100,7 @@ enum ACTIVITIES {          // all possible activities that are reported back to 
 // App Global Constants
 // talk and album display states.  these are used throughout the app to key on state
 let KEY_HELP = "KEY_HELP"
-let KEY_ALBUMROOT = "Audio Dharma"
+let KEY_ROOT_ALBUMS = "KEY_ROOT_ALBUMS"
 let KEY_ALL_TALKS = "KEY_ALL_TALKS"
 let KEY_SERIES_ALBUMS = "KEY_SERIES_ALBUMS"
 let KEY_SPEAKER_ALBUMS = "KEY_SPEAKER_ALBUMS"
@@ -122,14 +122,14 @@ let KEY_USER_TALKS = "KEY_USER_TALKS"
 let KEY_USEREDIT_TALKS = "KEY_USEREDIT_TALKS"
 let KEY_PLAY_TALK = "KEY_PLAY_TALK"
 
-let BUTTON_SIMILAR_COLOR = UIColor(red:0.80, green:0.12, blue:0.00, alpha:1.0)     //  red #CC1F00
-let BUTTON_FAVORITE_COLOR = UIColor(red:1.00, green:0.55, blue:0.00, alpha:1.0)     //  orange #ff8c00
-let BUTTON_NOTE_COLOR = UIColor(red:0.00, green:0.34, blue:0.80, alpha:1.0)     //  blue #0057CC
-let BUTTON_SHARE_COLOR = UIColor(red:0.38, green:0.73, blue:0.08, alpha:1.0)     //  green #62b914
-let BUTTON_DOWNLOAD_COLOR = UIColor(red:0.80, green:0.12, blue:0.00, alpha:1.0)     //  red #CC1F00
-let BUTTON_PLAYED_COLOR = UIColor(red:0.38, green:0.73, blue:0.08, alpha:1.0)     //  green #62b914
+let BUTTON_SIMILAR_COLOR = Color(red:0.80, green:0.12, blue:0.00)     //  red #CC1F00
+let BUTTON_FAVORITE_COLOR = Color(red:1.00, green:0.55, blue:0.00)     //  orange #ff8c00
+let BUTTON_NOTE_COLOR = Color(red:0.00, green:0.34, blue:0.80)     //  blue #0057CC
+let BUTTON_SHARE_COLOR = Color(red:0.38, green:0.73, blue:0.08)    //  green #62b914
+let BUTTON_DOWNLOAD_COLOR = Color(red:0.80, green:0.12, blue:0.00)     //  red #CC1F00
+let BUTTON_PLAYED_COLOR = Color(red:0.38, green:0.73, blue:0.08)     //  green #62b914
 
-let APP_ICON_COLOR = UIColor(red:0.38, green:0.73, blue:0.08, alpha:1.0)     //  green #62b914
+let APP_ICON_COLOR = Color(red:1.00, green:0.55, blue:0.00)     //  green #ff8c00
 
 let SECTION_BACKGROUND = UIColor.darkGray  // #555555ff
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
@@ -178,11 +178,11 @@ var TheTalkPlayer: TalkPlayer!
 class Model {
     
     //CJM DEV
-    var KeyToAlbums : [String: [AlbumData]] = [:]  // where all albums are stored.  dictionary keyed by content, value is array of albums
-    var KeyToTalks : [String: [TalkData]] = [:]  // where all talks are stored.  dictionary keyed by content, value is array of talks
+    var KeyToAlbums : [String: [AlbumData]] = [:]  // where all albums are stored.  dictionary keyed by "key", value is array of albums
+    var KeyToTalks : [String: [TalkData]] = [:]  // where all talks are stored.  dictionary keyed by "key", value is array of talks
     
     
-    var KeyToAlbumStats: [String: AlbumStats] = [:] // dictionary keyed by content, value is stat struct for Albums
+    var KeyToAlbumStats: [String: AlbumStats] = [:] // dictionary keyed by key, value is stat struct for Albums
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
 
     var UserTalkHistoryAlbum: [TalkHistoryData] = []    // history of talks for user
@@ -310,70 +310,7 @@ class Model {
     }
     
     
-    func downloadSimilarityData(talkFileName: String) {
-    
-        let config = URLSessionConfiguration.default
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        config.urlCache = nil
-        let session = URLSession.init(configuration: config)
-        
-        let similarKeyName = talkFileName.replacingOccurrences(of: ".mp3", with: "")
-        let path = URL_GET_SIMILAR + similarKeyName
-        let requestURL : URL? = URL(string: path)
-        let urlRequest = URLRequest(url : requestURL!)
-        
-        let task = session.dataTask(with: urlRequest) {
-            (data, response, error) -> Void in
-            
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-                HTTPResultCode = httpResponse.statusCode
-            } else {
-                HTTPResultCode = 404
-            }
-            
-            if let responseData = data {
-                if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    HTTPResultCode = 404
-                }
-            }
-            else {
-                HTTPResultCode = 404
-            }
-            
-            if HTTPResultCode == 200 {
-           
-                let content = talkFileName
-
-                var talks = [TalkData] ()
-
-                do {
-                    let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
-                    for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
-                        
-                        let filename = similarTalk["filename"] as? String ?? ""
-                        
-                        if let talk = self.FileNameToTalk[filename] {
-                            talks.append(talk)
-                        }
-                    }
-
-                    self.KeyToTalks[content] = talks
-
-                }
-                catch {
-                    print(error)
-                }
-            }
-        
-            //TheDataModel.refreshAllControllers()
-        }
-        task.resume()
-
-    }
-    
-    
+  
     
     func setHelpPage() {
         
@@ -537,7 +474,7 @@ class Model {
                 self.loadTalks(jsonDict: jsonDict)
                 
                 let albumList = jsonDict["albums"] as? [AnyObject] ?? []
-                self.loadAlbums(albumList: albumList, content: KEY_ALBUMROOT)
+                (_,_) = self.loadAlbums(albumList: albumList, key: KEY_ROOT_ALBUMS)
 
                 //self.loadAlbums(jsonDict: jsonDict])
                 //self.downloadSanghaActivity()
@@ -546,10 +483,12 @@ class Model {
                 print(error)
             }
             
-            self.computeRootAlbumsStats()
-            self.computeSpeakerStats()
-            self.computeSeriesStats()
-            self.computeRecommendedStats()
+            /*
+            for content in self.KeyToAlbums.keys {
+                self.computeAlbumStats(content: content)
+            }
+ */
+
             self.computeUserAlbumStats()
             self.computeNotesStats()
             self.computeUserFavoritesStats()
@@ -676,17 +615,16 @@ class Model {
                 // organize talks into speaker albums
                 if self.KeyToTalks[speaker] == nil {
                     self.KeyToTalks[speaker] = [TalkData] ()
-                    self.KeyToAlbums[KEY_SPEAKER_ALBUMS]?.append(AlbumData(title: speaker, content: speaker, section: "", image: speaker, date: date))
+                    self.KeyToAlbums[KEY_SPEAKER_ALBUMS]?.append(AlbumData(title: speaker, key: speaker, section: "", image: speaker, duration: 0, talkCount: 0, displayedDuration: ""))
                 }
                 self.KeyToTalks[speaker]?.append(talkData)
             
-
                 // organize talks into series albums
                 if series.count > 1 {
                     
                     if self.KeyToTalks[series] == nil {
                         self.KeyToTalks[series] = [TalkData] ()
-                        self.KeyToAlbums[KEY_SERIES_ALBUMS]?.append(AlbumData(title: series, content: series, section: "", image: speaker, date: date))
+                        self.KeyToAlbums[KEY_SERIES_ALBUMS]?.append(AlbumData(title: series, key: series, section: "", image: speaker, duration: 0, talkCount: 0, displayedDuration: ""))
                     }
                     self.KeyToTalks[series]?.append(talkData)
 
@@ -700,91 +638,109 @@ class Model {
         self.KeyToAlbumStats[KEY_ALL_TALKS] = stats
         
         // sort the albums
-        self.KeyToAlbums[KEY_SPEAKER_ALBUMS] = self.KeyToAlbums[KEY_SPEAKER_ALBUMS]?.sorted(by: { $0.Content < $1.Content })
-        self.KeyToAlbums[KEY_SERIES_ALBUMS] = self.KeyToAlbums[KEY_SERIES_ALBUMS]?.sorted(by: { $0.Content < $1.Content })
+        self.KeyToAlbums[KEY_SPEAKER_ALBUMS] = self.KeyToAlbums[KEY_SPEAKER_ALBUMS]?.sorted(by: { $0.Key < $1.Key })
+        self.KeyToAlbums[KEY_SERIES_ALBUMS] = self.KeyToAlbums[KEY_SERIES_ALBUMS]?.sorted(by: { $0.Key < $1.Key })
                 
     }
     
     
-    /*
-     * Load the albums section of the config file.
-     */
-    func loadAlbums(albumList: [AnyObject], content: String) {
+    func loadAlbums(albumList: [AnyObject], key: String)  -> (Int, Int)  {
 
-        print("loadAlbums")
-    
-        for Album in albumList {
+        //print("loadAlbums: ", key, albumList)
+        var totalTalkDuration = 0
+        var totalTalkCount = 0
 
+            for Album in albumList {
+                
+                let childKey = Album["key"] as? String ?? ""
                 let albumSection = Album["section"] as? String ?? ""
                 let title = Album["title"] as? String ?? ""
                 let image = Album["image"] as? String ?? ""
-                let albumContent = Album["content"] as? String ?? ""
-            
+
                 let albumList = Album["albums"] as? [AnyObject] ?? []
+                var albumData =  AlbumData(title: title, key: childKey, section: albumSection, image: image, duration: totalTalkDuration, talkCount: totalTalkCount, displayedDuration: "")
+                //print("Appending: ", albumData, key)
+                if (self.KeyToAlbums[key] == nil) { self.KeyToAlbums[key] = [AlbumData] () }
+
+                var talkCount, talkDuration : Int
                 let talkList = Album["talks"] as? [AnyObject] ?? []
+                if talkList.count > 0 {
+                    var talkCount = 0
+                    var talkDuration = 0
+                    for talk in talkList {
+                        
+                        var URL = talk["url"] as? String ?? ""
+                        let terms = URL.components(separatedBy: "/")
+                        let fileName = terms.last ?? ""
+                        let title = talk["title"] as? String ?? ""
+                        var speaker = ""
+                        var date = ""
+                        var durationDisplay = ""
+                        var pdf = ""
+                        var duration = 0
+                        
+                        // fill in these fields from talk data.  must do this as these fields are not stored in config json (to minimize space and make things
+                        // easier for config reading)
+                        if let talkData = self.FileNameToTalk[fileName] {
+                            URL = talkData.URL
+                            speaker = talkData.Speaker
+                            date = talkData.Date
+                            pdf = talkData.PDF
+                            durationDisplay = talkData.DurationDisplay
+                            duration = talkData.DurationInSeconds
 
-                let albumData =  AlbumData(title: title, content: albumContent, section: albumSection, image: image, date: "")
-            
-                //print("Appending: ", albumData, content)
-                if (self.KeyToAlbums[content] == nil) { self.KeyToAlbums[content] = [AlbumData] () }
-                self.KeyToAlbums[content]?.append(albumData)
-            
-                loadAlbums(albumList: albumList, content: albumContent)
- 
+                        }
+                        
+                        let totalSeconds = self.convertDurationToSeconds(duration: durationDisplay)
+                        
+                        var talkData =  TalkData(title: title,
+                                                 url: URL,
+                                                 fileName: fileName,
+                                                 date: date,
+                                                 durationDisplay: durationDisplay,
+                                                 speaker: speaker,
+                                                 section: "",
+                                                 durationInSeconds: totalSeconds,
+                                                 pdf: pdf)
+                        
+                        if doesTalkHaveTranscript(talk: talkData) {
+                            talkData.Title = talkData.Title + " [transcript]"
+                        }
+                        
+                        if (self.KeyToTalks[childKey] == nil) { self.KeyToTalks[childKey] = [TalkData] () }
+                        self.KeyToTalks[childKey]?.append(talkData)
+                        print("Appending Talk to Key: ", title, childKey)
 
-                // get the optional talk array for this Album
-                // if exists, store off all the talks in keyToTalks keyed by 'content' id
-                // the value for this key is an array of talks
- 
-                for talk in talkList {
-                    
-                    var URL = talk["url"] as? String ?? ""
-                    let terms = URL.components(separatedBy: "/")
-                    let fileName = terms.last ?? ""
-                    let title = talk["title"] as? String ?? ""
-                    var speaker = ""
-                    var date = ""
-                    var durationDisplay = ""
-                    var pdf = ""
-                    
-                    
-                    // fill in these fields from talk data.  must do this as these fields are not stored in config json (to minimize space and make things
-                    // easier for config reading)
-                    if let talkData = self.FileNameToTalk[fileName] {
-                        URL = talkData.URL
-                        speaker = talkData.Speaker
-                        date = talkData.Date
-                        pdf = talkData.PDF
-                        durationDisplay = talkData.DurationDisplay
-                    }
-                    
-                    let totalSeconds = self.convertDurationToSeconds(duration: durationDisplay)
-                    
-                    var talkData =  TalkData(title: title,
-                                             url: URL,
-                                             fileName: fileName,
-                                             date: date,
-                                             durationDisplay: durationDisplay,
-                                             speaker: speaker,
-                                             section: "",
-                                             durationInSeconds: totalSeconds,
-                                             pdf: pdf)
-                    
-                    if doesTalkHaveTranscript(talk: talkData) {
-                        talkData.Title = talkData.Title + " [transcript]"
-                    }
-                    
-                    if (self.KeyToTalks[albumContent] == nil) { self.KeyToTalks[albumContent] = [TalkData] () }
-                    self.KeyToTalks[albumContent]?.append(talkData)
-                 
+                     
+                        talkCount += 1
+                        talkDuration += duration
+
+                    }  // end talk loop
+                    return (talkCount, talkDuration)
                 }
-        } // end Album loop
-    }
+                
+                (talkCount, talkDuration) = loadAlbums(albumList: albumList, key: childKey)
+                totalTalkCount += talkCount
+                totalTalkDuration += talkDuration
+                
+                albumData.setDuration(duration: totalTalkDuration)
+                albumData.setTalkCount(talkCount: totalTalkCount)
+                albumData.setDisplayedDuration(displayedDuration: secondsToDurationDisplay(seconds: totalTalkDuration))
+                print("Appending Album to Key: ", title, key)
+                self.KeyToAlbums[key]?.append(albumData)
+
+                print(albumData)
+                
+
+            } // end album loop
+        
+            return (totalTalkCount, totalTalkDuration)
+        }
     
     
     func getAlbumData(key: String) -> [AlbumData] {
        
-        print("getAlbumdata: ", key)
+        //print("getAlbumdata: ", key)
         let listAlbums = KeyToAlbums[key] as? [AlbumData] ?? []
         
         //print(listAlbums)
@@ -1140,29 +1096,46 @@ class Model {
  */
     }
 
-    
-    
-    func computeRootAlbumsStats() {
+    /*
+    func computeAlbumStats(content: String) {
         
-        //CJM DEV
-        /*
-        for Album in self.KeyToAlbums[KEY_ALBUMROOT]! {
+        guard let listAlbums = KeyToAlbums[content] else {return}
+        
+        var totalSecondsAllLists = 0
+        var talkCountAllLists = 0
+        
+        for album in listAlbums {
             
+            guard let albumContent = KeyToTalks[album.Content] else {continue}
             let talksInAlbum = self.getTalks(content: Album.Content)
-            let talkCount = talksInAlbum.count
             
+            print(album.Content)
             var totalSeconds = 0
-            for talk in talksInAlbum {
+            var talkCount = 0
+            for talk in (KeyToTalks[album.Content])! {
                 totalSeconds += talk.DurationInSeconds
+                talkCount += 1
             }
             
-            let durationDisplay = self.secondsToDurationDisplay(seconds: totalSeconds)
+            talkCountAllLists += talkCount
+            totalSecondsAllLists += totalSeconds
+            let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
             
             let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-            self.KeyToAlbumStats[Album.Content] = stats
+            KeyToAlbumStats[album.Content] = stats
         }
- */
+        
+        let durationDisplayAllLists = secondsToDurationDisplay(seconds: totalSecondsAllLists)
+        
+        let stats = AlbumStats(totalTalks: talkCountAllLists, totalSeconds: totalSecondsAllLists, durationDisplay: durationDisplayAllLists)
+        KeyToAlbumStats[content] = stats
     }
+ */
+
+    
+
+    
+  
     
     //
     // generate the stats for the user-defined albums.
@@ -1197,102 +1170,7 @@ class Model {
         KeyToAlbumStats[KEY_USER_ALBUMS] = stats
     }
     
-    func computeSpeakerStats() {
-        
-        guard let listAlbums = KeyToAlbums[KEY_SPEAKER_ALBUMS] else {return}
-        
-        var totalSecondsAllLists = 0
-        var talkCountAllLists = 0
-        
-        for album in listAlbums {
-            
-            let content = album.Content
-            var totalSeconds = 0
-            var talkCount = 0
-            for talk in (KeyToTalks[content])! {
-                totalSeconds += talk.DurationInSeconds
-                talkCount += 1
-            }
-            
-            talkCountAllLists += talkCount
-            totalSecondsAllLists += totalSeconds
-            let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
-            
-            let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-            KeyToAlbumStats[content] = stats
-        }
-        
-        let durationDisplayAllLists = secondsToDurationDisplay(seconds: totalSecondsAllLists)
-        
-        let stats = AlbumStats(totalTalks: talkCountAllLists, totalSeconds: totalSecondsAllLists, durationDisplay: durationDisplayAllLists)
-        KeyToAlbumStats[KEY_SPEAKER_ALBUMS] = stats
-    }
-    
-    func computeSeriesStats() {
-        
-        guard let listAlbums = KeyToAlbums[KEY_SERIES_ALBUMS] else {return}
 
-        var totalSecondsAllLists = 0
-        var talkCountAllLists = 0
-        
-        for album in listAlbums {
-            
-            let content = album.Content
-            var totalSeconds = 0
-            var talkCount = 0
-            for talk in (KeyToTalks[content])! {
-                totalSeconds += talk.DurationInSeconds
-                talkCount += 1
-            }
-            
-            talkCountAllLists += talkCount
-            totalSecondsAllLists += totalSeconds
-            let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
-            
-            let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-            KeyToAlbumStats[content] = stats
-        }
-        
-        let durationDisplayAllLists = secondsToDurationDisplay(seconds: totalSecondsAllLists)
-        
-        let stats = AlbumStats(totalTalks: talkCountAllLists, totalSeconds: totalSecondsAllLists, durationDisplay: durationDisplayAllLists)
-        KeyToAlbumStats[KEY_SERIES_ALBUMS] = stats
-    }
-    
-    func computeRecommendedStats() {
-        
-        var totalSecondsAllLists = 0
-        var talkCountAllLists = 0
-        
-        //CJM DEV
-        /*
-        for album in RecommendedAlbums {
-            
-            let content = album.Content
-            var totalSeconds = 0
-            var talkCount = 0
-            if let talkList = KeyToTalks[content] {
-                for talk in talkList {
-                    if talk.Section == SECTION_HEADER { continue }
-                    totalSeconds += talk.DurationInSeconds
-                    talkCount += 1
-                }
-            }
-        
-            talkCountAllLists += talkCount
-            totalSecondsAllLists += totalSeconds
-            let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
-            
-            let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-            KeyToAlbumStats[content] = stats
-        }
-        
-        let durationDisplayAllLists = secondsToDurationDisplay(seconds: totalSecondsAllLists)
-        
-        let stats = AlbumStats(totalTalks: talkCountAllLists, totalSeconds: totalSecondsAllLists, durationDisplay: durationDisplayAllLists)
-        KeyToAlbumStats[KEY_RECOMMENDED_TALKS] = stats
- */
-    }
     
     func computeNotesStats() {
         
@@ -1650,11 +1528,11 @@ class Model {
     
    
     
-    func getTalkHistory(content: String) -> [TalkHistoryData] {
+    func getTalkHistory(key: String) -> [TalkHistoryData] {
         
         var talkHistoryList : [TalkHistoryData]
         
-        switch content {
+        switch key {
             
         case KEY_USER_TALKHISTORY:
             var talkHistories = [TalkHistoryData] ()
@@ -1700,15 +1578,15 @@ class Model {
     }
 
     
-    func getAlbumStats(content: String) -> AlbumStats {
+    func getAlbumStats(key: String) -> AlbumStats {
         
         
         var stats: AlbumStats
         
-        switch content {
+        switch key {
         
         case KEY_ALL_TALKS:
-            stats = KeyToAlbumStats[content] ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
+            stats = KeyToAlbumStats[key] ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
         
         case KEY_SANGHA_TALKHISTORY:
             stats = SanghaTalkHistoryStats ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
@@ -1717,7 +1595,7 @@ class Model {
             stats = SanghaShareHistoryStats ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
             
         default:
-            stats =  KeyToAlbumStats[content] ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
+            stats =  KeyToAlbumStats[key] ?? AlbumStats(totalTalks: 0, totalSeconds: 0, durationDisplay: "0:0:0")
             
         }
         
@@ -2217,38 +2095,87 @@ class Model {
     }
 }
     
-
 /*
- *************************************************************************************************
- * Extensions
- *************************************************************************************************
+ * Load the albums section of the config file.
  */
+/*
+func loadAlbums(albumDict: [String: [AnyObject]], key: String) -> (Int, Int) {
 
-import SwiftUI
-import UIKit
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
-        switch hex.count {
-        case 3: // RGB (12-bit)
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6: // RGB (24-bit)
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: // ARGB (32-bit)
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (a, r, g, b) = (1, 1, 1, 0)
+    print("loadAlbums")
+
+    var totalDuration : Int = 0
+    var totalTalkCount : Int = 0
+    
+    for talk in albumDict["talks"]  ?? [] {
+        
+        var URL = talk["url"] as? String ?? ""
+        let terms = URL.components(separatedBy: "/")
+        let fileName = terms.last ?? ""
+        let title = talk["title"] as? String ?? ""
+        var speaker = ""
+        var date = ""
+        var durationDisplay = ""
+        var pdf = ""
+        var duration: Int = 0
+        
+        // fill in these fields from talk data.  must do this as these fields are not stored in config json (to minimize space and make things
+        // easier for config reading)
+        if let talkData = self.FileNameToTalk[fileName] {
+            URL = talkData.URL
+            speaker = talkData.Speaker
+            date = talkData.Date
+            pdf = talkData.PDF
+            durationDisplay = talkData.DurationDisplay
+            duration = talkData.DurationInSeconds
         }
+        
+        let totalSeconds = self.convertDurationToSeconds(duration: durationDisplay)
+        
+        var talkData =  TalkData(title: title,
+                                 url: URL,
+                                 fileName: fileName,
+                                 date: date,
+                                 durationDisplay: durationDisplay,
+                                 speaker: speaker,
+                                 section: "",
+                                 durationInSeconds: totalSeconds,
+                                 pdf: pdf)
+        
+        if doesTalkHaveTranscript(talk: talkData) {
+            talkData.Title = talkData.Title + " [transcript]"
+        }
+        
+        if (self.KeyToTalks[key] == nil) { self.KeyToTalks[key] = [TalkData] () }
+        self.KeyToTalks[key]?.append(talkData)
+        
+        totalTalkCount += 1
+        totalDuration += duration
 
-        self.init(
-            .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue:  Double(b) / 255,
-            opacity: Double(a) / 255
-        )
-    }
+    } // end talk list
+
+    for album in albumDict["albums"] as? [AnyObject] ?? [] {
+
+            let albumSection = album["section"] as? String ?? ""
+            let title = album["title"] as? String ?? ""
+            let image = album["image"] as? String ?? ""
+            let key = album["key"] as? String ?? ""
+        
+            let albumList = album["albums"] as? [AnyObject] ?? []
+            let talkList = album["talks"] as? [AnyObject] ?? []
+
+            var albumTalkCount, albumDuration : Int
+            (albumTalkCount, albumDuration) = loadAlbums(albumDict: album, key: key)
+            aalbumData.TalkCount = albumTalkCount
+
+            let albumData =  AlbumData(title: title, content: albumContent, section: albumSection, image: image, date: "", duration: 0, talkCount: 0, displayedDuration: "")
+    
+            //print("Appending: ", albumData, content)
+            if (self.KeyToAlbums[content] == nil) { self.KeyToAlbums[content] = [AlbumData] () }
+            self.KeyToAlbums[content]?.append(albumData)
+
+
+    } // end Album loop
+    return (totalTalkCount, totalDuration)
 }
+*/
+
