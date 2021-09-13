@@ -66,21 +66,30 @@ struct TalkRow: View {
                 Spacer()
                     .frame(width: 6)
                 Text("\(talk.Title)")
-                    .font(.system(size: 14))
+                    .font(.system(size: 12))
                     .background(Color.white)
                 Spacer()
                 VStack() {
                     Text(String(talk.Date))
                         .background(Color.white)
-                        .padding(.trailing, -10)
+                        .padding(.trailing, -5)
                         .font(.system(size: 10))
                     Spacer()
                         .frame(height: 8)
                     Text(talk.DurationDisplay)
                         .background(Color.white)
-                        .padding(.trailing, -10)
+                        .padding(.trailing, -5)
                         .font(.system(size: 10))
                 }
+                VStack() {
+                    Image("favoritebar")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                    Image("notebar")
+                        .resizable()
+                        .frame(width: 12, height: 12)
+                 }
+
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
@@ -107,8 +116,10 @@ struct TalkRow: View {
 
 struct TalkListView: View {
     var title: String = ""
-    var contentKey: String = ""
+    var key: String = ""
     @State var selection: String?  = nil
+    @State var searchText: String  = ""
+
 
     /*
     init() {
@@ -117,11 +128,18 @@ struct TalkListView: View {
         }
     }
  */
- 
+ /*
+ List(todoItems.filter({ searchText.isEmpty ? true : $0.name.contains(searchText) })) { item in
+    Text(item.name)
+}
+ */
 
     var body: some View {
 
-        List(TheDataModel.getTalkData(key: contentKey)) { talk in
+        SearchBar(text: $searchText)
+           .padding(.top, 0)
+        List(TheDataModel.getTalkData(key: key, filter: searchText)) { talk in
+        
             TalkRow(talk: talk)
                 .onTapGesture {
                     print("talk selected")
@@ -135,6 +153,7 @@ struct TalkListView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
+        
     }
 }
 

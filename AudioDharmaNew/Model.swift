@@ -738,23 +738,45 @@ class Model {
         }
     
     
-    func getAlbumData(key: String) -> [AlbumData] {
-       
-        //print("getAlbumdata: ", key)
-        let listAlbums = KeyToAlbums[key] as? [AlbumData] ?? []
+    func getAlbumData(key: String, filter: String) -> [AlbumData] {
         
-        //print(listAlbums)
-        return listAlbums
+        var searchResults = [AlbumData] ()
+
+        //print("getAlbumdata: ", key)
+        let listAlbums = KeyToAlbums[key] ?? []
+        
+        if filter.isEmpty {
+            return listAlbums
+        } else {
+
+            for album in listAlbums {
+                let searchedData = album.Title.lowercased()
+                if searchedData.contains(filter.lowercased()) {searchResults.append(album)}
+            }
+        }
+        return searchResults
     }
     
     
-    func getTalkData(key: String) -> [TalkData] {
+    // CJM DEV
+    func getTalkData(key: String, filter: String) -> [TalkData] {
        
-        print("getTalkData: ", key)
-        let listTalks = KeyToTalks[key] as? [TalkData] ?? []
+        var searchResults = [TalkData] ()
         
-        //print(listTalks)
-        return listTalks
+        print("getTalkData: ", key)
+        let listTalks = KeyToTalks[key]  ?? []
+
+        if filter.isEmpty {
+            return listTalks
+        } else {
+            
+            for talk in listTalks {
+                let searchedData = talk.Title.lowercased() + " " + talk.Speaker.lowercased() 
+                if searchedData.contains(filter.lowercased()) {searchResults.append(talk)}
+
+            }
+        }
+        return searchResults
     }
 
     

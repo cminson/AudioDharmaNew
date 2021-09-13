@@ -87,8 +87,10 @@ struct TestData: Identifiable {
  */
 struct RootView: View {
     @State var selection: String?  = ""
-    @State var contentKey: String  = ""
+    @State var key: String  = ""
     @State var title: String  = ""
+    @State var searchText: String  = ""
+
 
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
@@ -113,8 +115,9 @@ struct RootView: View {
 
     var body: some View {
 
-        NavigationView {
-            List(TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS)) { album in
+       NavigationView {
+        
+        List(TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "")) { album in
                 AlbumRow(album: album)
                     .onTapGesture {
                         if album.Key.contains("ALBUM") {
@@ -123,21 +126,52 @@ struct RootView: View {
                         } else {
                             selection = "TALKS"
                         }
-                        contentKey = album.Key
+                        key = album.Key
                         title = album.Title
                     }
          
             }  // end List(albums)
             .environment(\.defaultMinListRowHeight, 20)
             //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: TalkListView(title: title, contentKey: contentKey), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: AlbumListView(title: title, contentKey: contentKey), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
+            .toolbar {
+                    ToolbarItemGroup(placement: .bottomBar) {
+                        Button {
+                            // your action here
+                        } label: {
+                            Image(systemName: "calendar")
+                        }
+                        //.buttonStyle(.plain)
+
+                        Spacer()
+                        Button(action: {
+                            print("Edit button was tapped")
+                        }) {
+                            Image(systemName: "note")
+                                .renderingMode(.original)
+
+                        }
+                        Spacer()
+                        Button(action: {
+                            print("Edit button was tapped")
+                        }) {
+                            Image(systemName: "heart.fill")
+                                .renderingMode(.original)
+
+                        }
+                    }
+                }
+
         }
 
     }
     
 
+    
+  
+    
 /*
         var body: some View {
             List {

@@ -62,16 +62,19 @@ struct AlbumRow: View {
 
 struct AlbumListView: View {
     var title: String = ""
-    var contentKey: String = ""
+    var key: String = ""
     @State var selection: String?  = ""
     @State var newTitle: String?  = ""
-    @State var newContentKey: String?  = ""
+    @State var childKey: String?  = ""
+    @State var searchText: String  = ""
 
 
     var body: some View {
 
+        SearchBar(text: $searchText)
+           .padding(.top, 0)
 
-        List(TheDataModel.getAlbumData(key: contentKey)) { album in
+        List(TheDataModel.getAlbumData(key: key, filter: searchText)) { album in
             AlbumRow(album: album)
                 .onTapGesture {
                     if album.Key.contains("ALBUM") {
@@ -81,13 +84,13 @@ struct AlbumListView: View {
                         selection = "TALKS"
                     }
                     
-                    newContentKey = album.Key
+                    childKey = album.Key
                     newTitle = album.Title
 
                 }
         }
-        .background(NavigationLink(destination: TalkListView(title: newTitle!,  contentKey: newContentKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: AlbumListView(title: newTitle!, contentKey: newContentKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkListView(title: newTitle!,  key: childKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: AlbumListView(title: newTitle!, key: childKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(title, displayMode: .inline)
         .navigationBarHidden(false)

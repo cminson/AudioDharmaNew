@@ -19,7 +19,7 @@ struct AudioDharmaNewApp: App {
         ModelLoadedSemaphore.wait()
         print("Model Loaded")
  
-        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS) {
+        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "") {
            //print("ALBUM: ", album)
         }
 
