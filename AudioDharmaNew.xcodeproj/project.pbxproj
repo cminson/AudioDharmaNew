@@ -21,7 +21,7 @@
 		83A2E4C626E0415900F8B531 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */; };
 		83A2E4CE26E0418900F8B531 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4CD26E0418900F8B531 /* Model.swift */; };
 		83D65D5526E2D18200751527 /* SessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D65D5426E2D18200751527 /* SessionData.swift */; };
-		83EB42DB26EACE6C00AD069B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB42DA26EACE6C00AD069B /* Extensions.swift */; };
+		83EB42DB26EACE6C00AD069B /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB42DA26EACE6C00AD069B /* Common.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,7 +54,7 @@
 		83A2E4C726E0415900F8B531 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83A2E4CD26E0418900F8B531 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		83D65D5426E2D18200751527 /* SessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
-		83EB42DA26EACE6C00AD069B /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		83EB42DA26EACE6C00AD069B /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +99,7 @@
 				83A2E4CD26E0418900F8B531 /* Model.swift */,
 				83D65D5426E2D18200751527 /* SessionData.swift */,
 				8376AB1226E3ECAE000F9848 /* StoredData.swift */,
-				83EB42DA26EACE6C00AD069B /* Extensions.swift */,
+				83EB42DA26EACE6C00AD069B /* Common.swift */,
 				83A2E4C226E0415900F8B531 /* Assets.xcassets */,
 				83A2E4C726E0415900F8B531 /* Info.plist */,
 				83A2E4C426E0415900F8B531 /* Preview Content */,
@@ -221,7 +221,7 @@
 				8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */,
 				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83A2E4CE26E0418900F8B531 /* Model.swift in Sources */,
-				83EB42DB26EACE6C00AD069B /* Extensions.swift in Sources */,
+				83EB42DB26EACE6C00AD069B /* Common.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
 				831B775926E9207A0028B88E /* TalkView.swift in Sources */,

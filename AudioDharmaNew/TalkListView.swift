@@ -13,6 +13,13 @@ var TEST : TalkData? = nil
 struct TalkRow: View {
     var talk: TalkData
     
+    @State private var displayNoteDialog = false
+    @State private var textInput = ""
+    
+    @State private var message = ""
+    @State private var textStyle = UIFont.TextStyle.body
+
+    
     init(talk: TalkData) {
             
         self.talk = talk
@@ -40,7 +47,9 @@ struct TalkRow: View {
     }
 
     func makeNote(talk: TalkData) {
-        print(talk)
+        
+       
+        print("makeNote: ", talk)
     }
     
     func share(talk: TalkData) {
@@ -99,7 +108,8 @@ struct TalkRow: View {
                         markFavorite(talk: talk)
                     }
                     Button("Make Note") {
-                        makeNote(talk: talk)
+                        print("Make NOTE")
+                        displayNoteDialog = true
                     }
                     Button("Share Talk") {
                         share(talk: talk)
@@ -110,8 +120,30 @@ struct TalkRow: View {
                 }
             }
         }
+        .popover(isPresented: $displayNoteDialog) {
+            VStack() {
+                Text(talk.Title)
+                    .padding()
+                Spacer()
+                    .frame(height:30)
+                TextView(text: $message, textStyle: $textStyle)
+                    .padding(.horizontal)
+                    .frame(height: 100)
+                    .border(Color.gray)
+                Spacer()
+                    .frame(height:30)
+                Button("Done") {
+                    print("Done", message)
+                    displayNoteDialog = false
+                }
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+
+        }
     .frame(height:40)
     }
+    
+
 }
 
 struct TalkListView: View {
@@ -120,19 +152,6 @@ struct TalkListView: View {
     @State var selection: String?  = nil
     @State var searchText: String  = ""
 
-
-    /*
-    init() {
-        for talk in TheDataModel.AllTalks {
-            print(talk.Title)
-        }
-    }
- */
- /*
- List(todoItems.filter({ searchText.isEmpty ? true : $0.name.contains(searchText) })) { item in
-    Text(item.name)
-}
- */
 
     var body: some View {
 
@@ -156,5 +175,6 @@ struct TalkListView: View {
         
     }
 }
+
 
 
