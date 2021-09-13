@@ -1,10 +1,8 @@
-
 //
 //  Model.swift
-//  AudioDharmaNew
 //
-//  Created by Christopher Minson on 6/22/17.
-//  Copyright © 2017 Christopher Minson. All rights reserved.
+//  Created by Christopher Minson on 9/12/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
 import SwiftUI

@@ -1,8 +1,9 @@
 //
 //  ContentView.swift
-//  Test01
+//  Base album view
 //
 //  Created by Christopher Minson on 8/31/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 //
 

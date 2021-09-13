@@ -1,8 +1,8 @@
 //
 //  Data.swift
-//  AudioDharmaNew
 //
 //  Created by Christopher Minson on 9/3/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
 import Foundation

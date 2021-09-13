@@ -1,8 +1,8 @@
 //
 //  MP3Player.swift
-//  AudioDharmaNew
 //
 //  Created by Christopher Minson on 9/4/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
 import Foundation
