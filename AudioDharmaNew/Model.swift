@@ -476,6 +476,7 @@ class Model {
                 self.loadTalks(jsonDict: jsonDict)
                 
                 let albumList = jsonDict["albums"] as? [AnyObject] ?? []
+                print(albumList)
                 (_,_) = self.loadAlbums(albumList: albumList, key: KEY_ROOT_ALBUMS)
 
                 //self.loadAlbums(jsonDict: jsonDict])
@@ -667,7 +668,7 @@ class Model {
 
                 let albumList = Album["albums"] as? [AnyObject] ?? []
                 var albumData =  AlbumData(title: title, key: childKey, section: albumSection, image: image, duration: totalTalkDuration, talkCount: totalTalkCount, displayedDuration: "")
-                //print("Appending: ", albumData, key)
+                print("Appending: ", albumData, key)
                 if (self.KeyToAlbums[key] == nil) { self.KeyToAlbums[key] = [AlbumData] () }
 
                 var talkCount, talkDuration : Int
@@ -936,12 +937,13 @@ class Model {
  */
     }
     
-    func downloadMP3(talk: TalkData) {
+    func download(talk: TalkData, completion: @escaping  () -> Int) {
         
         var requestURL: URL
         var localPathMP3: String
         
         DownloadInProgress = true
+        
         
         // remote source path for file
         if USE_NATIVE_MP3PATHS == true {
@@ -996,11 +998,12 @@ class Model {
             // if got a good response, store off file locally
             if HTTPResultCode == 200 {
                 
-                //print("Storing MP3 To: ", localPathMP3)
+                print("Storing talk To: ", localPathMP3)
                 do {
                     if let responseData = data {
                         try responseData.write(to: URL(fileURLWithPath: localPathMP3))
                     }
+                    print("Talk Stored")
                 }
                 catch  {
                     //print("Failed writing to URL: \(localPathMP3), Error: " + error.localizedDescription)  // fatal
@@ -1012,6 +1015,10 @@ class Model {
                 self.UserDownloads[talk.FileName]?.DownloadCompleted = "YES"
                 self.saveUserDownloadData()
                 TheDataModel.DownloadInProgress = false
+                print("calling callback")
+                let result = completion()
+
+                
             }
             
             //self.refreshAllControllers()
@@ -1019,6 +1026,7 @@ class Model {
 
         }
         task.resume()
+
     }
 
     
@@ -1893,9 +1901,10 @@ class Model {
         refreshAllControllers()
     }
     
-    func isDownloadTalk(talk: TalkData) -> Bool {
+    func isDownloaded(talk: TalkData) -> Bool {
         
         let isDownload = UserDownloads[talk.FileName] != nil
+        print("isDownloaded \(talk.Title): \(isDownload)")
         return isDownload
         
     }

@@ -95,7 +95,11 @@ struct RootView: View {
 
     init() {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
-        
+        print("ROOT ALBUMS")
+        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "") {
+            print(album.Title)
+            
+        }
      }
     
 /*

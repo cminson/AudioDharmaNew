@@ -16,9 +16,15 @@ struct TalkRow: View {
     
     @State private var display = false
     @State private var displayNoteDialog = false
+    @State private var displayDownloadDialog = false
+
     @State private var noteText = ""
     @State var stateImageFavorite : String
     @State var stateImageNote: String
+    @State var stateTalkTitle: String
+    @State var stateTalkTitleColor: Color
+
+    
     @State private var textStyle = UIFont.TextStyle.body
 
     init(talk: TalkData) {
@@ -34,7 +40,29 @@ struct TalkRow: View {
         } else {
             self.stateImageNote = "whiterect"
         }
+        
+        stateTalkTitle = talk.Title
+        if TheDataModel.isDownloaded(talk: talk) {
+            self.stateTalkTitleColor = Color.red
+        } else {
+            self.stateTalkTitleColor = Color.black
+        }
+
+        if TheDataModel.isDownloadInProgress(talk: talk) {
+            self.stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+            self.stateTalkTitleColor = Color.red
+        }
     }
+    
+    
+    func downloadComplete() -> Int {
+        print("downloadComplete")
+
+        return 1
+        
+
+    }
+
     
     var body: some View {
         
@@ -42,14 +70,15 @@ struct TalkRow: View {
             HStack() {
                 Image(talk.Speaker)
                     .resizable()
-                    .frame(width:50, height:50)
+                    .frame(width:40, height:40)
                     .clipShape(Circle())
                     .background(Color.white)
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
-                Text("\(talk.Title)")
+                Text("\(stateTalkTitle)")
                     .font(.system(size: 12))
+                    .foregroundColor(stateTalkTitleColor)
                     .background(Color.white)
                 Spacer()
                 VStack() {
@@ -93,9 +122,24 @@ struct TalkRow: View {
                     Button("Share Talk") {
                     }
                     Button("Download Talk") {
+                        print("download talk")
+                        displayDownloadDialog = true
                     }
                 }
             }
+            .alert(isPresented: $displayDownloadDialog) {
+                Alert(
+                    title: Text("Download Text"),
+                    message: Text("Download talk to your device."),
+                    primaryButton: .destructive(Text("Download")) {
+                        stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+                        TheDataModel.download(talk: talk, completion: downloadComplete)
+                        TheDataModel.setTalkAsDownload(talk: talk)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+
         }
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
