@@ -10,66 +10,40 @@ import UIKit
 
 var TEST : TalkData? = nil
 
+
 struct TalkRow: View {
     var talk: TalkData
     
+    @State private var display = false
     @State private var displayNoteDialog = false
-    @State private var textInput = ""
-    
-    @State private var message = ""
+    @State private var noteText = ""
+    @State var stateImageFavorite : String
+    @State var stateImageNote: String
     @State private var textStyle = UIFont.TextStyle.body
 
-    
     init(talk: TalkData) {
-            
+        
         self.talk = talk
-    }
-
-    func getImage(name: String) -> Image {
-        
-        //print("getimage: ", name)
-        return Image(name)
-        
-    }
-    
-    func test(talk: TalkData) {
-        print(talk)
-        print("TEST")
-        
+        if TheDataModel.isFavoriteTalk(talk: talk) {
+            self.stateImageFavorite = "favoritebar"
+        } else {
+            self.stateImageFavorite = "whiterect"
+        }
+        if TheDataModel.isNotatedTalk(talk: talk) {
+            self.stateImageNote = "notebar"
+        } else {
+            self.stateImageNote = "whiterect"
+        }
     }
     
-    func getSimilar(talk: TalkData) {
-        print(talk)
-    }
-
-    func markFavorite(talk: TalkData) {
-        print(talk)
-    }
-
-    func makeNote(talk: TalkData) {
-        
-       
-        print("makeNote: ", talk)
-    }
-    
-    func share(talk: TalkData) {
-        print(talk)
-    }
-    
-    func download(talk: TalkData) {
-        print(talk)
-    }
-
     var body: some View {
         
         VStack(alignment: .leading) {
             HStack() {
-                getImage(name: talk.Speaker)
+                Image(talk.Speaker)
                     .resizable()
                     .frame(width:50, height:50)
                     .clipShape(Circle())
-                    //.shadow(radius: 10)
-                    //.overlay(Circle().stroke(APP_ICON_COLOR, lineWidth: 2))
                     .background(Color.white)
                     .padding(.leading, -15)
                 Spacer()
@@ -91,31 +65,34 @@ struct TalkRow: View {
                         .font(.system(size: 10))
                 }
                 VStack() {
-                    Image("favoritebar")
+ 
+                    Image(self.stateImageFavorite)
                         .resizable()
                         .frame(width: 12, height: 12)
-                    Image("notebar")
+                    Image(self.stateImageNote)
                         .resizable()
                         .frame(width: 12, height: 12)
-                 }
 
+                 }
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
-                         getSimilar(talk: talk)
                     }
                     Button("Favorite Talk") {
-                        markFavorite(talk: talk)
+                        let isFavorite = TheDataModel.toggleTalkAsFavorite(talk: talk)
+                        if isFavorite {
+                            self.stateImageFavorite = "favoritebar"
+                        } else {
+                            self.stateImageFavorite = "whiterect"
+                        }
                     }
                     Button("Make Note") {
-                        print("Make NOTE")
+                        noteText = TheDataModel.getNoteForTalk(talk: talk)
                         displayNoteDialog = true
                     }
                     Button("Share Talk") {
-                        share(talk: talk)
                     }
                     Button("Download Talk") {
-                        download(talk: talk)
                     }
                 }
             }
@@ -126,15 +103,23 @@ struct TalkRow: View {
                     .padding()
                 Spacer()
                     .frame(height:30)
-                TextView(text: $message, textStyle: $textStyle)
+                TextView(text: $noteText, textStyle: $textStyle)
                     .padding(.horizontal)
                     .frame(height: 100)
                     .border(Color.gray)
                 Spacer()
                     .frame(height:30)
                 Button("Done") {
-                    print("Done", message)
+                    print("Done", noteText)
+                    TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
                     displayNoteDialog = false
+                    let isNoted = TheDataModel.isNotatedTalk(talk: talk)
+                    if isNoted {
+                        self.stateImageNote = "notebar"
+                    } else {
+                        self.stateImageNote = "whiterect"
+                    }
+
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)

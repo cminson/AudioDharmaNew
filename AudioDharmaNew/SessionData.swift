@@ -12,7 +12,7 @@ import UIKit
 import os.log
 
 
-struct AlbumData: Identifiable {
+class AlbumData: Identifiable {
     
     //MARK: Properties
     let id = UUID()
@@ -34,15 +34,11 @@ struct AlbumData: Identifiable {
         TalkCount = talkCount
         DisplayedDuration = "HERE"
     }
-    
-    mutating func setDuration(duration: Int) {self.Duration = duration}
-    mutating func setDisplayedDuration(displayedDuration: String) {self.DisplayedDuration = displayedDuration}
-    mutating func setTalkCount(talkCount: Int) {self.TalkCount = talkCount}
 
 }
 
 
-struct TalkData: Identifiable {
+class TalkData: Identifiable {
     
     // MARK: Properties
     let id = UUID()

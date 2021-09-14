@@ -16,13 +16,13 @@ struct AlbumRow: View {
     init(album: AlbumData) {
             
         self.album = album
-        print("ALBUM: ", album)
+        //print("ALBUM: ", album)
     }
 
     
     func getImage(name: String) -> Image {
         
-        print("getimage: ", name)
+        //print("getimage: ", name)
         return Image(name)
     }
 
