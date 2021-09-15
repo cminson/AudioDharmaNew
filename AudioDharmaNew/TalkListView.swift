@@ -8,6 +8,16 @@
 import SwiftUI
 import UIKit
 
+var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
+                                       url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
+                                       fileName: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
+                                       date: "2021.09.01",
+                                       durationDisplay: "16:47",
+                                       speaker: "Kim Allen",
+                                       section: "",
+                                       durationInSeconds: 1007,
+                                       pdf: "")
+
 var TEST : TalkData? = nil
 
 
@@ -17,6 +27,7 @@ struct TalkRow: View {
     @State private var display = false
     @State private var displayNoteDialog = false
     @State private var displayDownloadDialog = false
+    @State private var displayShareSheet = false
 
     @State private var noteText = ""
     @State var stateImageFavorite : String
@@ -59,8 +70,6 @@ struct TalkRow: View {
         print("downloadComplete")
 
         return 1
-        
-
     }
 
     
@@ -70,7 +79,7 @@ struct TalkRow: View {
             HStack() {
                 Image(talk.Speaker)
                     .resizable()
-                    .frame(width:40, height:40)
+                    .frame(width: SPEAKER_IMAGE_WIDTH, height: SPEAKER_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .background(Color.white)
                     .padding(.leading, -15)
@@ -120,6 +129,7 @@ struct TalkRow: View {
                         displayNoteDialog = true
                     }
                     Button("Share Talk") {
+                        self.displayShareSheet = true
                     }
                     Button("Download Talk") {
                         print("download talk")
@@ -139,6 +149,14 @@ struct TalkRow: View {
                     secondaryButton: .cancel()
                 )
             }
+            .sheet(isPresented: $displayShareSheet) {
+                let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
+                let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!
+                let sharedObjects:[AnyObject] = [objectsToShare as AnyObject, shareText as AnyObject]
+
+                ShareSheet(activityItems: sharedObjects)
+            }
+
 
         }
         .popover(isPresented: $displayNoteDialog) {
@@ -186,7 +204,7 @@ struct TalkListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(TheDataModel.getTalkData(key: key, filter: searchText)) { talk in
+        List(TheDataModel.getTalks(key: key, filter: searchText)) { talk in
         
             TalkRow(talk: talk)
                 .onTapGesture {

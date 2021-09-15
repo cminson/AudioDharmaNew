@@ -8,6 +8,25 @@
 
 import SwiftUI
 
+
+
+//
+// Global Constants
+//
+let SPEAKER_IMAGE_HEIGHT : CGFloat = 40.0
+let SPEAKER_IMAGE_WIDTH : CGFloat = 40.0
+
+let APP_ICON_COLOR = Color(red:1.00, green:0.55, blue:0.00)     //  green #ff8c00
+let SECTION_BACKGROUND = UIColor.darkGray  // #555555ff
+let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
+let SECONDARY_FONT_COLOR = UIColor.gray
+let SECTION_TEXT = UIColor.white
+
+var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
+
+
+
+
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -130,3 +149,24 @@ struct TextView: UIViewRepresentable {
     }
 }
 
+struct ShareSheet: UIViewControllerRepresentable {
+    typealias Callback = (_ activityType: UIActivity.ActivityType?, _ completed: Bool, _ returnedItems: [Any]?, _ error: Error?) -> Void
+    
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+    let excludedActivityTypes: [UIActivity.ActivityType]? = nil
+    let callback: Callback? = nil
+    
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities)
+        controller.excludedActivityTypes = excludedActivityTypes
+        controller.completionWithItemsHandler = callback
+        return controller
+    }
+    
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        // nothing to do here
+    }
+}

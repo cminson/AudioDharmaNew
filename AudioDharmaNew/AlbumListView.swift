@@ -33,7 +33,7 @@ struct AlbumRow: View {
             HStack() {
                 getImage(name: album.Image)
                     .resizable()
-                    .frame(width:50, height:50)
+                    .frame(width: SPEAKER_IMAGE_WIDTH, height:SPEAKER_IMAGE_HEIGHT)
                     .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")

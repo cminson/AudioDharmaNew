@@ -11,74 +11,6 @@ import SwiftUI
 import UIKit
 
 
-var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
-                                       url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
-                                       fileName: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
-                                       date: "2021.09.01",
-                                       durationDisplay: "16:47",
-                                       speaker: "Kim Allen",
-                                       section: "",
-                                       durationInSeconds: 1007,
-                                       pdf: "")
-
-
-struct TestRow: View {
-    
-    var body: some View {
-        Text("Test Row")
-
-        /*
-            HStack {
-                Spacer()
-              Text("Hello SwiftUI!")
-                Spacer()
-            }
-            .background(Color.black)
-            .foregroundColor(.white)
-            .font(.headline)
-            .frame(height:30)
-        }
- */
-    }
-}
-
-struct TaskRow: View {
-    var body: some View {
-        Text("Task data goes here")
-            .frame(height:40)
-    }
-}
-
-struct SectionRow: View {
-    var body: some View {
-        VStack(spacing: 0){
-        HStack {
-            Spacer()
-            Text("Section")
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.trailing, 0)
-                .font(.system(size: 15))
-
-            Spacer()
-    }.frame(height:30)
-        //.background(Color.black)
-        .background(Color(hex: "333333"))
-
-        
-    }
-    .padding(.leading, -15)
-    .padding(.trailing, -15)
-        .background(Color(hex: "ff0000"))
-
-}
-}
-
-struct TestData: Identifiable {
-    var id = UUID()
-    var title: String
-    var items: [String]
-}
 
 /*
  ******************************************************************************
@@ -101,22 +33,7 @@ struct RootView: View {
             
         }
      }
-    
-/*
-    let TEST = [
-        AlbumData(title: "All Talks", content:"", section: "", image: "", date: ""),
-        AlbumData(title: "Talk by Series", content:"", section: "", image: "", date: "")
-
-    ]
- */
-    
-    let TEST_SECTIONS = [
-        TestData(title: "Numbers", items: ["1","2","3"]),
-        TestData(title: "Letters", items: ["A","B","C"]),
-        TestData(title: "Symbols", items: ["€","%","&"])
-    ]
-
-    
+        
 
     var body: some View {
 
@@ -172,42 +89,7 @@ struct RootView: View {
         }
 
     }
-    
-
-    
-  
-    
-/*
-        var body: some View {
-            List {
-                ForEach(TEST_SECTIONS) { section in
-                    Section(header: Text(section.title)) {
-                        
-                        ForEach(TEST) { item in
-                            
-                            AlbumRow(album: item)
-                        }
-                         
-
-                    }
-                }
-                
-                ForEach(TEST_SECTIONS) { section in
-                    Section(header: Text(section.title)) {
-                        
-                        ForEach(TEST) { item in
-                            
-                            AlbumRow(album: item)
-                        }
-                         
-
-                    }
-                }
-
-            }
-        }
-    */
-     
+         
 }
 
 
