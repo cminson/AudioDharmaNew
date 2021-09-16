@@ -134,6 +134,7 @@ let DATA_ALBUMS: [String] = ["DATA00", "DATA01", "DATA02", "DATA03", "DATA04", "
 
 
 var TheTalkPlayer: TalkPlayer!
+var RootAlbum: AlbumData? = nil
 
 class Model {
     
@@ -417,10 +418,7 @@ class Model {
                 self.loadTalks(jsonDict: jsonDict)
                 
                 let albumList = jsonDict["albums"] as? [AnyObject] ?? []
-                for album in albumList {
-                    print(album["title"] as? String ?? "NONE")
-                }
-                (_,_) = self.loadAlbums(albumDictList: albumList,  talkDictList : [],  key: KEY_ROOT_ALBUMS)
+                self.loadAlbums(albumDictList: albumList,  talkDictList : [],  key: KEY_ROOT_ALBUMS)
 
                 //self.loadAlbums(jsonDict: jsonDict])
                 //self.downloadSanghaActivity()
@@ -429,11 +427,7 @@ class Model {
                 print(error)
             }
             
-            /*
-            for content in self.KeyToAlbums.keys {
-                self.computeAlbumStats(content: content)
-            }
- */
+   
 
             self.computeUserAlbumStats()
             self.computeNotesStats()
@@ -472,6 +466,11 @@ class Model {
 
             self.UserShareHistoryAlbum = TheDataModel.loadShareHistoryData()
             self.computeShareHistoryStats()
+            
+            //CJM DEV
+            if let rootAlbum = RootAlbum {
+                (_,_) = self.xtest(album: rootAlbum)
+            }
 
             
             print("Model Signaling Loaded")
@@ -491,17 +490,17 @@ class Model {
        // if let config = jsonDict["config"] {
         if let config = jsonDict["config"] {
 
-            print("URL_MP3_HOST: ", config["URL_MP3_HOST"] as? String ?? "ERROR URL_MP3_HOST")
+            //print("URL_MP3_HOST: ", config["URL_MP3_HOST"] as? String ?? "ERROR URL_MP3_HOST")
 
             URL_MP3_HOST = config["URL_MP3_HOST"] as? String ?? URL_MP3_HOST
-            print("URL_MP3_HOST: ", URL_MP3_HOST)
+            //print("URL_MP3_HOST: ", URL_MP3_HOST)
 
             USE_NATIVE_MP3PATHS = config["USE_NATIVE_MP3PATHS"] as? Bool ?? USE_NATIVE_MP3PATHS
             //print("User Native MP3 Paths: ", USE_NATIVE_MP3PATHS)
         
             URL_REPORT_ACTIVITY = config["URL_REPORT_ACTIVITY"] as? String ?? URL_REPORT_ACTIVITY
             URL_GET_ACTIVITY = config["URL_GET_ACTIVITY"] as? String ?? URL_GET_ACTIVITY
-            print("URL_GET_ACTIVITY: ", URL_GET_ACTIVITY)
+            //print("URL_GET_ACTIVITY: ", URL_GET_ACTIVITY)
 
             URL_DONATE = config["URL_DONATE"] as? String ?? URL_DONATE
         
@@ -594,13 +593,11 @@ class Model {
     }
     
     
-    func loadAlbums(albumDictList: [AnyObject], talkDictList : [AnyObject], key: String)  -> (Int, Int)  {
+    func loadAlbums(albumDictList: [AnyObject], talkDictList : [AnyObject], key: String)  {
 
-        print("LOADALBUMS BEGINS")
+        //print("LOADALBUMS BEGINS")
  
-        var talkCount = 0
-        var talkDuration = 0
-        
+
         if (self.KeyToAlbums[key] == nil) { self.KeyToAlbums[key] = [AlbumData] () }
 
         for albumDict in albumDictList {
@@ -612,17 +609,17 @@ class Model {
             let childAlbumDictList = albumDict["albums"] as? [AnyObject] ?? []
             let talkDictList = albumDict["talks"] as? [AnyObject] ?? []
             
-            print(title, talkDictList)
+            //print(title, talkDictList)
             
-            var album =  AlbumData(title: title, key: childKey, section: albumSection, image: image, duration: talkDuration, talkCount: talkCount, displayedDuration: "")
+            let album =  AlbumData(title: title, key: childKey, section: albumSection, image: image, duration: 0, talkCount: 0, displayedDuration: "")
             
+            //if key == KEY_ROOT_ALBUMS {RootAlbum = album}
+
+
             self.KeyToAlbums[key]?.append(album)
-            (talkCount, talkDuration) = loadAlbums(albumDictList: childAlbumDictList, talkDictList: talkDictList, key: childKey)
-            album.TalkCount = talkCount
-            album.Duration +=  talkDuration
-            album.DisplayedDuration = secondsToDurationDisplay(seconds: album.Duration)
+            loadAlbums(albumDictList: childAlbumDictList, talkDictList: talkDictList, key: childKey)
          
-            print("Appending album \(album.Title) to key \(key)")
+            //print("Appending album \(album.Title) to key \(key)")
         } // end album loop
 
             for talkDict in talkDictList {
@@ -631,20 +628,16 @@ class Model {
                     let fileName = getFileName(path: talkDict["url"] as? String ?? "")
                     if let talk = self.FileNameToTalk[fileName] {
                         
-                        let duration = talk.DurationInSeconds
                         
                         if (self.KeyToTalks[key] == nil) { self.KeyToTalks[key] = [TalkData] () }
                         self.KeyToTalks[key]?.append(talk)
-                        print("Appending Talk to Key: ", talk.Title, key)
+                        //print("Appending Talk to Key: ", talk.Title, key)
                      
-                        talkCount += 1
-                        talkDuration += duration
-                    } // end if let
+                     } // end if let
                 } // end talk loop
              
         
-            print("LOADALBUM RETURNS")
-            return (talkCount, talkDuration)
+            //print("LOADALBUM RETURNS")
         }
     
     
@@ -671,7 +664,7 @@ class Model {
     // CJM DEV
     func getTalks(key: String, filter: String) -> [TalkData] {
        
-        print("getTalks: ", key)
+        //print("getTalks: ", key)
         var talkList : [TalkData]
         var searchResults = [TalkData] ()
         
@@ -2085,5 +2078,106 @@ class Model {
             }
             }.resume()
     }
-}
+
+        
+    func computeAlbumStats(albumList: [AlbumData], talkList : [TalkData], key: String)  -> (Int, Int)  {
+
+            print("computeStates")
+     
+            var totalTalks = 0
+            var totalDuration = 0
+            
+            for album in albumList {
+                var talkCount = 0
+                var talkDuration = 0
+                    
+                let childKey = album.Key
+                let childAlbumList = KeyToAlbums[childKey] ?? []
+                let childTalkList = self.getTalks(key: childKey, filter: "")
+
+                (talkCount, talkDuration) = computeAlbumStats(albumList: childAlbumList, talkList: childTalkList, key: childKey)
+                album.TalkCount = talkCount
+                album.Duration +=  talkDuration
+                album.DisplayedDuration = secondsToDurationDisplay(seconds: album.Duration)
+             
+            } // end album loop
+            for talk in talkList {
+                        
+                totalDuration += talk.DurationInSeconds
+                totalTalks += 1
     
+            } // end talk loop
+                 
+            return (totalTalks, totalDuration)
+        }
+
+
+    func xtest(album: AlbumData)  -> (Int, Int)  {
+
+        print("test")
+        print(album, album.Key)
+        let albumList = KeyToAlbums[album.Key] ?? []
+        let talkList = self.getTalks(key: album.Key, filter: "")
+
+        var totalTalks = 0
+        var totalDuration = 0
+        
+        for childAlbum in albumList {
+            var talkCount = 0
+            var talkDuration = 0
+                
+            (talkCount, talkDuration) = xtest(album: childAlbum)
+            print(talkCount, talkDuration)
+            childAlbum.TalkCount = talkCount
+            childAlbum.Duration =  talkDuration
+            childAlbum.DisplayedDuration = secondsToDurationDisplay(seconds: childAlbum.Duration)
+            
+            album.TalkCount += childAlbum.TalkCount
+            album.Duration += childAlbum.Duration
+         
+        }
+        for talk in talkList {
+                    
+            totalDuration += talk.DurationInSeconds
+            totalTalks += 1
+        }
+             
+        return (totalTalks, totalDuration)
+    }
+}
+
+/*
+ 
+ func computeRecommendedStats() {
+     
+     var totalSecondsAllLists = 0
+     var talkCountAllLists = 0
+     
+     for album in RecommendedAlbums {
+         
+         let content = album.Content
+         var totalSeconds = 0
+         var talkCount = 0
+         if let talkList = KeyToTalks[content] {
+             for talk in talkList {
+                 if talk.Section == SECTION_HEADER { continue }
+                 totalSeconds += talk.DurationInSeconds
+                 talkCount += 1
+             }
+         }
+     
+         talkCountAllLists += talkCount
+         totalSecondsAllLists += totalSeconds
+         let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
+         
+         let stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
+         KeyToAlbumStats[content] = stats
+     }
+     
+     let durationDisplayAllLists = secondsToDurationDisplay(seconds: totalSecondsAllLists)
+     
+     let stats = AlbumStats(totalTalks: talkCountAllLists, totalSeconds: totalSecondsAllLists, durationDisplay: durationDisplayAllLists)
+     KeyToAlbumStats[KEY_RECOMMENDED_TALKS] = stats
+ }
+ 
+*/

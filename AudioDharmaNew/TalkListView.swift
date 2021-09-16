@@ -215,7 +215,7 @@ struct TalkListView: View {
         }
         .background(NavigationLink(destination: TalkPlayerView(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
 
-        .navigationBarTitle("All Talks", displayMode: .inline)
+        //.navigationBarTitle("All Talks", displayMode: .inline)
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())

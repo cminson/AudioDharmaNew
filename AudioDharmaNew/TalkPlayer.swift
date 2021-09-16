@@ -59,7 +59,6 @@ class TalkPlayer : NSObject {
     func startTalk(talkURL: URL, startAtTime: Int){
         
         print("startTalk")
-        print(talkURL)
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true

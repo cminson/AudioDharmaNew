@@ -56,38 +56,34 @@ struct TalkPlayerView: View {
     @State private var displayedElapsedTime: String = "00:00:00"
     @State private var sliderUpdating = false
     
-    /*
-        @State private var  elapsedTime: Double = 0 {
-      willSet {
-        print("WILLSET")
-        //TheTalkPlayer.seekToTime(seconds: Int64(newValue))
-        print(newValue)
-      }
-    }
- */
-
+    
     func playTalk() {
         
-        //let pathMP3 = URL_MP3_HOST + talk.URL
-        let pathMP3 = "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3"
-        if let talkURL = URL(string: pathMP3) {
+        print(URL_MP3_HOST + talk.URL)
         
-            print("URL \(pathMP3)")
-
+        var startAtTime = 0
+        if TalkPlayerStatus == .PAUSED {
+            startAtTime = CurrentTalkTime
+        }
+        
+        if let talkURL = URL(string: URL_MP3_HOST + talk.URL) {
             TheTalkPlayer = TalkPlayer()
             TheTalkPlayer.talkPlayerView = self
-            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: 0)
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: startAtTime)
         }
     }
     
     func pauseTalk () {
         
         TheTalkPlayer.pause()
+        TalkPlayerStatus = .PAUSED
     }
     
     func talkHasCompleted () {
         
         print("talkHasCompleted")
+        TalkPlayerStatus = .FINISHED
+
 
         /*
             TalkPlayerStatus = .FINISHED
@@ -121,6 +117,8 @@ struct TalkPlayerView: View {
             if CurrentTalkTime > 0 {
                 elapsedTime = Double(CurrentTalkTime)
                 displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
+                
+                TalkPlayerStatus = .PLAYING
         }
          
     }
@@ -161,46 +159,96 @@ struct TalkPlayerView: View {
  */
     }
 
+    /*
+    if TheDataModel.isDownloaded(talk: talk) {
+        .foreground(Color.black)
+    } else {
+        .foreground(Color.red)
+    }
+    */
 
     var body: some View {
         
-        ZStack {Color(.orange).opacity(0.2).edgesIgnoringSafeArea(.all)
+        //ZStack {Color(.white).opacity(0.2).edgesIgnoringSafeArea(.all)
         VStack(alignment: .center, spacing: 10) {
 
             Group {
-            Text(talk.Title)
-                .background(Color.blue)
-                .padding(.trailing, 0)
-                .font(.system(size: 20))
+            Spacer()
+                .frame(height: 5)
+           Text(talk.Title)
+                .background(Color.white)
+                .padding(.trailing, 15)
+                .padding(.leading, 15)
+                .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 10)
-            Text(talk.Speaker)
-                .background(Color.blue)
+                Text(talk.Speaker)
+                .background(Color.white)
                 .padding(.trailing, 0)
-                .font(.system(size: 20))
-            
+                .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
-            Text(displayedElapsedTime)
-                .font(.system(size: 20, weight: .heavy))
+                .frame(height: 10)
+            HStack() {
+                Button(action: {
+                    print("left pressed")
+                    TheTalkPlayer.seekFastBackward()
+                })
+                {
+                    Image("tri_left")
+                        .resizable()
+                        .frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
+                            .disabled(!isTalkActive)
 
-            Spacer()
-                .frame(height: 10)
-            Button(action: {
-                print("button pressed")
-                print(isTalkActive)
-                isTalkActive = (isTalkActive ? false : true)
-                if isTalkActive {playTalk()} else {pauseTalk()}
-            })
-            {
-                Image(isTalkActive ? "blacksquare" : "tri_right")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-            }
-            .buttonStyle(PlainButtonStyle())
+                }
+                Spacer()
+                    .frame(width: 20)
+                Button(action: {
+                    print("button pressed")
+                    print(isTalkActive)
+                    isTalkActive = (isTalkActive ? false : true)
+                    if isTalkActive {playTalk()} else {pauseTalk()}
+                    })
+                    {
+                        Image(isTalkActive ? "blacksquare" : "tri_right")
+                            .resizable()
+                            .frame(width: 60, height: 60)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                Spacer()
+                    .frame(width: 20)
+                Button(action: {
+                    print("right pressed")
+                    TheTalkPlayer.seekFastForward()
+                })
+                {
+                    Image("tri_right")
+                        .resizable()
+                        .resizable()
+                        .frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
+                            .disabled(!isTalkActive)
+                }
+            }  // end HStack
+            
             }  //end group 1
             
             Spacer()
-                .frame(height: 30)
+                .frame(height: 25)
+            HStack() {
+                Spacer()
+                Text(displayedElapsedTime)
+                    .font(.system(size: 12, weight: .regular))
+                Spacer()
+                    .frame(width: 20)
+                Text("|")
+                    .font(.system(size: 12, weight: .regular))
+                Spacer()
+                    .frame(width: 20)
+                Text(talk.DurationDisplay)
+                    .font(.system(size: 12, weight: .regular))
+                Spacer()
+            }
+            Spacer()
+                .frame(height: 0)
             Slider(value: $elapsedTime,
                    in: 0...Double(talk.DurationInSeconds),
                    onEditingChanged: { editing in
@@ -213,7 +261,6 @@ struct TalkPlayerView: View {
                 .padding(.leading, 20)
                 .frame(height: 30)
             Spacer()
-           
             VolumeSlider()
                .frame(height: 40)
                .padding(.horizontal)
@@ -221,7 +268,7 @@ struct TalkPlayerView: View {
         }  // VStack
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
-        } // ZStack
+        //}
     }
         //.navigationBarTitle("Play Talk", displayMode: .inline)
         //.navigationBarHidden(false)
