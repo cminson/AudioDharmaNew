@@ -79,6 +79,12 @@ struct TalkPlayerView: View {
         TalkPlayerStatus = .PAUSED
     }
     
+    func finishTalk() {
+        
+        TheTalkPlayer.stop()
+        TalkPlayerStatus = .FINISHED
+    }
+    
     func talkHasCompleted () {
         
         print("talkHasCompleted")
@@ -170,7 +176,7 @@ struct TalkPlayerView: View {
     var body: some View {
         
         //ZStack {Color(.white).opacity(0.2).edgesIgnoringSafeArea(.all)
-        VStack(alignment: .center, spacing: 10) {
+        VStack(alignment: .center, spacing: 0) {
 
             Group {
             Spacer()
@@ -181,13 +187,13 @@ struct TalkPlayerView: View {
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
-                .frame(height: 10)
-                Text(talk.Speaker)
+                .frame(height: 20)
+            Text(talk.Speaker)
                 .background(Color.white)
                 .padding(.trailing, 0)
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
-                .frame(height: 10)
+                .frame(height: 20)
             HStack() {
                 Button(action: {
                     print("left pressed")
@@ -232,7 +238,7 @@ struct TalkPlayerView: View {
             }  //end group 1
             
             Spacer()
-                .frame(height: 25)
+                .frame(height: 30)
             HStack() {
                 Spacer()
                 Text(displayedElapsedTime)
@@ -247,8 +253,8 @@ struct TalkPlayerView: View {
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
             }
-            Spacer()
-                .frame(height: 0)
+            //.border(Color.red, width: 4)
+
             Slider(value: $elapsedTime,
                    in: 0...Double(talk.DurationInSeconds),
                    onEditingChanged: { editing in
@@ -260,6 +266,7 @@ struct TalkPlayerView: View {
                 .padding(.trailing, 20)
                 .padding(.leading, 20)
                 .frame(height: 30)
+                //.border(Color.red, width: 4)
             Spacer()
             VolumeSlider()
                .frame(height: 40)
@@ -268,6 +275,11 @@ struct TalkPlayerView: View {
         }  // VStack
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
+        .onDisappear {
+            print("DetailView disappeared!")
+            finishTalk()
+        }
+
         //}
     }
         //.navigationBarTitle("Play Talk", displayMode: .inline)
