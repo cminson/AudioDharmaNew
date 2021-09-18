@@ -58,6 +58,15 @@ struct TalkPlayerView: View {
     @State private var displayedElapsedTime: String = "00:00:00"
     @State private var sliderUpdating = false
     
+    /*
+    init(talk: TalkData, currentTime: currentTime) {
+        
+        self.talk = talk
+        self.currentTime = currentTime
+        
+        elapsedTime = currentTime
+    }
+ */
     
     func playTalk() {
         
@@ -69,6 +78,7 @@ struct TalkPlayerView: View {
         }
         
         startAtTime = currentTime
+        elapsedTime = Double(currentTime)
         
         if let talkURL = URL(string: URL_MP3_HOST + talk.URL) {
             TheTalkPlayer = TalkPlayer()
@@ -85,7 +95,7 @@ struct TalkPlayerView: View {
     
     func finishTalk() {
         
-        TheTalkPlayer.stop()
+        TheTalkPlayer?.stop()
         TalkPlayerStatus = .FINISHED
     }
     

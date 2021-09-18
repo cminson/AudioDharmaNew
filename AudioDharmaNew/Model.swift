@@ -444,7 +444,6 @@ class Model {
             self.computeNotesStats()
             self.UserFavorites = TheDataModel.loadUserFavoriteData()
             
-            print("LOADING USER FAVORITES")
             for (k, _) in self.UserFavorites {print("FAVORITES: ", k)}
 
             
@@ -473,9 +472,10 @@ class Model {
             }
 
             
-            print("Model Signaling Loaded")
+            print("Signalling: Critical Section End")
             ModelUpdateSemaphore.signal()
             ModelLoadedSemaphore.signal()
+
             // END CRITICAL SECTION
             
             //self.RootController?.reportModelLoaded()

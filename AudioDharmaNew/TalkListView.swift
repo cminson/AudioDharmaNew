@@ -210,7 +210,7 @@ struct TalkListView: View {
         SearchBar(text: $searchText)
            .padding(.top, 0)
         List(TheDataModel.getTalks(key: key, filter: searchText)) { talk in
-        
+            
             TalkRow(talk: talk)
                 .onTapGesture {
                     print("talk selected")

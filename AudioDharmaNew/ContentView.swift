@@ -26,6 +26,7 @@ struct RootView: View {
 
 
     init() {
+        print("RootView init")
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         print("ROOT ALBUMS")
         for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "") {
@@ -57,12 +58,16 @@ struct RootView: View {
             .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: HelpPageView(), tag: "HELP_PAGE", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: DonationPageView(), tag: "DONATION_PAGE", selection: $selection) { EmptyView() } .hidden())
+
 
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
             .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Button {
                             print("Help")
+                            selection = "HELP_PAGE"
                         } label: {
                             Image(systemName: "calendar")
                         }
@@ -84,13 +89,14 @@ struct RootView: View {
                         Spacer()
                         Button(action: {
                             print("Donate")
-                        }) {
+                            selection = "DONATION_PAGE"
+                       }) {
                             Image(systemName: "heart.fill")
                                 .renderingMode(.original)
 
                         }
                     }
-                }
+                } // end toolbar
 
         }
        .alert(isPresented: $noCurrentTalk) { () -> Alert in
