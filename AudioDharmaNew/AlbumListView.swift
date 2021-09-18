@@ -13,6 +13,11 @@ import UIKit
 struct AlbumRow: View {
     var album: AlbumData
     
+    @State var selection: String?  = ""
+    @State var noCurrentTalk: Bool = false
+
+
+    
     init(album: AlbumData) {
             
         self.album = album
@@ -56,6 +61,9 @@ struct AlbumRow: View {
             }
         }
         .frame(height:40)
+        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+ 
+
     }
 }
 
@@ -67,6 +75,8 @@ struct AlbumListView: View {
     @State var newTitle: String?  = ""
     @State var childKey: String?  = ""
     @State var searchText: String  = ""
+
+    @State var noCurrentTalk: Bool = false
 
 
     var body: some View {
@@ -96,6 +106,39 @@ struct AlbumListView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
+        .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button {
+                        // your action here
+                    } label: {
+                        Image(systemName: "calendar")
+                    }
+                    Spacer()
+                    Button(action: {
+                        print(CurrentTalk.Title)
+                        if CurrentTalk.Title == "NO TALK" {
+                            print("none")
+                            noCurrentTalk = true
+                        } else {
+                            noCurrentTalk = false
+                            selection = "PLAY_TALK"
+                        }
+                    }) {
+                        Image(systemName: "note")
+                            .renderingMode(.original)
+
+                    }
+                    Spacer()
+                    Button(action: {
+                        print("Edit button was tapped")
+                    }) {
+                        Image(systemName: "heart.fill")
+                            .renderingMode(.original)
+
+                    }
+                }
+            }
+
     }
 }
 

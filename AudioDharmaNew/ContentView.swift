@@ -11,7 +11,6 @@ import SwiftUI
 import UIKit
 
 
-
 /*
  ******************************************************************************
  * RootView
@@ -55,21 +54,18 @@ struct RootView: View {
          
             }  // end List(albums)
             .environment(\.defaultMinListRowHeight, 20)
-            //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
 
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
             .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {
                         Button {
-                            // your action here
+                            print("Help")
                         } label: {
                             Image(systemName: "calendar")
                         }
-                        //.buttonStyle(.plain)
-
                         Spacer()
                         Button(action: {
                             print(CurrentTalk.Title)
@@ -87,7 +83,7 @@ struct RootView: View {
                         }
                         Spacer()
                         Button(action: {
-                            print("Edit button was tapped")
+                            print("Donate")
                         }) {
                             Image(systemName: "heart.fill")
                                 .renderingMode(.original)
@@ -99,11 +95,9 @@ struct RootView: View {
         }
        .alert(isPresented: $noCurrentTalk) { () -> Alert in
                    Alert(title: Text("You haven't played a talk yet, so there is no talk to re-start"))
-               }
-
-
+        }
     }
-         
+        
 }
 
 /*

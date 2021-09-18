@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		831B775926E9207A0028B88E /* TalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831B775826E9207A0028B88E /* TalkView.swift */; };
+		831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831B775826E9207A0028B88E /* TalkPlayerView.swift */; };
 		8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924526EA4ECF00F9A006 /* TalkListView.swift */; };
 		8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924726EA4F6000F9A006 /* AlbumListView.swift */; };
 		8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; };
@@ -39,7 +39,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		831B775826E9207A0028B88E /* TalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkView.swift; sourceTree = "<group>"; };
+		831B775826E9207A0028B88E /* TalkPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayerView.swift; sourceTree = "<group>"; };
 		8327924526EA4ECF00F9A006 /* TalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkListView.swift; sourceTree = "<group>"; };
 		8327924726EA4F6000F9A006 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
 		8361D60926E126500073CC83 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = Carthage/Build/iOS/ZipArchive.framework; sourceTree = "<group>"; };
@@ -94,7 +94,7 @@
 				83A2E4C026E0415700F8B531 /* ContentView.swift */,
 				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
 				8327924526EA4ECF00F9A006 /* TalkListView.swift */,
-				831B775826E9207A0028B88E /* TalkView.swift */,
+				831B775826E9207A0028B88E /* TalkPlayerView.swift */,
 				8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */,
 				83A2E4CD26E0418900F8B531 /* Model.swift */,
 				83D65D5426E2D18200751527 /* SessionData.swift */,
@@ -224,7 +224,7 @@
 				83EB42DB26EACE6C00AD069B /* Common.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
-				831B775926E9207A0028B88E /* TalkView.swift in Sources */,
+				831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */,
 				8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

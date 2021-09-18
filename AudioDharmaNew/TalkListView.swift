@@ -200,6 +200,9 @@ struct TalkListView: View {
     var key: String = ""
     @State var selection: String?  = nil
     @State var searchText: String  = ""
+    
+    @State var noCurrentTalk: Bool = false
+
 
 
     var body: some View {
@@ -221,6 +224,39 @@ struct TalkListView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
+        .toolbar {
+                ToolbarItemGroup(placement: .bottomBar) {
+                    Button {
+                        // your action here
+                    } label: {
+                        Image(systemName: "calendar")
+                    }
+                    Spacer()
+                    Button(action: {
+                        print(CurrentTalk.Title)
+                        if CurrentTalk.Title == "NO TALK" {
+                            print("none")
+                            noCurrentTalk = true
+                        } else {
+                            noCurrentTalk = false
+                            selection = "PLAY_TALK"
+                        }
+                    }) {
+                        Image(systemName: "note")
+                            .renderingMode(.original)
+
+                    }
+                    Spacer()
+                    Button(action: {
+                        print("Edit button was tapped")
+                    }) {
+                        Image(systemName: "heart.fill")
+                            .renderingMode(.original)
+
+                    }
+                }
+            }
+
         
     }
 }
