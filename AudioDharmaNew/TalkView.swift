@@ -51,6 +51,8 @@ struct VolumeSlider: UIViewRepresentable {
 
 struct TalkPlayerView: View {
     var talk: TalkData
+    var currentTime: Int
+    
     @State private var isTalkActive = false
     @State private var elapsedTime: Double = 0
     @State private var displayedElapsedTime: String = "00:00:00"
@@ -65,6 +67,8 @@ struct TalkPlayerView: View {
         if TalkPlayerStatus == .PAUSED {
             startAtTime = CurrentTalkTime
         }
+        
+        startAtTime = currentTime
         
         if let talkURL = URL(string: URL_MP3_HOST + talk.URL) {
             TheTalkPlayer = TalkPlayer()

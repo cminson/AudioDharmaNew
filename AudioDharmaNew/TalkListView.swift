@@ -8,6 +8,7 @@
 import SwiftUI
 import UIKit
 
+/*
 var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
                                        url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
                                        fileName: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
@@ -17,6 +18,7 @@ var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
                                        section: "",
                                        durationInSeconds: 1007,
                                        pdf: "")
+ */
 
 var TEST : TalkData? = nil
 
@@ -210,10 +212,10 @@ struct TalkListView: View {
                 .onTapGesture {
                     print("talk selected")
                     selection = "PLAY_TALK"
-                    SelectedTalk = talk
+                    CurrentTalk = talk
                 }
         }
-        .background(NavigationLink(destination: TalkPlayerView(talk: SelectedTalk), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
 
         //.navigationBarTitle("All Talks", displayMode: .inline)
         .navigationBarHidden(false)

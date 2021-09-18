@@ -32,8 +32,8 @@ var PlayingDownloadedTalk: Bool = false
 var ResumingLastTalk: Bool = false
 
 var TalkList : [TalkData]!
-var CurrentTalk : TalkData!
-var CurrentTalkTime : Int = 0
+//var CurrentTalk : TalkData!
+//var CurrentTalkTime : Int = 0
 var TalkTimer : Timer?
 
 

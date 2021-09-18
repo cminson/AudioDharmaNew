@@ -23,6 +23,7 @@ struct RootView: View {
     @State var key: String  = ""
     @State var title: String  = ""
     @State var searchText: String  = ""
+    @State var noCurrentTalk: Bool = false
 
 
     init() {
@@ -57,6 +58,8 @@ struct RootView: View {
             //.background(NavigationLink(destination: AlbumView(name: "dfed"), isActive: $isActive) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
             .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {
@@ -69,7 +72,14 @@ struct RootView: View {
 
                         Spacer()
                         Button(action: {
-                            print("Edit button was tapped")
+                            print(CurrentTalk.Title)
+                            if CurrentTalk.Title == "NO TALK" {
+                                print("none")
+                                noCurrentTalk = true
+                            } else {
+                                noCurrentTalk = false
+                                selection = "PLAY_TALK"
+                            }
                         }) {
                             Image(systemName: "note")
                                 .renderingMode(.original)
@@ -87,11 +97,29 @@ struct RootView: View {
                 }
 
         }
+       .alert(isPresented: $noCurrentTalk) { () -> Alert in
+                   Alert(title: Text("You haven't played a talk yet, so there is no talk to re-start"))
+               }
+
 
     }
          
 }
 
+/*
+.alert(isPresented: $displayDownloadDialog) {
+    Alert(
+        title: Text("Download Text"),
+        message: Text("Download talk to your device."),
+        primaryButton: .destructive(Text("Download")) {
+            stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+            TheDataModel.download(talk: talk, completion: downloadComplete)
+            TheDataModel.setTalkAsDownload(talk: talk)
+        },
+        secondaryButton: .cancel()
+    )
+}
+ */
 
 
 

@@ -22,9 +22,88 @@ let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 let SECTION_TEXT = UIColor.white
 
+var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "",durationDisplay: "",speaker: "",section: "",durationInSeconds: 1, pdf: "")
+var CurrentTalkTime : Int = 0
+
 var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
 
 
+import SwiftUI
+
+struct ItemsToolbar: ToolbarContent {
+    let add: () -> Void
+    let sort: () -> Void
+
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .primaryAction) {
+            Button("Add", action: add)
+        }
+        
+
+        ToolbarItem(placement: .bottomBar) {
+            Button("Sort", action: sort)
+        }
+    }
+}
+
+
+struct ToolBar: ToolbarContent {
+ 
+    var body: some ToolbarContent {
+        
+        ToolbarItem(placement: .bottomBar) {
+            Button(action: {
+                print("Edit button was tapped")
+                let x = CurrentTalk
+                //selection = "PLAY_TALK"
+
+            }) {
+                Image(systemName: "note")
+                    .renderingMode(.original)
+
+            }        }
+        
+        ToolbarItem(placement: .bottomBar) {
+            Button(action: {
+                print("Edit button was tapped")
+
+            }) {
+                Image(systemName: "note")
+                    .renderingMode(.original)
+
+            }        }
+
+        ToolbarItem(placement: .bottomBar) {
+            Button(action: {
+                print("Edit button was tapped")
+
+            }) {
+                Image(systemName: "note")
+                    .renderingMode(.original)
+
+            }
+            
+        }
+        
+        
+        
+    }
+}
+
+/*
+
+Button(action: {
+    print("Edit button was tapped")
+    let x = SelectedTalk
+    selection = "PLAY_TALK"
+
+}) {
+    Image(systemName: "note")
+        .renderingMode(.original)
+
+}
+Spacer()
+ */
 
 
 extension Color {
