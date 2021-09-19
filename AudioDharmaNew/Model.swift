@@ -1969,6 +1969,8 @@ class Model {
     
     func doesTalkHaveTranscript(talk: TalkData) -> Bool {
         
+        // CJM DEV
+        
         if talk.PDF.lowercased().range(of:"http:") != nil {
             return true
         }

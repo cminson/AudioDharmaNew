@@ -16,14 +16,11 @@
 		8376AB1726E3EE11000F9848 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8376AB1626E3EE11000F9848 /* AVFoundation.framework */; };
 		8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */; };
 		83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */; };
-		83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4C026E0415700F8B531 /* ContentView.swift */; };
+		83A2E4C126E0415700F8B531 /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4C026E0415700F8B531 /* HomePageView.swift */; };
 		83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C226E0415900F8B531 /* Assets.xcassets */; };
 		83A2E4C626E0415900F8B531 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */; };
 		83A2E4CE26E0418900F8B531 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4CD26E0418900F8B531 /* Model.swift */; };
 		83D65D5526E2D18200751527 /* SessionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83D65D5426E2D18200751527 /* SessionData.swift */; };
-		83EB0CBF26F6969000570A48 /* LandingPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB0CBE26F6969000570A48 /* LandingPageView.swift */; };
-		83EB0CC126F696A900570A48 /* HelpPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB0CC026F696A900570A48 /* HelpPageView.swift */; };
-		83EB0CC326F696B700570A48 /* DonationPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB0CC226F696B700570A48 /* DonationPageView.swift */; };
 		83EB0CC726F6A4E200570A48 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB0CC626F6A4E200570A48 /* SplashScreen.swift */; };
 		83EB42DB26EACE6C00AD069B /* Common.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83EB42DA26EACE6C00AD069B /* Common.swift */; };
 /* End PBXBuildFile section */
@@ -52,15 +49,12 @@
 		8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayer.swift; sourceTree = "<group>"; };
 		83A2E4BB26E0415700F8B531 /* AudioDharmaNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDharmaNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDharmaNewApp.swift; sourceTree = "<group>"; };
-		83A2E4C026E0415700F8B531 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		83A2E4C026E0415700F8B531 /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
 		83A2E4C226E0415900F8B531 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		83A2E4C726E0415900F8B531 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83A2E4CD26E0418900F8B531 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
 		83D65D5426E2D18200751527 /* SessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
-		83EB0CBE26F6969000570A48 /* LandingPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPageView.swift; sourceTree = "<group>"; };
-		83EB0CC026F696A900570A48 /* HelpPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpPageView.swift; sourceTree = "<group>"; };
-		83EB0CC226F696B700570A48 /* DonationPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DonationPageView.swift; sourceTree = "<group>"; };
 		83EB0CC626F6A4E200570A48 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		83EB42DA26EACE6C00AD069B /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -98,20 +92,17 @@
 		83A2E4BD26E0415700F8B531 /* AudioDharmaNew */ = {
 			isa = PBXGroup;
 			children = (
-				83A2E4CD26E0418900F8B531 /* Model.swift */,
-				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
 				83EB0CC626F6A4E200570A48 /* SplashScreen.swift */,
-				83EB0CBE26F6969000570A48 /* LandingPageView.swift */,
-				83A2E4C026E0415700F8B531 /* ContentView.swift */,
+				83A2E4C026E0415700F8B531 /* HomePageView.swift */,
 				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
 				8327924526EA4ECF00F9A006 /* TalkListView.swift */,
 				831B775826E9207A0028B88E /* TalkPlayerView.swift */,
 				8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */,
-				83EB0CC026F696A900570A48 /* HelpPageView.swift */,
-				83EB0CC226F696B700570A48 /* DonationPageView.swift */,
 				83D65D5426E2D18200751527 /* SessionData.swift */,
 				8376AB1226E3ECAE000F9848 /* StoredData.swift */,
 				83EB42DA26EACE6C00AD069B /* Common.swift */,
+				83A2E4CD26E0418900F8B531 /* Model.swift */,
+				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
 				83A2E4C226E0415900F8B531 /* Assets.xcassets */,
 				83A2E4C726E0415900F8B531 /* Info.plist */,
 				83A2E4C426E0415900F8B531 /* Preview Content */,
@@ -231,14 +222,11 @@
 				8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */,
 				83D65D5526E2D18200751527 /* SessionData.swift in Sources */,
 				83EB0CC726F6A4E200570A48 /* SplashScreen.swift in Sources */,
-				83EB0CC126F696A900570A48 /* HelpPageView.swift in Sources */,
 				8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */,
 				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83A2E4CE26E0418900F8B531 /* Model.swift in Sources */,
 				83EB42DB26EACE6C00AD069B /* Common.swift in Sources */,
-				83A2E4C126E0415700F8B531 /* ContentView.swift in Sources */,
-				83EB0CC326F696B700570A48 /* DonationPageView.swift in Sources */,
-				83EB0CBF26F6969000570A48 /* LandingPageView.swift in Sources */,
+				83A2E4C126E0415700F8B531 /* HomePageView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
 				831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */,
 				8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */,

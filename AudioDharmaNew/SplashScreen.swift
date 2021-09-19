@@ -2,47 +2,47 @@
 //  SplashScreen.swift
 //  AudioDharmaNew
 //
-//  Created by Christopher on 9/18/21.
+//  Created by Christopher Minson on 9/18/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
 import SwiftUI
 
-struct SplashView: View {
+struct SplashScreen : View {
     
-    // 1.
-    @State var isActive:Bool = false
+    @State var appIsReady:Bool = false
     
     init() {
-        print("Audiodharma init")
+
         TheDataModel.loadAllData()
-        print("Model Loading")
         ModelLoadedSemaphore.wait()
         print("MODEL LOADED")
+
     }
 
-    
     var body: some View {
-        VStack {
-            // 2.
-            if self.isActive {
-                // 3.
-                RootView()
+        VStack(alignment: .center, spacing: 0) {
+            if self.appIsReady {
+                HomePageView()
             } else {
-                // 4.
-                Text("Splash Screen")
-                    .font(Font.largeTitle)
+                Spacer()
+                Image("Earth")
+                    .frame(minWidth: 100, maxWidth: 300, minHeight: 100, maxHeight: 300, alignment: .center)
+                Spacer()
             }
         }
-        // 5.
+        .background(Color.black)
         .onAppear {
-            // 6.
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                // 7.
                 withAnimation {
-                    self.isActive = true
+                    self.appIsReady = true
                 }
             }
         }
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        .background(Color.black)
+
     }
+
     
 }

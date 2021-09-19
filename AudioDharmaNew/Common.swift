@@ -1,13 +1,14 @@
 //
 //  Common.swift
-//  Common shared extensions and views
+//  Common shared code
 //
 //  Created by Christopher Minson on 9/9/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
 import SwiftUI
-
+import PDFKit
+import WebKit
 
 
 //
@@ -84,26 +85,49 @@ struct ToolBar: ToolbarContent {
             }
             
         }
-        
-        
-        
     }
 }
 
-/*
-
-Button(action: {
-    print("Edit button was tapped")
-    let x = SelectedTalk
-    selection = "PLAY_TALK"
-
-}) {
-    Image(systemName: "note")
-        .renderingMode(.original)
-
+struct HTMLView: UIViewRepresentable {
+  @Binding var text: String
+   
+  func makeUIView(context: Context) -> WKWebView {
+    return WKWebView()
+  }
+   
+  func updateUIView(_ uiView: WKWebView, context: Context) {
+    uiView.loadHTMLString(text, baseURL: nil)
+  }
 }
-Spacer()
- */
+
+
+struct PDFKitRepresentedView: UIViewRepresentable {
+    let url: URL
+
+    init(_ url: URL) {
+        self.url = url
+    }
+
+    func makeUIView(context: UIViewRepresentableContext<PDFKitRepresentedView>) -> PDFKitRepresentedView.UIViewType {
+        // Create a `PDFView` and set its `PDFDocument`.
+        let pdfView = PDFView()
+        pdfView.document = PDFDocument(url: self.url)
+        return pdfView
+    }
+
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<PDFKitRepresentedView>) {
+        // Update the view.
+    }
+}
+
+
+struct PDFKitView: View {
+    var url: URL
+
+    var body: some View {
+        PDFKitRepresentedView(url)
+    }
+}
 
 
 extension Color {
@@ -228,6 +252,7 @@ struct TextView: UIViewRepresentable {
     }
 }
 
+
 struct ShareSheet: UIViewControllerRepresentable {
     typealias Callback = (_ activityType: UIActivity.ActivityType?, _ completed: Bool, _ returnedItems: [Any]?, _ error: Error?) -> Void
     
@@ -249,3 +274,50 @@ struct ShareSheet: UIViewControllerRepresentable {
         // nothing to do here
     }
 }
+
+struct TranscriptView: View {
+    var talk: TalkData
+    
+    init(talk: TalkData) {
+        
+        self.talk = talk
+        print("Talk: ", talk.Title, "  ", talk.PDF)
+        
+    }
+    
+    var body: some View {
+        
+        VStack () {
+        if let requestURL = URL(string: talk.PDF) {
+            PDFKitView(url: requestURL)
+                //.frame(width: 200)
+
+        }
+        }
+    }
+}
+
+struct HelpPageView: View {
+    
+    @State var text = "<h1>AudioDharma Help</h1><p><br>Press and Hold"
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HTMLView(text: $text)
+                  .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        }
+    }
+}
+
+struct DonationPageView: View {
+    
+    @State var text = "<h1>Donation Page</h1>"
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HTMLView(text: $text)
+                  .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        }
+    }
+}
+

@@ -9,28 +9,21 @@ import SwiftUI
 import UIKit
 
 
-
 struct AlbumRow: View {
     var album: AlbumData
     
     @State var selection: String?  = ""
     @State var noCurrentTalk: Bool = false
 
-
-    
     init(album: AlbumData) {
-            
         self.album = album
-        //print("ALBUM: ", album)
     }
 
-    
     func getImage(name: String) -> Image {
         
         //print("getimage: ", name)
         return Image(name)
     }
-
 
     var body: some View {
         
@@ -62,15 +55,15 @@ struct AlbumRow: View {
         }
         .frame(height:40)
         .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
- 
-
     }
 }
 
 
 struct AlbumListView: View {
+    
     var title: String = ""
     var key: String = ""
+    
     @State var selection: String?  = ""
     @State var newTitle: String?  = ""
     @State var childKey: String?  = ""

@@ -8,20 +8,7 @@
 import SwiftUI
 import UIKit
 
-/*
-var SelectedTalk : TalkData = TalkData(title: "The Depth of The Body",
-                                       url: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
-                                       fileName: "20210826-Kim_Allen-IMC-the_depth_of_the_body_3_of_4_the_body_as_a_support_for_concentration.mp3",
-                                       date: "2021.09.01",
-                                       durationDisplay: "16:47",
-                                       speaker: "Kim Allen",
-                                       section: "",
-                                       durationInSeconds: 1007,
-                                       pdf: "")
- */
-
 var TEST : TalkData? = nil
-
 
 struct TalkRow: View {
     var talk: TalkData

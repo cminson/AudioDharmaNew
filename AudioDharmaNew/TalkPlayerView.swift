@@ -57,6 +57,10 @@ struct TalkPlayerView: View {
     @State private var elapsedTime: Double = 0
     @State private var displayedElapsedTime: String = "00:00:00"
     @State private var sliderUpdating = false
+    @State private var selection: String?  = ""
+    @State var displayTranscriptPage: Bool = false
+
+
     
     /*
     init(talk: TalkData, currentTime: currentTime) {
@@ -188,6 +192,7 @@ struct TalkPlayerView: View {
     */
 
     var body: some View {
+
         
         //ZStack {Color(.white).opacity(0.2).edgesIgnoringSafeArea(.all)
         VStack(alignment: .center, spacing: 0) {
@@ -195,6 +200,8 @@ struct TalkPlayerView: View {
             Group {
             Spacer()
                 .frame(height: 5)
+                
+           // title of talk and speaker
            Text(talk.Title)
                 .background(Color.white)
                 .padding(.trailing, 15)
@@ -208,16 +215,20 @@ struct TalkPlayerView: View {
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
+                
+            // play, pause, fast-forward,  fast-backward buttons
             HStack() {
                 Button(action: {
                     print("left pressed")
                     TheTalkPlayer.seekFastBackward()
                 })
                 {
-                    Image("tri_left")
+                    Image(systemName: "arrowtriangle.left")
                         .resizable()
-                        .frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
-                            .disabled(!isTalkActive)
+                        //.frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
+                        .frame(width: 30, height:  30)
+
+                        .disabled(!isTalkActive)
 
                 }
                 Spacer()
@@ -229,7 +240,7 @@ struct TalkPlayerView: View {
                     if isTalkActive {playTalk()} else {pauseTalk()}
                     })
                     {
-                        Image(isTalkActive ? "blacksquare" : "tri_right")
+                    Image(systemName: isTalkActive ? "square" : "arrowtriangle.right.circle")
                             .resizable()
                             .frame(width: 60, height: 60)
                     }
@@ -241,16 +252,20 @@ struct TalkPlayerView: View {
                     TheTalkPlayer.seekFastForward()
                 })
                 {
-                    Image("tri_right")
+                    Image(systemName: "arrowtriangle.right")
                         .resizable()
-                        .resizable()
-                        .frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
-                            .disabled(!isTalkActive)
+                        //.frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
+                        .frame(width: 30, height:  30)
+
+                        .disabled(!isTalkActive)
                 }
             }  // end HStack
             
             }  //end group 1
             
+            Group {
+                
+            // current time and total time display
             Spacer()
                 .frame(height: 30)
             HStack() {
@@ -267,8 +282,8 @@ struct TalkPlayerView: View {
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
             }
-            //.border(Color.red, width: 4)
-
+           
+            // talk current position control
             Slider(value: $elapsedTime,
                    in: 0...Double(talk.DurationInSeconds),
                    onEditingChanged: { editing in
@@ -280,20 +295,50 @@ struct TalkPlayerView: View {
                 .padding(.trailing, 20)
                 .padding(.leading, 20)
                 .frame(height: 30)
-                //.border(Color.red, width: 4)
+                
+            // optional biograph and transcript buttons
+            Spacer()
+                .frame(height: 20)
+            HStack() {
+                if TheDataModel.doesTalkHaveTranscript(talk: talk) {
+                    Button("transcript") {
+                        //displayTranscriptPage = true
+                        selection = "TRANSCRIPTS"
+                    }
+                    .font(.system(size: 20, weight: .regular))
+                    .padding(.trailing, 15)
+
+                }
+            }
+                
+            // Standard volume and output device control
             Spacer()
             VolumeSlider()
                .frame(height: 40)
                .padding(.horizontal)
+            } // end group 2
   
         }  // VStack
+        .popover(isPresented: $displayTranscriptPage) {
+            VStack() {
+                Spacer()
+                    .frame(height: 10)
+                Button("Done") {
+                    displayTranscriptPage = false
+                }
+                Spacer()
+                    .frame(height: 15)
+                TranscriptView(talk: talk)
+            }
+        }
+
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onDisappear {
             print("DetailView disappeared!")
             finishTalk()
         }
-
+        .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPTS", selection: $selection) { EmptyView() } .hidden())
         //}
     }
         //.navigationBarTitle("Play Talk", displayMode: .inline)

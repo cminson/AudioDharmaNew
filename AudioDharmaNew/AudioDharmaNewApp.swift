@@ -7,29 +7,12 @@
 
 import SwiftUI
 
-
 @main
 struct AudioDharmaNewApp: App {
     
-    init() {
-        /*
-        print("Audiodharma init")
-        TheDataModel.loadAllData()
-        print("Model Loading")
-        ModelLoadedSemaphore.wait()
-        print("MODEL LOADED")
- 
-        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "") {
-           print("ALBUM: ", album)
-        }
- */
-    }
-    
     var body: some Scene {
         WindowGroup {
-            //RootView()
-            SplashView()
-            //LandingPageView()
+            SplashScreen()
         }
     }
 }
