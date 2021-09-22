@@ -17,8 +17,6 @@ struct AlbumRow: View {
 
     init(album: AlbumData) {
         self.album = album
-        
-        print("AlbumRow: ", album.Title, "  ", album.Key)
     }
 
       
@@ -43,18 +41,18 @@ struct AlbumRow: View {
                     .padding(.leading, 0)
                 Spacer()
                 VStack() {
-                    /*
-                    Text(String(album.TalkCount))
+
+                    Text(String(album.totalTalks))
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
                     Spacer()
                         .frame(height: 8)
-                    Text(album.DisplayedDuration)
+                    Text(album.durationDisplay)
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
- */
+
                 }
             }
         }
@@ -80,17 +78,12 @@ struct AlbumListView: View {
         
         self.title = title
         self.key = key
-
-        print("ALBUMLISTVIEW INIT")
     }
 
     
     func getKey(album: AlbumData) -> String {
         
         let key = album.Key
-        let title = album.Title
-        print("GETKEY: ",  key, title)
-
         return key
     }
 
@@ -104,7 +97,6 @@ struct AlbumListView: View {
             AlbumRow(album: album)
                 .onTapGesture {
                     if album.Key.contains("ALBUM") {
-                        print("HERE", album.Key)
                         selection = "ALBUMS"
                     } else {
                         selection = "TALKS"
@@ -123,6 +115,7 @@ struct AlbumListView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
+        /*
         .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -132,9 +125,7 @@ struct AlbumListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        print(CurrentTalk.Title)
                         if CurrentTalk.Title == "NO TALK" {
-                            print("none")
                             noCurrentTalk = true
                         } else {
                             noCurrentTalk = false
@@ -147,7 +138,6 @@ struct AlbumListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        print("Edit button was tapped")
                     }) {
                         Image(systemName: "heart.fill")
                             .renderingMode(.original)
@@ -155,6 +145,7 @@ struct AlbumListView: View {
                     }
                 }
             }
+        */
 
     }
 }

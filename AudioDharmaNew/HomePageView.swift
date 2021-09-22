@@ -17,33 +17,21 @@ import UIKit
  */
 struct HomePageView: View {
     
-    
     @State var selection: String?  = ""
     @State var key: String  = ""
     @State var title: String  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
     
-
+    
     init() {
-        print("HomePageView init")
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
-        
-/*
-        print("HomePageView ALBUMS")
-        for album in TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "") {
-            print(album.Title)
-        }
- */
-     }
+    }
     
     func getKey(album: AlbumData) -> String {
         
-        print("GETKEY: ", album.Title, album.Key)
         return album.Key
     }
-    
-
     
     var body: some View {
 
@@ -60,10 +48,7 @@ struct HomePageView: View {
                         } else {
                             selection = "TALKS"
                         } 
-
-
                     }
-         
             }  // end List(albums)
             .environment(\.defaultMinListRowHeight, 20)
             .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
@@ -79,7 +64,6 @@ struct HomePageView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
-                        print("Display Help")
                         selection = "HELP"
 
                     } label: {
@@ -88,9 +72,7 @@ struct HomePageView: View {
                     Spacer()
                     
                     Button(action: {
-                        print(CurrentTalk.Title)
                         if CurrentTalk.Title == "NO TALK" {
-                            print("none")
                             noCurrentTalk = true
                         } else {
                             noCurrentTalk = false

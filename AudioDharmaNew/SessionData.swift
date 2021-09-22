@@ -21,6 +21,13 @@ class AlbumData: Identifiable {
     var Section: String
     var Image: String
     var Date: String
+    var totalTalks: Int
+    var totalSeconds: Int
+    var durationDisplay: String
+    
+    var albumList: [AlbumData]
+    var talkList: [TalkData]
+
 
     init(title: String, key: String, section: String, image: String,  date : String) {
         
@@ -29,6 +36,14 @@ class AlbumData: Identifiable {
         Section = section
         Image = image
         Date = date
+        
+        albumList = []
+        talkList = []
+        
+        totalTalks = 0
+        totalSeconds = 0
+        durationDisplay = "00:00:00"
+        
     }
 }
 
