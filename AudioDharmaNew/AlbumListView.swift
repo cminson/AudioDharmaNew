@@ -17,19 +17,22 @@ struct AlbumRow: View {
 
     init(album: AlbumData) {
         self.album = album
+        
+        print("AlbumRow: ", album.Title, "  ", album.Key)
     }
 
-    func getImage(name: String) -> Image {
-        
-        //print("getimage: ", name)
-        return Image(name)
+      
+    func getImage(named: String) -> Image {
+       let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
+       return Image(uiImage: uiImage)
     }
+
 
     var body: some View {
         
         VStack(alignment: .leading) {
             HStack() {
-                getImage(name: album.Image)
+                getImage(named: album.Image)
                     .resizable()
                     .frame(width: SPEAKER_IMAGE_WIDTH, height:SPEAKER_IMAGE_HEIGHT)
                     .background(Color.white)
@@ -40,6 +43,7 @@ struct AlbumRow: View {
                     .padding(.leading, 0)
                 Spacer()
                 VStack() {
+                    /*
                     Text(String(album.TalkCount))
                         .background(Color.white)
                         .padding(.trailing, -10)
@@ -50,6 +54,7 @@ struct AlbumRow: View {
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
+ */
                 }
             }
         }
@@ -70,6 +75,24 @@ struct AlbumListView: View {
     @State var searchText: String  = ""
 
     @State var noCurrentTalk: Bool = false
+    
+    init(title: String, key: String) {
+        
+        self.title = title
+        self.key = key
+
+        print("ALBUMLISTVIEW INIT")
+    }
+
+    
+    func getKey(album: AlbumData) -> String {
+        
+        let key = album.Key
+        let title = album.Title
+        print("GETKEY: ",  key, title)
+
+        return key
+    }
 
 
     var body: some View {
@@ -87,7 +110,8 @@ struct AlbumListView: View {
                         selection = "TALKS"
                     }
                     
-                    childKey = album.Key
+                    //childKey = album.Key
+                    childKey = getKey(album: album)
                     newTitle = album.Title
 
                 }

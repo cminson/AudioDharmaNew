@@ -20,21 +20,16 @@ class AlbumData: Identifiable {
     var Key: String
     var Section: String
     var Image: String
-    var Duration: Int
-    var TalkCount: Int
-    var DisplayedDuration: String
-    
-    init(title: String, key: String, section: String, image: String,  duration: Int, talkCount: Int, displayedDuration: String) {
+    var Date: String
+
+    init(title: String, key: String, section: String, image: String,  date : String) {
         
         Title = title
         Key = key
         Section = section
         Image = image
-        Duration = duration
-        TalkCount = talkCount
-        DisplayedDuration = "HERE"
+        Date = date
     }
-
 }
 
 

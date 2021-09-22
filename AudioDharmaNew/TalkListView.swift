@@ -42,7 +42,7 @@ struct TalkRow: View {
         }
         
         stateTalkTitle = talk.Title
-        if TheDataModel.isDownloaded(talk: talk) {
+        if TheDataModel.isDownloadTalk(talk: talk) {
             self.stateTalkTitleColor = Color.red
         } else {
             self.stateTalkTitleColor = Color.black
@@ -54,19 +54,24 @@ struct TalkRow: View {
         }
     }
     
-    
     func downloadComplete() -> Int {
         print("downloadComplete")
 
         return 1
     }
-
+    
+    
+    func getImage(named: String) -> Image {
+       let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
+       return Image(uiImage: uiImage)
+    }
     
     var body: some View {
         
+
         VStack(alignment: .leading) {
             HStack() {
-                Image(talk.Speaker)
+                getImage(named: talk.Speaker)
                     .resizable()
                     .frame(width: SPEAKER_IMAGE_WIDTH, height: SPEAKER_IMAGE_HEIGHT)
                     .clipShape(Circle())
@@ -178,7 +183,6 @@ struct TalkRow: View {
         }
     .frame(height:40)
     }
-    
 
 }
 
@@ -211,6 +215,7 @@ struct TalkListView: View {
         .navigationBarHidden(false)
 
         .navigationViewStyle(StackNavigationViewStyle())
+        /*
         .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -243,6 +248,7 @@ struct TalkListView: View {
                     }
                 }
             }
+ */
 
         
     }

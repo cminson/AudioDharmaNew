@@ -9,6 +9,8 @@ import SwiftUI
 import MediaPlayer
 import UIKit
 
+var TheTalkPlayer: TalkPlayer!
+
 
 /*
  let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)

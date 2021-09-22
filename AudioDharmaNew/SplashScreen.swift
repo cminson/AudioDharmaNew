@@ -8,16 +8,49 @@
 
 import SwiftUI
 
+
+/*
+ 
+ var Splash : SplashScreen!
+ var SplashTimer : Timer?
+ 
+ 
+ @objc func loadTimer() {
+     Splash.update()
+ }
+ 
+ 
+ConfigurationComplete = false
+Splash = splashScreen
+SplashTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(loadTimer), userInfo: nil, repeats: true)
+*/
+
+
+var SplashAppeared = false
+
 struct SplashScreen : View {
     
     @State var appIsReady:Bool = false
     
     init() {
 
-        TheDataModel.loadAllData()
-        ModelLoadedSemaphore.wait()
+        TheDataModel.loadData()
+        ModelLoadSemaphore.wait()
         print("MODEL LOADED")
-
+        
+       // let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
+    }
+    
+  
+    func update() {
+        print("splash fired!")
+        /*
+        if ConfigurationComplete == true {
+            SplashTimer?.invalidate()
+            print("SPLASH DONE")
+            appIsReady = true
+        }
+         */
     }
 
     var body: some View {
@@ -33,7 +66,8 @@ struct SplashScreen : View {
         }
         .background(Color.black)
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                 withAnimation {
                     self.appIsReady = true
                 }

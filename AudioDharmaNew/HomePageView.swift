@@ -28,28 +28,40 @@ struct HomePageView: View {
     init() {
         print("HomePageView init")
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
-        print("HomePageView ALBUMS")
-        for album in TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "") {
-            print(album.Title)
-            
-        }
-     }
         
+/*
+        print("HomePageView ALBUMS")
+        for album in TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "") {
+            print(album.Title)
+        }
+ */
+     }
+    
+    func getKey(album: AlbumData) -> String {
+        
+        print("GETKEY: ", album.Title, album.Key)
+        return album.Key
+    }
+    
+
+    
     var body: some View {
 
        NavigationView {
         
-        List(TheDataModel.getAlbumData(key: KEY_ROOT_ALBUMS, filter: "")) { album in
+        List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "")) { album in
                 AlbumRow(album: album)
                     .onTapGesture {
-                        if album.Key.contains("ALBUM") {
-                            print("HERE", album.Key)
+                        
+                        key = album.Key
+                        title = album.Title
+                        if KEYS_TO_ALBUMS.contains(key) {
                             selection = "ALBUMS"
                         } else {
                             selection = "TALKS"
-                        }
-                        key = album.Key
-                        title = album.Title
+                        } 
+
+
                     }
          
             }  // end List(albums)
