@@ -17,7 +17,7 @@ import ZipArchive
 let TheDataModel = Model()
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
-let ModelLoadSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
+let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
 
 
 // all possible web config points
@@ -389,6 +389,10 @@ class Model {
                 self.computeAlbumStats(albumKey: key)
             }
             
+            self.computeUserFavoriteStats()
+            self.computeNotesStats()
+
+            
             /*
             self.computeUserAlbumStats()
             self.computeNotesStats()
@@ -419,7 +423,10 @@ class Model {
  */
 
             
+            print("signalling semaphore")
             ModelUpdateSemaphore.signal()
+            ModelLoadSemaphore.signal()
+
             // END CRITICAL SECTION
  
         }
@@ -969,8 +976,45 @@ class Model {
         KeyToAlbum[albumKey]?.durationDisplay = durationDisplayAllLists
     }
     
+    
+    func computeUserFavoriteStats() {
+        var talkCount = 0
+        var totalSeconds = 0
+        
+        
+        for (fileName, _) in UserFavorites {
+            
+            if let talk = FileNameToTalk[fileName] {
+                totalSeconds += talk.DurationInSeconds
+                talkCount += 1
+            }
+        }
+        let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
+        
+        print("FAVORITE", talkCount, durationDisplay)
+        KeyToAlbum[KEY_USER_FAVORITES]?.totalTalks = talkCount
+        KeyToAlbum[KEY_USER_FAVORITES]?.durationDisplay = durationDisplay
+    }
  
-  
+    func computeNotesStats() {
+        
+        var talkCount = 0
+        var totalSeconds = 0
+        
+        for (fileName, _) in UserNotes {
+            
+            if let talk = FileNameToTalk[fileName] {
+                totalSeconds += talk.DurationInSeconds
+                talkCount += 1
+            }
+        }
+        let durationDisplay = secondsToDurationDisplay(seconds: totalSeconds)
+        
+        print("NOTES", talkCount, durationDisplay)
+
+        KeyToAlbum[KEY_NOTES]?.totalTalks = talkCount
+        KeyToAlbum[KEY_NOTES]?.durationDisplay = durationDisplay
+    }
 
 
     // MARK: Persistant API
@@ -980,11 +1024,15 @@ class Model {
     }
     
     func saveUserNoteData() {
+        print("saveUserNoteData", TheDataModel.UserNotes)
         
         NSKeyedArchiver.archiveRootObject(TheDataModel.UserNotes, toFile: UserNoteData.ArchiveURL.path)
     }
     
     func saveUserFavoritesData() {
+        
+        print("saveUserFavoritesData", TheDataModel.UserFavorites)
+
         
         NSKeyedArchiver.archiveRootObject(TheDataModel.UserFavorites, toFile: UserFavoriteData.ArchiveURL.path)
     }
@@ -1049,9 +1097,11 @@ class Model {
     
     func loadUserFavoriteData() -> [String: UserFavoriteData]  {
         
+        print("loadUserFavoriteData")
         if let userFavorites = NSKeyedUnarchiver.unarchiveObject(withFile: UserFavoriteData.ArchiveURL.path)
             as? [String: UserFavoriteData] {
             
+            print("Returning favorites")
             return userFavorites
         } else {
             
@@ -1181,6 +1231,15 @@ class Model {
 
         var searchResults = [AlbumData] ()
 
+        
+        if filter == "TEST" {
+            let test = AlbumData(title: "test", key: "test", section: "", image: "speaker", date: "01-01-01")
+            var testa = [test]
+            for i in 1 ... 100 {
+                testa.append(test)
+            }
+            return testa
+        }
   
         let listAlbums = KeyToAlbum[key]?.albumList ?? []
         
@@ -1481,14 +1540,14 @@ class Model {
         
         UserFavorites[talk.FileName] = UserFavoriteData(fileName: talk.FileName)
         saveUserFavoritesData()
-        //computeUserFavoritesStats()
+        computeUserFavoriteStats()
     }
     
     func unsetTalkAsFavorite(talk: TalkData) {
         
         UserFavorites[talk.FileName] = nil
         saveUserFavoritesData()
-        //computeUserFavoritesStats()
+        computeUserFavoriteStats()
     }
     
     func toggleTalkAsFavorite(talk: TalkData) -> Bool {
@@ -1500,7 +1559,7 @@ class Model {
         }
 
         saveUserFavoritesData()
-        //computeUserFavoritesStats()
+        computeUserFavoriteStats()
 
         return UserFavorites[talk.FileName] != nil
     }    
@@ -1590,7 +1649,7 @@ class Model {
         
         // save the data, recompute stats, reload root view to display updated stats
         saveUserNoteData()
-        // computeNotesStats()
+        computeNotesStats()
     }
     
     func getNoteForTalk(talk: TalkData) -> String {

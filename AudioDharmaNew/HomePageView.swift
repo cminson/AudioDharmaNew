@@ -33,6 +33,7 @@ struct HomePageView: View {
         return album.Key
     }
     
+    
     var body: some View {
 
        NavigationView {
@@ -50,18 +51,19 @@ struct HomePageView: View {
                         } 
                     }
             }  // end List(albums)
+            .listStyle(PlainListStyle())
+
             .environment(\.defaultMinListRowHeight, 20)
             .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
-
-
-
+            //.navigationBarTitle("Audio Dharma")
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
- 
-            .toolbar {
+
+
+             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
                         selection = "HELP"
@@ -93,12 +95,15 @@ struct HomePageView: View {
 
                     }
                 }
-            }  // end toolbar
+            }
+           // end toolbar
        }
+
        .alert(isPresented: $noCurrentTalk) { () -> Alert in
                    Alert(title: Text("You haven't played a talk yet, so there is no talk to re-start"))
         
         }
+       .navigationViewStyle(.stack)  // fix CONSTRAINT warmings
     }
         
 }
@@ -106,7 +111,7 @@ struct HomePageView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        HelpPageView()
+        HomePageView()
         //TalkPlayerView(talk: SelectedTalk)
     }
 }

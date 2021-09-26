@@ -12,7 +12,8 @@ struct AudioDharmaNewApp: App {
     
     var body: some Scene {
         WindowGroup {
-            SplashScreen()
+           SplashScreen()
+            //HomePageView()
         }
     }
 }

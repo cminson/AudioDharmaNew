@@ -35,8 +35,11 @@ struct SplashScreen : View {
     init() {
 
         TheDataModel.loadData()
+        print("Waiting on Model")
+
         ModelLoadSemaphore.wait()
         print("MODEL LOADED")
+
         
        // let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
     }

@@ -68,7 +68,6 @@ struct TalkRow: View {
     
     var body: some View {
         
-
         VStack(alignment: .leading) {
             HStack() {
                 getImage(named: talk.Speaker)
@@ -179,7 +178,6 @@ struct TalkRow: View {
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
-
         }
     .frame(height:40)
     }

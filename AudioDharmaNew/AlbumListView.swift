@@ -12,19 +12,14 @@ import UIKit
 struct AlbumRow: View {
     var album: AlbumData
     
-    @State var selection: String?  = ""
-    @State var noCurrentTalk: Bool = false
-
     init(album: AlbumData) {
         self.album = album
     }
 
-      
     func getImage(named: String) -> Image {
        let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
        return Image(uiImage: uiImage)
     }
-
 
     var body: some View {
         
@@ -41,7 +36,6 @@ struct AlbumRow: View {
                     .padding(.leading, 0)
                 Spacer()
                 VStack() {
-
                     Text(String(album.totalTalks))
                         .background(Color.white)
                         .padding(.trailing, -10)
@@ -52,13 +46,13 @@ struct AlbumRow: View {
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
-
                 }
             }
         }
         .frame(height:40)
-        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-    }
+        .frame(maxWidth: .infinity)
+
+     }
 }
 
 
@@ -75,18 +69,9 @@ struct AlbumListView: View {
     @State var noCurrentTalk: Bool = false
     
     init(title: String, key: String) {
-        
         self.title = title
         self.key = key
     }
-
-    
-    func getKey(album: AlbumData) -> String {
-        
-        let key = album.Key
-        return key
-    }
-
 
     var body: some View {
 
@@ -102,15 +87,12 @@ struct AlbumListView: View {
                         selection = "TALKS"
                     }
                     
-                    //childKey = album.Key
-                    childKey = getKey(album: album)
+                    childKey = album.Key
                     newTitle = album.Title
-
                 }
         }
         .background(NavigationLink(destination: TalkListView(title: newTitle!,  key: childKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(title: newTitle!, key: childKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-
         .navigationBarTitle(title, displayMode: .inline)
         .navigationBarHidden(false)
 
