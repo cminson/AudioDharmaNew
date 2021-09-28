@@ -59,7 +59,7 @@ struct SplashScreen : View {
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if self.appIsReady {
-                HomePageView()
+                HomePageView(parentAlbum: TheDataModel.RootAlbum)
             } else {
                 Spacer()
                 Image("Earth")

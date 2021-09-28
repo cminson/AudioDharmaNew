@@ -12,7 +12,7 @@ import UIKit
 import os.log
 
 
-class AlbumData: Identifiable {
+class AlbumData: Identifiable, ObservableObject {
     
     //MARK: Properties
     let id = UUID()
@@ -57,7 +57,6 @@ class TalkData: Identifiable {
     var FileName: String
     var Date: String
     var Speaker: String
-    var Section: String
     var DurationDisplay: String
     var PDF: String
     var DurationInSeconds: Int
@@ -70,7 +69,6 @@ class TalkData: Identifiable {
          date: String,
          durationDisplay: String,
          speaker: String,
-         section: String,
          durationInSeconds: Int,
          pdf: String)
     {
@@ -80,7 +78,6 @@ class TalkData: Identifiable {
         Date = date
         DurationDisplay = durationDisplay
         Speaker = speaker
-        Section = section
         DurationInSeconds = durationInSeconds
         PDF = pdf
         

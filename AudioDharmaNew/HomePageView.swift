@@ -16,46 +16,47 @@ import UIKit
  * UI for the top-level display of albums.  Invoked by SplashScreen after model is loaded.
  */
 struct HomePageView: View {
+    var parentAlbum: AlbumData
     
+    @State var selectedAlbum: AlbumData
     @State var selection: String?  = ""
-    @State var key: String  = ""
-    @State var title: String  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
     
     
-    init() {
+    init(parentAlbum: AlbumData) {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
+        self.parentAlbum = parentAlbum
+        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", image: "", date: "")
     }
-    
-    func getKey(album: AlbumData) -> String {
-        
-        return album.Key
-    }
-    
+
     
     var body: some View {
 
        NavigationView {
         
-        List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "")) { album in
+        //List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "")) { album in
+           List(parentAlbum.albumList) { album in
+               
                 AlbumRow(album: album)
                     .onTapGesture {
-                        
-                        key = album.Key
-                        title = album.Title
-                        if KEYS_TO_ALBUMS.contains(key) {
+                        selectedAlbum = album
+                        if KEYS_TO_ALBUMS.contains(selectedAlbum.Key) {
                             selection = "ALBUMS"
                         } else {
+                            print(selectedAlbum.Key)
                             selection = "TALKS"
                         } 
                     }
             }  // end List(albums)
-            .listStyle(PlainListStyle())
+           .background(NavigationLink(destination: TalkListView(album: selectedAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+           .background(NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+
+            .listStyle(PlainListStyle())  // ensures fills parent view
 
             .environment(\.defaultMinListRowHeight, 20)
-            .background(NavigationLink(destination: TalkListView(title: title, key: key), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+
+            //.background(NavigationLink(destination: AlbumListView(title: title, key: key), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: CurrentTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
@@ -108,13 +109,15 @@ struct HomePageView: View {
         
 }
 
+/*
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        HomePageView()
+        //HomePageView()
         //TalkPlayerView(talk: SelectedTalk)
     }
 }
+ */
 
 
 

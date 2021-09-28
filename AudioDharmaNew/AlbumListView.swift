@@ -9,12 +9,10 @@ import SwiftUI
 import UIKit
 
 
+
 struct AlbumRow: View {
-    var album: AlbumData
+    @ObservedObject var album: AlbumData
     
-    init(album: AlbumData) {
-        self.album = album
-    }
 
     func getImage(named: String) -> Image {
        let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
@@ -57,20 +55,30 @@ struct AlbumRow: View {
 
 
 struct AlbumListView: View {
+    var album: AlbumData
     
-    var title: String = ""
-    var key: String = ""
-    
+    @State var selectedAlbum: AlbumData
+
     @State var selection: String?  = ""
-    @State var newTitle: String?  = ""
-    @State var childKey: String?  = ""
     @State var searchText: String  = ""
 
     @State var noCurrentTalk: Bool = false
     
-    init(title: String, key: String) {
-        self.title = title
-        self.key = key
+    
+    init(album: AlbumData) {
+        self.album = album
+        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", image: "", date: "")
+
+        
+        print("AlbumListView: ", album.Title)
+        
+        print("Album List")
+        /*
+        for album in album.albumList {
+            print(album.Title)
+        }
+         */
+
     }
 
     var body: some View {
@@ -78,23 +86,25 @@ struct AlbumListView: View {
         SearchBar(text: $searchText)
            .padding(.top, 0)
 
-        List(TheDataModel.getAlbumData(key: key, filter: searchText)) { album in
-            AlbumRow(album: album)
+        //List(TheDataModel.getAlbumData(key: key, filter: searchText)) { album in
+        List(album.albumList) { album in
+           AlbumRow(album: album)
                 .onTapGesture {
+                    selectedAlbum = album
                     if album.Key.contains("ALBUM") {
                         selection = "ALBUMS"
                     } else {
                         selection = "TALKS"
                     }
-                    
-                    childKey = album.Key
-                    newTitle = album.Title
                 }
         }
-        .background(NavigationLink(destination: TalkListView(title: newTitle!,  key: childKey!), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: AlbumListView(title: newTitle!, key: childKey!), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .navigationBarTitle(title, displayMode: .inline)
+        .background(NavigationLink(destination: TalkListView(album: selectedAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+        .navigationBarTitle(album.Title, displayMode: .inline)
         .navigationBarHidden(false)
+        
+        .listStyle(PlainListStyle())  // ensures fills parent view
+
 
         .navigationViewStyle(StackNavigationViewStyle())
         /*

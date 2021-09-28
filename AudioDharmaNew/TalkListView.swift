@@ -11,6 +11,7 @@ import UIKit
 var TEST : TalkData? = nil
 
 struct TalkRow: View {
+    var album: AlbumData
     var talk: TalkData
     
     @State private var display = false
@@ -27,9 +28,11 @@ struct TalkRow: View {
     
     @State private var textStyle = UIFont.TextStyle.body
 
-    init(talk: TalkData) {
+    init(album: AlbumData, talk: TalkData) {
         
+        self.album = album
         self.talk = talk
+        
         if TheDataModel.isFavoriteTalk(talk: talk) {
             self.stateImageFavorite = "favoritebar"
         } else {
@@ -185,22 +188,31 @@ struct TalkRow: View {
 }
 
 struct TalkListView: View {
-    var title: String = ""
-    var key: String = ""
+    var album: AlbumData
+
     @State var selection: String?  = nil
     @State var searchText: String  = ""
     
     @State var noCurrentTalk: Bool = false
 
-
+    init(album: AlbumData) {
+        self.album = album
+        print("TalkListView: ", album.Title)
+        /*
+        for talk in album.talkList {
+            print(talk.Title)
+        }
+         */
+    }
+    
 
     var body: some View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(TheDataModel.getTalks(key: key, filter: searchText)) { talk in
+        List(album.talkList) { talk in
             
-            TalkRow(talk: talk)
+            TalkRow(album: album, talk: talk)
                 .onTapGesture {
                     print("talk selected")
                     selection = "PLAY_TALK"
@@ -211,6 +223,8 @@ struct TalkListView: View {
 
         //.navigationBarTitle("All Talks", displayMode: .inline)
         .navigationBarHidden(false)
+        .listStyle(PlainListStyle())  // ensures fills parent view
+
 
         .navigationViewStyle(StackNavigationViewStyle())
         /*

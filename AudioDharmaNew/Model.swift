@@ -4,7 +4,7 @@
 //
 //  Created by Christopher on 6/22/17.
 //  Copyright © 2017 Christopher Minson. All rights reserved.
-//
+//            self.UserFavorites = TheDataModel.loadUserFavoriteData()
 
 import UIKit
 import Foundation
@@ -15,6 +15,7 @@ import ZipArchive
 
 // MARK: Global Constants and Vars
 let TheDataModel = Model()
+//@EnvironmentObject var TheDataModel: Model = Model()
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
 let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
@@ -132,7 +133,7 @@ let DATA_ALBUMS: [String] = ["DATA00", "DATA01", "DATA02", "DATA03", "DATA04", "
 
 class Model {
     
-    var KeyToAlbum : [String: AlbumData] = [:]  // where all albums are stored.  dictionary keyed by "key", value is an album
+    var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
 
     var UserTalkHistoryAlbum: [TalkHistoryData] = []    // history of talks for user
@@ -141,9 +142,14 @@ class Model {
     var SangaTalkHistoryAlbum: [TalkHistoryData] = []          // history of talks for sangha
     var SangaShareHistoryAlbum: [TalkHistoryData] = []          // history of shares for sangha
     
-    var AllTalks: [TalkData] = []
-    var SpeakerAlbums: [AlbumData] = []
-    var SeriesAlbums: [AlbumData] = []
+    var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", image: "albumdefault", date: "")
+    var RecommendedAlbum: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", image: "albumdefault", date: "")
+
+    var ListAllTalks: [TalkData] = []
+    var ListSpeakerAlbums: [AlbumData] = []
+    var ListSeriesAlbums: [AlbumData] = []
+    var ListRecommenedAlbums: [AlbumData] = []
+    var ListFavoriteTalls : [TalkData] = []
 
     var DownloadInProgress = false
 
@@ -169,7 +175,7 @@ class Model {
         SangaTalkHistoryAlbum = []
         SangaShareHistoryAlbum = []
         
-        AllTalks = []
+        ListAllTalks = []
         
         DownloadInProgress = false
         
@@ -195,7 +201,7 @@ class Model {
         SangaTalkHistoryAlbum  = []
         SangaShareHistoryAlbum = []
 
-        AllTalks = []
+        ListAllTalks = []
         
         HTTPResultCode = 0
         URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
@@ -224,6 +230,7 @@ class Model {
         do {
             try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
         } catch let error as NSError {
+            log(error: error)
         }
         
     }
@@ -344,6 +351,7 @@ class Model {
                     }
                 }
                 catch let error as NSError {
+                    self.log(error: error)
                     return
                 }
             }
@@ -363,16 +371,18 @@ class Model {
 
             // get our unzipped json from the local storage and process it
             var jsonData: Data!
-            do {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-                jsonData = try Data(contentsOf: URL(fileURLWithPath: configJSONPath))
+            do {                                                                                                            jsonData = try Data(contentsOf: URL(fileURLWithPath: configJSONPath))
             }
             catch let error as NSError {
                 HTTPResultCode = 404
+                self.log(error: error)
                 return
             }
                         
             // BEGIN CRITICAL SECTION
             ModelUpdateSemaphore.wait()
+
+            self.UserFavorites = TheDataModel.loadUserFavoriteData()
 
             
             do {
@@ -385,9 +395,11 @@ class Model {
             catch {
             }
             
+            /*
             for key in KEYS_TO_ALBUMS {
                 self.computeAlbumStats(albumKey: key)
             }
+             */
             
             self.computeUserFavoriteStats()
             self.computeNotesStats()
@@ -458,17 +470,16 @@ class Model {
         var totalSeconds = 0
         
         // get all talks
-        for talk in jsonDict["talks"] as? [AnyObject] ?? [] {
+        for jsonTalk in jsonDict["talks"] as? [AnyObject] ?? [] {
                 
-                let series = talk["series"] as? String ?? ""
-                let title = talk["title"] as? String ?? ""
-                let URL = (talk["url"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-                let speaker = talk["speaker"] as? String ?? ""
-                var date = talk["date"] as? String ?? ""
+                let series = jsonTalk["series"] as? String ?? ""
+                let title = jsonTalk["title"] as? String ?? ""
+                let URL = (jsonTalk["url"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+                let speaker = jsonTalk["speaker"] as? String ?? ""
+                var date = jsonTalk["date"] as? String ?? ""
                 date = date.replacingOccurrences(of: "-", with: ".")
-                let duration = talk["duration"] as? String ?? ""
-                let pdf = talk["pdf"] as? String ?? ""
-                let section = ""
+                let duration = jsonTalk["duration"] as? String ?? ""
+                let pdf = jsonTalk["pdf"] as? String ?? ""
                 
                 let terms = URL.components(separatedBy: "/")
                 let fileName = terms.last ?? ""
@@ -476,42 +487,53 @@ class Model {
                 let seconds = self.convertDurationToSeconds(duration: duration)
                 totalSeconds += seconds
             
-                let talkData =  TalkData(title: title,
+                let talk =  TalkData(title: title,
                                          url: URL,
                                          fileName: fileName,
                                          date: date,
                                          durationDisplay: duration,
                                          speaker: speaker,
-                                         section: section,
                                          durationInSeconds: seconds,
                                          pdf: pdf)
                     
-                if doesTalkHaveTranscript(talk: talkData) {
-                    talkData.Title = talkData.Title + " [transcript]"
+                if doesTalkHaveTranscript(talk: talk) {
+                    talk.Title = talk.Title + " [transcript]"
                 }
             
-                self.FileNameToTalk[fileName] = talkData
+                self.FileNameToTalk[fileName] = talk
                 
                 // add this talk to  list of all talks
-                self.AllTalks.append(talkData)
+                self.ListAllTalks.append(talk)
             
-                // add talk to the list of talks for this speaker
+                var speakerAlbum : AlbumData
+                var seriesAlbum : AlbumData
+
                 if self.KeyToAlbum[speaker] == nil {
-                    self.KeyToAlbum[speaker] = AlbumData(title: speaker, key: speaker, section: "", image: speaker, date: date)
-                    SpeakerAlbums.append(self.KeyToAlbum[speaker]!)
+                    speakerAlbum = AlbumData(title: speaker, key: speaker, section: "", image: speaker, date: date)
+                    self.KeyToAlbum[speaker] = speakerAlbum
+                    ListSpeakerAlbums.append(speakerAlbum)
                 }
-                self.KeyToAlbum[speaker]?.talkList.append(talkData)
+                speakerAlbum = self.KeyToAlbum[speaker]!
+                speakerAlbum.talkList.append(talk)
+                speakerAlbum.totalTalks += 1
+                speakerAlbum.totalSeconds += seconds
+                speakerAlbum.durationDisplay  = self.secondsToDurationDisplay(seconds: speakerAlbum.totalSeconds)
+
                 
                 // if a series is specified, create an album if one doesn't exist.  add talk to album
-                if series.count > 1 {
+                if !series.isEmpty {
                     
                     let seriesKey = "SERIES" + series
-
                     if self.KeyToAlbum[seriesKey] == nil {
-                        self.KeyToAlbum[seriesKey] = AlbumData(title: series, key: seriesKey, section: "", image: speaker, date : date)
-                        SeriesAlbums.append(self.KeyToAlbum[seriesKey]!)
+                        seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", image: speaker, date : date)
+                        self.KeyToAlbum[seriesKey] = seriesAlbum
+                        ListSeriesAlbums.append(seriesAlbum)
                     }
-                    self.KeyToAlbum[seriesKey]?.talkList.append(talkData)
+                    seriesAlbum = self.KeyToAlbum[seriesKey]!
+                    seriesAlbum.talkList.append(talk)
+                    seriesAlbum.totalTalks += 1
+                    seriesAlbum.totalSeconds += seconds
+                    seriesAlbum.durationDisplay  = self.secondsToDurationDisplay(seconds: seriesAlbum.totalSeconds)
                  }
                 
                 talkCount += 1
@@ -521,136 +543,122 @@ class Model {
 
         
         // sort the albums
-        let sortedSpeakerList = self.KeyToAlbum[KEY_ALL_SPEAKERS]?.albumList.sorted(by: { $0.Key < $1.Key })
-        self.KeyToAlbum[KEY_ALL_SPEAKERS]?.albumList = sortedSpeakerList!
-        let sortedSeriesList = self.KeyToAlbum[KEY_ALL_SERIES]?.albumList.sorted(by: { $0.Key < $1.Key })
-        self.KeyToAlbum[KEY_ALL_SERIES]?.albumList = sortedSeriesList!
-        let sortedAllTalks  = self.KeyToAlbum[KEY_ALL_TALKS]?.talkList.sorted(by: { $0.Date > $1.Date })
-        self.KeyToAlbum[KEY_ALL_SERIES]?.talkList = sortedAllTalks!
-
-
-        // also sort all talks in series albums (note: must take possible sections into account)
-        if let seriesAlbumList = self.KeyToAlbum[KEY_ALL_SERIES]?.albumList {
-            
-            for seriesAlbum in seriesAlbumList {
-                // dharmettes are already sorted and need to be presented with most current talks on top
-                // all other series need further sorting, as the most current talks must be at bottom
-                if seriesAlbum.Key == "SERIESDharmettes" {
-                    continue
-                }
-                if let talkList = self.KeyToAlbum[KEY_ALL_SERIES]?.talkList {
-                    let sortedTalks  = talkList.sorted(by: { $1.Date > $0.Date })
-                    self.KeyToAlbum[KEY_ALL_SERIES]?.talkList = sortedTalks
-                }
+        self.ListSpeakerAlbums = self.ListSpeakerAlbums.sorted(by: { $0.Key < $1.Key })
+        self.ListSeriesAlbums = self.ListSeriesAlbums.sorted(by: { $1.Date < $0.Date })
+        self.ListAllTalks = self.ListAllTalks.sorted(by: { $0.Date > $1.Date })
+        
+        //  sort all talks in series albums
+        for seriesAlbum in ListSeriesAlbums {
+            // dharmettes are already sorted and need to be presented with most current talks on top
+            // all other series need further sorting, as the most current talks must be at bottom
+            if seriesAlbum.Key == "SERIESDharmettes" {
+                continue
             }
+            let talkList = seriesAlbum.talkList
+            seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
     }
     
-    func loadAlbums(jsonDict: [String: AnyObject]) {
     
-        var prevAlbumSection = ""
+    func loadAlbums(jsonDict: [String: AnyObject]) {
 
-        self.KeyToAlbum[KEY_ALBUMROOT] = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", image: "albumdefault", date: "")
+        var albumList : [AlbumData] = []
+        var talkList : [TalkData] = []
+        var totalAlbumSeconds : Int
+        
+        for jsonAlbum in jsonDict["albums"] as? [AnyObject] ?? [] {
             
-        for Album in jsonDict["albums"] as? [AnyObject] ?? [] {
-            
-                let albumSection = Album["section"] as? String ?? ""
-                let title = Album["title"] as? String ?? ""
-                let key = Album["content"] as? String ?? ""
-                let image = Album["image"] as? String ?? ""
-                let talkList = Album["talks"] as? [AnyObject] ?? []
-                let albumData =  AlbumData(title: title, key: key, section: albumSection, image: image, date: "")
-                self.KeyToAlbum[key] = albumData
-            
-                if ((albumSection != "") && (albumSection != prevAlbumSection)) {
-                    let albumSectionHeader = AlbumData(title: SECTION_HEADER, key: key, section: albumSection, image: image, date: "")
-                    self.KeyToAlbum[KEY_ALBUMROOT]?.albumList.append(albumSectionHeader)
-                    prevAlbumSection = albumSection
+                let albumSection = jsonAlbum["section"] as? String ?? ""
+                let title = jsonAlbum["title"] as? String ?? ""
+                let key = jsonAlbum["content"] as? String ?? ""
+                let image = jsonAlbum["image"] as? String ?? ""
+                let jsonTalkList = jsonAlbum["talks"] as? [AnyObject] ?? []
+                let album =  AlbumData(title: title, key: key, section: albumSection, image: image, date: "")
+
+                switch (key) {
+                case KEY_ALL_TALKS:
+                    talkList = self.ListAllTalks
+                case KEY_ALL_SPEAKERS:
+                    albumList = self.ListSpeakerAlbums
+                case KEY_ALL_SERIES:
+                    albumList = self.ListSeriesAlbums
+                case KEY_RECOMMENDED_TALKS:
+                    self.RecommendedAlbum = album
+                    albumList = []
+                    talkList = []
+                case KEY_USER_FAVORITES:
+                    for (fileName, _ ) in self.UserFavorites {
+                        if let talk = FileNameToTalk[fileName] {
+                            album.talkList.append(talk)
+                        }
+                    }
+               default:
+                    albumList = []
+                    talkList = []
                 }
-            
-                self.KeyToAlbum[KEY_ALBUMROOT]?.albumList.append(albumData)
+                album.albumList = albumList
+                album.talkList = talkList
+                self.RootAlbum.albumList.append(album)
 
                 // get the optional talk array for this Album
-                // the value for this key is an array of talks
-                var currentSeries = "_"
-                var prevTalkSection = ""
-
-                for talk in talkList {
+                totalAlbumSeconds = 0
+                for jsonTalk in jsonTalkList {
                     
-                    var URL = talk["url"] as? String ?? ""
-
+                    var URL = jsonTalk["url"] as? String ?? ""
                     let terms = URL.components(separatedBy: "/")
                     let fileName = terms.last ?? ""
-                    
-                    var talkSection = talk["section"] as? String ?? "_"
-                    let series = talk["series"] as? String ?? ""
-                    let title = talk["title"] as? String ?? ""
+                    let series = jsonTalk["series"] as? String ?? ""
+                    let title = jsonTalk["title"] as? String ?? ""
                     var speaker = ""
                     var date = ""
                     var durationDisplay = ""
                     var pdf = ""
                     
-                    
-                    // DEV NOTE: remove placeholder.  this code might not be necessary long-term
-                    if talkSection == "_" || talkSection == "__" {
-                        talkSection = ""
+                    if let talk = self.FileNameToTalk[fileName] {
+                        URL = talk.URL
+                        speaker = talk.Speaker
+                        date = talk.Date
+                        pdf = talk.PDF
+                        durationDisplay = talk.DurationDisplay
                     }
                     
-                    // fill in these fields from talk data.  must do this as these fields are not stored in config json (to make things
-                    // easier for config reading)
-                    if let talkData = self.FileNameToTalk[fileName] {
-                        URL = talkData.URL
-                        speaker = talkData.Speaker
-                        date = talkData.Date
-                        pdf = talkData.PDF
-                        durationDisplay = talkData.DurationDisplay
+                    let seconds = self.convertDurationToSeconds(duration: durationDisplay)
+                    
+                    let talk =  TalkData(title: title,
+                                     url: URL,
+                                     fileName: fileName,
+                                     date: date,
+                                     durationDisplay: durationDisplay,
+                                     speaker: speaker,
+                                     durationInSeconds: seconds,
+                                     pdf: pdf)
+                    
+                    if doesTalkHaveTranscript(talk: talk) {
+                        talk.Title = talk.Title + " [transcript]"
                     }
                     
-                    let totalSeconds = self.convertDurationToSeconds(duration: durationDisplay)
-                    
-                    let talkData =  TalkData(title: title,
-                                             url: URL,
-                                             fileName: fileName,
-                                             date: date,
-                                             durationDisplay: durationDisplay,
-                                             speaker: speaker,
-                                             section: talkSection,
-                                             durationInSeconds: totalSeconds,
-                                             pdf: pdf)
-                    
-                    if doesTalkHaveTranscript(talk: talkData) {
-                        talkData.Title = talkData.Title + " [transcript]"
-                    }
-                    
-                    // if a series is specified create a series album if not already there.  then add talk to it
-                    // otherwise, just add the talk directly to the parent album
-                    if series.count > 1 {
-                        
-                        if series != currentSeries {
-                            currentSeries = series
-                        }
-                        let seriesKey = "RECOMMENDED" + series
-                        
-                        // create the album if not there already
+                    // if series specified, these always go into RecommendedAlbum
+                    var seriesAlbum : AlbumData
+                    if !series.isEmpty {
+                         let seriesKey = "RECOMMENDED" + series
                         if self.KeyToAlbum[seriesKey] == nil {
-                            
-                            let albumData =  AlbumData(title: series, key: seriesKey, section: "", image: "albumdefault", date: date)
-                            self.KeyToAlbum[seriesKey] = albumData
-                            self.KeyToAlbum[KEY_RECOMMENDED_TALKS]?.albumList.append(albumData)
+                            seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", image: speaker, date : date)
+                            self.KeyToAlbum[seriesKey] = seriesAlbum
+                            self.RecommendedAlbum.albumList.append(seriesAlbum)
                         }
-                        self.KeyToAlbum[seriesKey]?.talkList.append(talkData)
-                        
+                        seriesAlbum = self.KeyToAlbum[seriesKey]!
+                        seriesAlbum.talkList.append(talk)
+                        seriesAlbum.totalTalks += 1
+                        seriesAlbum.totalSeconds += seconds
+                        seriesAlbum.durationDisplay  = self.secondsToDurationDisplay(seconds: seriesAlbum.totalSeconds)
+
                     } else {
-                        
-                        self.KeyToAlbum[key]?.talkList.append(talkData)
+                        album.talkList.append(talk)
                     }
-                }
+                } // end talk loop
+            
+            print("Setting time: ", album.Title, album.totalSeconds)
         } // end Album loop
-        
-        
-        self.KeyToAlbum[KEY_ALL_TALKS]?.talkList = AllTalks
-        self.KeyToAlbum[KEY_ALL_SPEAKERS]?.albumList = SpeakerAlbums
-        self.KeyToAlbum[KEY_ALL_SERIES]?.albumList = SeriesAlbums
     }
     
     
@@ -866,7 +874,7 @@ class Model {
                 self.UserDownloads[talk.FileName]?.DownloadCompleted = "YES"
                 self.saveUserDownloadData()
                 TheDataModel.DownloadInProgress = false
-                let result = completion()
+                let _ = completion()
 
             }
             
@@ -944,20 +952,17 @@ class Model {
     
    
     
-    func computeAlbumStats(albumKey: String) {
+    func computeAlbumStats(parentAlbum: AlbumData) {
         
         var totalSecondsAllLists = 0
         var talkCountAllLists = 0
         
-        for childAlbum in KeyToAlbum[albumKey]?.albumList ?? [] {
+        for album in parentAlbum.albumList {
             
             var totalSeconds = 0
             var talkCount = 0
             
-            let talkList = childAlbum.talkList
-            let key = childAlbum.Key
-
-            for talk in talkList {
+            for talk in album.talkList {
                 totalSeconds += talk.DurationInSeconds
                 talkCount += 1
             }
@@ -1833,6 +1838,10 @@ class Model {
                 return completion(nil)
             }
             }.resume()
+    }
+    
+    func log(error: NSError) {
+        
     }
     
     

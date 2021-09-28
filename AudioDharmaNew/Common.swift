@@ -23,7 +23,7 @@ let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 let SECTION_TEXT = UIColor.white
 
-var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "",durationDisplay: "",speaker: "",section: "",durationInSeconds: 1, pdf: "")
+var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "",durationDisplay: "",speaker: "", durationInSeconds: 1, pdf: "")
 var CurrentTalkTime : Int = 0
 
 var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
