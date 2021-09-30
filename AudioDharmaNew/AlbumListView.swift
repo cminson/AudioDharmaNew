@@ -53,6 +53,15 @@ struct AlbumRow: View {
      }
 }
 
+/*
+ 
+ NavigationLink(destination: AlbumListView(album: album)) {
+     AlbumRow(album: album)
+
+ NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden()
+
+ */
+
 
 struct AlbumListView: View {
     var album: AlbumData
@@ -80,6 +89,13 @@ struct AlbumListView: View {
          */
 
     }
+    
+    func getKey (album: AlbumData) -> Bool {
+        print("ALBUM BODY RENDERING")
+        
+        return album.Key.contains("ALBUM")
+    
+    }
 
     var body: some View {
 
@@ -91,15 +107,18 @@ struct AlbumListView: View {
            AlbumRow(album: album)
                 .onTapGesture {
                     selectedAlbum = album
-                    if album.Key.contains("ALBUM") {
+                    //if album.Key.contains("ALBUM") {
+                    if getKey(album: album) {
                         selection = "ALBUMS"
                     } else {
                         selection = "TALKS"
                     }
                 }
         }
+
         .background(NavigationLink(destination: TalkListView(album: selectedAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+
         .navigationBarTitle(album.Title, displayMode: .inline)
         .navigationBarHidden(false)
         
@@ -107,7 +126,6 @@ struct AlbumListView: View {
 
 
         .navigationViewStyle(StackNavigationViewStyle())
-        /*
         .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -137,8 +155,6 @@ struct AlbumListView: View {
                     }
                 }
             }
-        */
-
     }
 }
 

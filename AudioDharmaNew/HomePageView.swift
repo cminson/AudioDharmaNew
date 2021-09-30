@@ -28,29 +28,38 @@ struct HomePageView: View {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", image: "", date: "")
+        
+        print("UserFavorite Talks at Album Init", TheDataModel.UserFavoritesAlbum.Title)
+        for talk in TheDataModel.UserFavoritesAlbum.talkList {
+            print(talk.Title)
+        }
+
     }
 
-    
+      
     var body: some View {
 
        NavigationView {
         
         //List(TheDataModel.getAlbumData(key: KEY_ALBUMROOT, filter: "")) { album in
            List(parentAlbum.albumList) { album in
-               
-                AlbumRow(album: album)
+              
+                 AlbumRow(album: album)
                     .onTapGesture {
                         selectedAlbum = album
                         if KEYS_TO_ALBUMS.contains(selectedAlbum.Key) {
+                            print("RENDER ALBUM")
                             selection = "ALBUMS"
                         } else {
-                            print(selectedAlbum.Key)
+                            print("RENDER TALKS")
                             selection = "TALKS"
                         } 
                     }
-            }  // end List(albums)
+            }
+
            .background(NavigationLink(destination: TalkListView(album: selectedAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
            .background(NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+
 
             .listStyle(PlainListStyle())  // ensures fills parent view
 

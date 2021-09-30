@@ -12,7 +12,7 @@ var TEST : TalkData? = nil
 
 struct TalkRow: View {
     var album: AlbumData
-    var talk: TalkData
+    @ObservedObject var talk: TalkData
     
     @State private var display = false
     @State private var displayNoteDialog = false
@@ -23,7 +23,6 @@ struct TalkRow: View {
     @State var stateImageFavorite : String
     @State var stateImageNote: String
     @State var stateTalkTitle: String
-    @State var stateTalkTitleColor: Color
 
     
     @State private var textStyle = UIFont.TextStyle.body
@@ -33,34 +32,27 @@ struct TalkRow: View {
         self.album = album
         self.talk = talk
         
-        if TheDataModel.isFavoriteTalk(talk: talk) {
+        if talk.isFavoriteTalk() {
             self.stateImageFavorite = "favoritebar"
         } else {
             self.stateImageFavorite = "whiterect"
         }
-        if TheDataModel.isNotatedTalk(talk: talk) {
+        if talk.isNotatedTalk() {
             self.stateImageNote = "notebar"
         } else {
             self.stateImageNote = "whiterect"
         }
         
         stateTalkTitle = talk.Title
-        if TheDataModel.isDownloadTalk(talk: talk) {
-            self.stateTalkTitleColor = Color.red
-        } else {
-            self.stateTalkTitleColor = Color.black
-        }
-
-        if TheDataModel.isDownloadInProgress(talk: talk) {
+         if talk.isDownloadInProgress() {
             self.stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-            self.stateTalkTitleColor = Color.red
         }
     }
     
-    func downloadComplete() -> Int {
-        print("downloadComplete")
+    func downloadCompleted() -> Void {
+        print("downloadCompleted")
 
-        return 1
+        stateTalkTitle = self.talk.Title
     }
     
     
@@ -83,7 +75,7 @@ struct TalkRow: View {
                     .frame(width: 6)
                 Text("\(stateTalkTitle)")
                     .font(.system(size: 12))
-                    .foregroundColor(stateTalkTitleColor)
+                    .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
                 VStack() {
@@ -113,7 +105,7 @@ struct TalkRow: View {
                     Button("Get Similar Talks") {
                     }
                     Button("Favorite Talk") {
-                        let isFavorite = TheDataModel.toggleTalkAsFavorite(talk: talk)
+                        let isFavorite = talk.toggleTalkAsFavorite()
                         if isFavorite {
                             self.stateImageFavorite = "favoritebar"
                         } else {
@@ -121,7 +113,7 @@ struct TalkRow: View {
                         }
                     }
                     Button("Make Note") {
-                        noteText = TheDataModel.getNoteForTalk(talk: talk)
+                        noteText = talk.getNoteForTalk()
                         displayNoteDialog = true
                     }
                     Button("Share Talk") {
@@ -139,8 +131,8 @@ struct TalkRow: View {
                     message: Text("Download talk to your device."),
                     primaryButton: .destructive(Text("Download")) {
                         stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                        TheDataModel.download(talk: talk, completion: downloadComplete)
-                        TheDataModel.setTalkAsDownload(talk: talk)
+                        //TheDataModel.download(talk: talk, notifyUI: downloadCompleted)
+                        talk.download(notifyUI: downloadCompleted)
                     },
                     secondaryButton: .cancel()
                 )
@@ -169,9 +161,9 @@ struct TalkRow: View {
                     .frame(height:30)
                 Button("Done") {
                     print("Done", noteText)
-                    TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
+                    talk.addNoteToTalk(noteText: noteText)
                     displayNoteDialog = false
-                    let isNoted = TheDataModel.isNotatedTalk(talk: talk)
+                    let isNoted = talk.isNotatedTalk()
                     if isNoted {
                         self.stateImageNote = "notebar"
                     } else {
@@ -188,6 +180,7 @@ struct TalkRow: View {
 }
 
 struct TalkListView: View {
+    //@Published var counter: Int = 0
     var album: AlbumData
 
     @State var selection: String?  = nil
@@ -197,12 +190,8 @@ struct TalkListView: View {
 
     init(album: AlbumData) {
         self.album = album
-        print("TalkListView: ", album.Title)
-        /*
-        for talk in album.talkList {
-            print(talk.Title)
-        }
-         */
+
+
     }
     
 
@@ -227,7 +216,6 @@ struct TalkListView: View {
 
 
         .navigationViewStyle(StackNavigationViewStyle())
-        /*
         .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -260,7 +248,6 @@ struct TalkListView: View {
                     }
                 }
             }
- */
 
         
     }

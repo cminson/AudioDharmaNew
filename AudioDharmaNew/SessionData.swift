@@ -21,7 +21,7 @@ class AlbumData: Identifiable, ObservableObject {
     var Section: String
     var Image: String
     var Date: String
-    var totalTalks: Int
+    @Published var totalTalks: Int
     var totalSeconds: Int
     var durationDisplay: String
     
@@ -48,7 +48,7 @@ class AlbumData: Identifiable, ObservableObject {
 }
 
 
-class TalkData: Identifiable {
+class TalkData: Identifiable, Equatable, ObservableObject {
     
     // MARK: Properties
     let id = UUID()
@@ -61,6 +61,12 @@ class TalkData: Identifiable {
     var PDF: String
     var DurationInSeconds: Int
     var SpeakerPhoto: UIImage
+    @Published var isDownloaded: Bool
+    
+    static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
+        return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
+    }
+
         
     // MARK: Init
     init(title: String,
@@ -82,7 +88,138 @@ class TalkData: Identifiable {
         PDF = pdf
         
         SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
+        isDownloaded = false
      }
+    
+     
+    func toggleTalkAsFavorite() -> Bool {
+
+        if isFavoriteTalk() {
+            TheDataModel.UserFavorites[self.FileName] = nil
+            if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: self) {
+                print("toglleTalkAsFavorite removing: ", self.Title)
+                TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
+            }
+        } else {
+            TheDataModel.UserFavorites[self.FileName] = UserFavoriteData(fileName: self.FileName)
+            print("toglleTalkAsFavorite adding: ", self.Title)
+            TheDataModel.UserFavoritesAlbum.talkList.append(self)
+        }
+
+        TheDataModel.saveUserFavoritesData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
+
+        return TheDataModel.UserFavorites[self.FileName] != nil
+    }
+    
+    
+    func isFavoriteTalk() -> Bool {
+        
+        let isFavorite = TheDataModel.UserFavorites[self.FileName] != nil
+        return isFavorite
+    }
+    
+    
+    func download(notifyUI: @escaping  () -> Void) {
+        
+        TheDataModel.download(talk: self, notifyUI: notifyUI)
+        
+
+    }
+    
+       
+    func isDownloadInProgress() -> Bool {
+        
+        var downloadInProgress = false
+        if let userDownload = TheDataModel.UserDownloads[self.FileName]  {
+            downloadInProgress = (userDownload.DownloadCompleted == "NO")
+        }
+        return downloadInProgress
+    }
+
+    
+    
+    func setTalkAsDownloaded() {
+        
+        TheDataModel.UserDownloadAlbum.talkList.append(self)
+        TheDataModel.UserDownloads[self.FileName] = UserDownloadData(fileName: self.FileName, downloadCompleted: "YES")
+        TheDataModel.saveUserDownloadData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+        
+        // CJM DEV - Must be moved into main UI thread  receive: on:
+        self.isDownloaded = true
+    }
+    
+    
+    func unsetTalkAsDownloaded() {
+        
+        if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: self) {
+            print("download removing: ", self.Title)
+            TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
+        }
+        
+        if let userDownload = TheDataModel.UserDownloads[self.FileName] {
+            if userDownload.DownloadCompleted == "NO" {
+                TheDataModel.DownloadInProgress = false
+            }
+        }
+        TheDataModel.UserDownloads[self.FileName] = nil
+        let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + FileName
+        do {
+            try FileManager.default.removeItem(atPath: localPathMP3)
+        }
+        catch let error as NSError {
+        }
+        
+        TheDataModel.saveUserDownloadData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+        
+        self.isDownloaded = false
+
+    }
+
+    
+    func addNoteToTalk(noteText: String) {
+
+        //
+        // if there is a note text for this talk fileName, then save it in the note dictionary
+        // otherwise clear this note dictionary entry
+        let talkFileName = self.FileName
+
+        let charset = CharacterSet.alphanumerics
+
+        if (noteText.count > 0) && noteText.rangeOfCharacter(from: charset) != nil {
+            TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
+        } else {
+            TheDataModel.UserNotes[talkFileName] = nil
+        }
+        
+        // save the data, recompute stats, reload root view to display updated stats
+        TheDataModel.saveUserNoteData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserNoteAlbum)
+    }
+    
+    
+    func getNoteForTalk() -> String {
+
+        var noteText = ""
+
+        if let userNoteData = TheDataModel.UserNotes[self.FileName]   {
+            noteText = userNoteData.Notes
+        }
+        return noteText
+    }
+
+
+    func isNotatedTalk() -> Bool {
+        
+        if let _ = TheDataModel.UserNotes[self.FileName] {
+            return true
+        }
+        return false
+    }
+
+
 
 }
 
