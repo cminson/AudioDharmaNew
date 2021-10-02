@@ -17,7 +17,7 @@ struct AlbumRow: View {
     func getImage(named: String) -> Image {
        let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
        return Image(uiImage: uiImage)
-    }
+    } 
 
     var body: some View {
         
@@ -34,7 +34,8 @@ struct AlbumRow: View {
                     .padding(.leading, 0)
                 Spacer()
                 VStack() {
-                    Text(String(album.totalTalks))
+                    //Text(String(album.totalTalks))
+                    Text(album.totalTalks.withCommas())
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))

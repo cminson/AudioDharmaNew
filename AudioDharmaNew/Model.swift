@@ -170,7 +170,6 @@ class Model {
     var UserNotes: [String: UserNoteData] = [:]      // all the  user notes defined by this user, indexed by fileName
     var UserFavorites: [String: UserFavoriteData] = [:]      // all the favorites defined by this user, indexed by fileName
 	var UserDownloads: [String: UserDownloadData] = [:]      // all the downloads defined by this user, indexed by fileName
-    // CJM
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
@@ -197,9 +196,6 @@ class Model {
     func loadData() {
         
         FileNameToTalk = [String: TalkData] ()
-
-
-
         ListAllTalks = []
         
         HTTPResultCode = 0
@@ -207,18 +203,8 @@ class Model {
         URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
         
-        // MUST be done before calling downloadAndConfigure, as that computes
-        // stats and that in turn relies on KeyToTalks not being nil (which I do check for, but
-        // let's overkill it here just in case
-        //CJM DEV
-        /*
-        for dataContent in DATA_ALBUMS {
-            self.KeyToTalks[dataContent] = [TalkData] ()
-        }
- */
-
+        self.PlayedTalks = self.loadPlayedTalksData()
         downloadAndConfigure(path: URL_CONFIGURATION)
-        
         
         // build the data directories on device, if needed
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
@@ -978,7 +964,8 @@ class Model {
     
     func saveTalkHistoryData() {
         
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserTalkHistoryAlbum, toFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
+
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserTalkHistoryList, toFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
     }
     
     func saveShareHistoryData() {
@@ -986,13 +973,13 @@ class Model {
         NSKeyedArchiver.archiveRootObject(TheDataModel.UserShareHistoryAlbum, toFile: TalkHistoryData.ArchiveShareHistoryURL.path)
     }
     
-    // CJM
+
     func savePlayedTalksData() {
          
          NSKeyedArchiver.archiveRootObject(PlayedTalks, toFile: PlayedTalks_ArchiveURL.path)
      }
     
-    func loadUPlayedTalksData() -> [String: Bool]  {
+    func loadPlayedTalksData() -> [String: Bool]  {
         
         if let playedTalks = NSKeyedUnarchiver.unarchiveObject(withFile: PlayedTalks_ArchiveURL.path)
             as? [String: Bool] {
@@ -1400,30 +1387,34 @@ class Model {
     //
     func addToTalkHistory(talk: TalkData) {
         
+        self.PlayedTalks[talk.FileName] = true
+
         let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy.MM.dd"
         let datePlayed = formatter.string(from: date)
-        
         formatter.dateFormat = "HH:mm:ss"
         let timePlayed = formatter.string(from: date)
 
-        self.PlayedTalks[talk.FileName] = true
         talk.DatePlayed = datePlayed
         talk.TimePlayed = timePlayed
-        UserTalkHistoryAlbum.talkList.append(talk)
-        
-        let excessTalkCount = UserTalkHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
+
+        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
+
+        self.UserTalkHistoryAlbum.talkList.append(talk)
+        self.UserTalkHistoryList.append(talkHistory)
+        let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {
-                UserTalkHistoryAlbum.talkList.remove(at: 0)
+                UserTalkHistoryList.remove(at: 0)
             }
         }
+ 
+
         
-        // save the data, recompute stats, reload root view to display updated stats
-        savePlayedTalksData()   // CJM
+        savePlayedTalksData()
         saveTalkHistoryData()
-        //computeTalkHistoryStats()
+        self.computeAlbumStats(album: self.UserTalkHistoryAlbum)
     }
     
     func addToShareHistory(talk: TalkData) {

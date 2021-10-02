@@ -134,7 +134,6 @@ struct TalkPlayerView: View {
     
     func updateView(){
 
-        print("updateView")
         if sliderUpdating == true {
             displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
         }
@@ -145,44 +144,44 @@ struct TalkPlayerView: View {
                 displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
                 
                 TalkPlayerStatus = .PLAYING
-        }
-         
-    }
-        
-
-            // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
-        /*
-            CurrentTalkTime = MP3TalkPlayer.getCurrentTimeInSeconds()
-            if CurrentTalkTime > 0 {
-
-                TalkPlayerStatus = .PLAYING
-
-                disableActivityIcons()
-                enableScanButtons()
-
-                // show current talk time and actual talk duration
-                // note these may be different from what is stated in the (often inaccurate) config!
-                let currentTime = MP3TalkPlayer.getCurrentTimeInSeconds()
-                let duration = MP3TalkPlayer.getDurationInSeconds()
-
-                let fractionTimeCompleted = Float(currentTime) / Float(duration)
-                talkProgressSlider.value = fractionTimeCompleted
-
-                updateTitleDisplay()
-
-                // if play time exceeds reporting threshold and not previously reported, report it
-                if CurrentTalkTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: CurrentTalk) == false {
-
-                    TheDataModel.addToTalkHistory(talk: CurrentTalk)
-                    TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
-                }
-                //MARKPLAYED_TALK_THRESHOLD
-
-                UserDefaults.standard.set(CurrentTalkTime, forKey: "CurrentTalkTime")
-                UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
-
             }
- */
+         
+        }
+    
+        // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
+        CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
+        if CurrentTalkTime > 0 {
+
+            TalkPlayerStatus = .PLAYING
+
+            /*
+            disableActivityIcons()
+            enableScanButtons()
+             */
+
+           /*
+            let currentTime = TheTalkPlayer.getCurrentTimeInSeconds()
+            let duration = TheTalkPlayer.getDurationInSeconds()
+
+            let fractionTimeCompleted = Float(currentTime) / Float(duration)
+            talkProgressSlider.value = fractionTimeCompleted
+
+            updateTitleDisplay()
+            */
+
+            // if play time exceeds reporting threshold and not previously reported, report it
+            if CurrentTalkTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: CurrentTalk) == false {
+
+                TheDataModel.addToTalkHistory(talk: CurrentTalk)
+                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
+            }
+            //MARKPLAYED_TALK_THRESHOLD
+
+            UserDefaults.standard.set(CurrentTalkTime, forKey: "CurrentTalkTime")
+            UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
+
+        }
+
     }
 
     /*
