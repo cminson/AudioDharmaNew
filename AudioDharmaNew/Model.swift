@@ -137,17 +137,20 @@ class Model {
     var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
 
-    var UserTalkHistoryAlbum: [TalkHistoryData] = []    // history of talks for user
+    //var UserTalkHistoryAlbum: [TalkHistoryData] = []    // history of talks for user
     var FileNameToUserTalkHistory: [String: TalkHistoryData]   = [String: TalkHistoryData] ()  //
-    var UserShareHistoryAlbum: [TalkHistoryData] = []   // history of shared talks for user
-    var SangaTalkHistoryAlbum: [TalkHistoryData] = []          // history of talks for sangha
-    var SangaShareHistoryAlbum: [TalkHistoryData] = []          // history of shares for sangha
     
     var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", image: "albumdefault", date: "")
     var RecommendedAlbum: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", image: "albumdefault", date: "")
     var UserFavoritesAlbum: AlbumData = AlbumData(title: "USER FAVORITES", key: KEY_USER_FAVORITES, section: "", image: "albumdefault", date: "")
     var UserNoteAlbum: AlbumData = AlbumData(title: "USER NOTES", key: KEY_NOTES, section: "", image: "albumdefault", date: "")
     var UserDownloadAlbum: AlbumData = AlbumData(title: "USER DOWNLOADS", key: KEY_USER_DOWNLOADS, section: "", image: "albumdefault", date: "")
+    var SanghaTalkHistoryAlbum =  AlbumData(title: "Today's Talk History", key: KEY_SANGHA_TALKHISTORY, section: "", image: "albumdefault", date: "")
+    var SanghaShareHistoryAlbum =  AlbumData(title: "Today's Shared Talks", key: KEY_SANGHA_SHAREHISTORY, section: "", image: "albumdefault", date: "")
+    var UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", image: "albumdefault", date: "")
+    var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", image: "albumdefault", date: "")
+    
+    var UserTalkHistoryList: [TalkHistoryData] = []
 
 
     var ListAllTalks: [TalkData] = []
@@ -175,10 +178,7 @@ class Model {
     func resetData() {
 
         FileNameToTalk = [String: TalkData] ()
-        UserTalkHistoryAlbum = []
-        UserShareHistoryAlbum = []
-        SangaTalkHistoryAlbum = []
-        SangaShareHistoryAlbum = []
+
         
         ListAllTalks = []
         
@@ -191,20 +191,14 @@ class Model {
         UserFavorites = [:]
         UserDownloads = [:]
         
-        /*
-        for dataContent in DATA_ALBUMS {
-            self.KeyToTalks[dataContent] = [TalkData] ()
-        }
- */
+       
     }
     
     func loadData() {
         
         FileNameToTalk = [String: TalkData] ()
-        UserTalkHistoryAlbum = []
-        UserShareHistoryAlbum = []
-        SangaTalkHistoryAlbum  = []
-        SangaShareHistoryAlbum = []
+
+
 
         ListAllTalks = []
         
@@ -225,8 +219,6 @@ class Model {
 
         downloadAndConfigure(path: URL_CONFIGURATION)
         
-        // get sangha activity and set up timer for updates
-        downloadSanghaActivity()
         
         // build the data directories on device, if needed
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
@@ -244,70 +236,6 @@ class Model {
         
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(getSanghaActivity), userInfo: nil, repeats: true)
     }
-    
-    
-    func downloadSimilarityData(talkFileName: String) {
-    
-        /*
-        let config = URLSessionConfiguration.default
-        config.requestCachePolicy = .reloadIgnoringLocalCacheData
-        config.urlCache = nil
-        let session = URLSession.init(configuration: config)
-        
-        let similarKeyName = talkFileName.replacingOccurrences(of: ".mp3", with: "")
-        let path = URL_GET_SIMILAR + similarKeyName
-        let requestURL : URL? = URL(string: path)
-        let urlRequest = URLRequest(url : requestURL!)
-        
-        let task = session.dataTask(with: urlRequest) {
-            (data, response, error) -> Void in
-            
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-                HTTPResultCode = httpResponse.statusCode
-            } else {
-                HTTPResultCode = 404
-            }
-            
-            if let responseData = data {
-                if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    HTTPResultCode = 404
-                }
-            }
-            else {
-                HTTPResultCode = 404
-            }
-            
-            if HTTPResultCode == 200 {
-           
-                let content = talkFileName
-
-                var talks = [TalkData] ()
-
-                do {
-                    let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
-                    for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
-                        
-                        let filename = similarTalk["filename"] as? String ?? ""
-                        
-                        if let talk = self.FileNameToTalk[filename] {
-                            talks.append(talk)
-                        }
-                    }
-
-                    self.KeyToTalks[content] = talks
-
-                }
-                catch {
-                }
-            }
-        
-        }
-        task.resume()
-*/
-    }
-    
             
     
     // MARK: Configuration
@@ -361,9 +289,6 @@ class Model {
                 }
             }
 
-            // unzip zipped config back into json
-            //let time1 = Date.timeIntervalSinceReferenceDate
-            
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
                 HTTPResultCode = 404
                 
@@ -384,9 +309,7 @@ class Model {
                 return
             }
                         
-            // BEGIN CRITICAL SECTION
-            ModelUpdateSemaphore.wait()
-
+            // BEGIN CRITICAL SECTION  CJM DEV
 
             do {
                 let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
@@ -398,51 +321,14 @@ class Model {
             catch {
             }
             
-/*
-            self.computeUserFavoriteStats()
-            self.computeNotesStats()
- */
-
+            /*
             for album in self.RootAlbum.albumList {
                 self.computeAlbumStats(album: album)
             }
-
-            
- 
-            
-            /*
-            self.computeUserAlbumStats()
-            self.computeNotesStats()
-            self.computeUserFavoritesStats()
-            self.computeUserDownloadStats()
-            self.computeTalkHistoryStats()
-            self.computeShareHistoryStats()
-            self.computeDataStats()
-
-            self.UserAlbums = TheDataModel.loadUserAlbumData()
-            self.computeUserAlbumStats()
-            
-             
-            self.UserNotes = TheDataModel.loadUserNoteData()
-            self.computeNotesStats()
-            self.UserFavorites = TheDataModel.loadUserFavoriteData()
-            self.computeUserFavoritesStats()
-            self.UserDownloads = TheDataModel.loadUserDownloadData()
-            TheDataModel.validateUserDownloadData()
-            self.computeUserDownloadStats()
-
-            self.UserTalkHistoryAlbum = TheDataModel.loadTalkHistoryData()
-            self.PlayedTalks = TheDataModel.loadUPlayedTalksData()
-            self.computeTalkHistoryStats()
-
-            self.UserShareHistoryAlbum = TheDataModel.loadShareHistoryData()
-            self.computeShareHistoryStats()
- */
-
             
             print("signalling semaphore")
-            ModelUpdateSemaphore.signal()
             ModelLoadSemaphore.signal()
+             */
             
   
 
@@ -546,7 +432,6 @@ class Model {
                 talkCount += 1
         }
         
-        
         // sort the albums
         self.ListSpeakerAlbums = self.ListSpeakerAlbums.sorted(by: { $0.Key < $1.Key })
         self.ListSeriesAlbums = self.ListSeriesAlbums.sorted(by: { $1.Date < $0.Date })
@@ -623,6 +508,25 @@ class Model {
                             talkList.append(talk)
                         }
                     }
+                case KEY_USER_TALKHISTORY:
+                    print("talk History")
+                    self.UserTalkHistoryAlbum = album
+                    self.UserTalkHistoryList = TheDataModel.loadTalkHistoryData()
+
+                    for talkHistory in self.UserTalkHistoryList {
+                        if let talk = FileNameToTalk[talkHistory.FileName] {
+                            print("adding talk history", talk.Title)
+                            talkList.append(talk)
+                        }
+                    }
+
+                case KEY_USER_SHAREHISTORY:
+                    self.UserShareHistoryAlbum = album
+
+                case KEY_SANGHA_TALKHISTORY:
+                    self.SanghaTalkHistoryAlbum = album
+                case KEY_SANGHA_SHAREHISTORY:
+                    self.SanghaShareHistoryAlbum = album
               default:
                     albumList = []
                     talkList = []
@@ -694,7 +598,7 @@ class Model {
     
     func downloadSanghaActivity() {
         
-        /*
+  
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -728,12 +632,10 @@ class Model {
             if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
                 return
             }
-            
-            self.SangaTalkHistoryAlbum = []
-            self.SangaShareHistoryAlbum = []
-
+  
             do {
                 // get the community talk history
+                print("Now the Sangha Data")
                 var talkCount = 0
                 var totalSeconds = 0
                 let json =  try JSONSerialization.jsonObject(with: responseData) as! [String: AnyObject]
@@ -748,24 +650,21 @@ class Model {
                    
                     if let talk = self.FileNameToTalk[fileName] {
                         
-                        let talkHistory = TalkHistoryData(fileName: fileName,
-                                                          datePlayed: datePlayed,
-                                                          timePlayed: timePlayed,
-                                                          cityPlayed: city,
-                                                          statePlayed: state,
-                                                          countryPlayed: country)
+                        var talkHistory = talk.copy() as! TalkData
+                        talkHistory.DatePlayed = datePlayed
+                        talkHistory.City  = city
+                        talkHistory.Country = country
+
                         talkCount += 1
                         totalSeconds += talk.DurationInSeconds
-                        self.SangaTalkHistoryAlbum.append(talkHistory)
+                        self.SanghaTalkHistoryAlbum.talkList.append(talkHistory)
                         
                         if talkCount >= MAX_TALKHISTORY_COUNT {
                             break
                         }
                     }
                 }
-                var durationDisplay = self.secondsToDurationDisplay(seconds: totalSeconds)
-                var stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-                self.SanghaTalkHistoryStats = stats
+
 
                 // get the community share history
                 talkCount = 0
@@ -781,13 +680,12 @@ class Model {
                     
                     if let talk = self.FileNameToTalk[fileName] {
                         
-                        let talkHistory = TalkHistoryData(fileName: fileName,
-                                                          datePlayed: dateShared,
-                                                          timePlayed: timeShared,
-                                                          cityPlayed: city,
-                                                          statePlayed: state,
-                                                          countryPlayed: country)
-                        self.SangaShareHistoryAlbum.append(talkHistory)
+                        var talkHistory = talk.copy() as! TalkData
+                        talkHistory.DatePlayed = dateShared
+                        talkHistory.City  = city
+                        talkHistory.Country = country
+
+                        self.SanghaShareHistoryAlbum.talkList.append(talkHistory)
                         
                         talkCount += 1
                         totalSeconds += talk.DurationInSeconds
@@ -797,37 +695,45 @@ class Model {
                         }
                     }
                  }
-                durationDisplay = self.secondsToDurationDisplay(seconds: totalSeconds)
-                stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-                self.SanghaShareHistoryStats = stats
+
                 
                 // lastly get the pluggable DATA albums.  these are optional
                 for dataContent in DATA_ALBUMS {
                     
                     talkCount = 0
                     totalSeconds = 0
-                    self.KeyToTalks[dataContent] = [TalkData] ()
                     for talkJSON in json[dataContent] as? [AnyObject] ?? [] {
                     
                         let fileName = talkJSON["filename"] as? String ?? ""
                         if let talk = self.FileNameToTalk[fileName] {
                         
-                            self.KeyToTalks[dataContent]?.append(talk)
+                            //self.KeyToTalks[dataContent]?.append(talk)
                             talkCount += 1
                             totalSeconds += talk.DurationInSeconds
                         }
                     }
-                
-                    durationDisplay = self.secondsToDurationDisplay(seconds: totalSeconds)
-                    stats = AlbumStats(totalTalks: talkCount, totalSeconds: totalSeconds, durationDisplay: durationDisplay)
-                    self.KeyToAlbumStats[dataContent] = stats
+                    
+                    /* CJM DEV add album assignment*/
+
                 }
             } catch {   // end do catch
             }
             
+            for album in self.RootAlbum.albumList {
+                self.computeAlbumStats(album: album)
+            }
+            
+            print("signalling semaphore")
+            ModelLoadSemaphore.signal()
+            
         }
+        
+ 
         task.resume()
- */
+        
+        
+
+
     }
     
     func download(talk: TalkData, notifyUI: @escaping  () -> Void) {
@@ -1336,7 +1242,7 @@ class Model {
  
     
 
-    
+    /*
     func getTalkHistory(content: String) -> [TalkHistoryData] {
         
         var talkHistoryList : [TalkHistoryData]
@@ -1363,7 +1269,7 @@ class Model {
             
         case KEY_SANGHA_TALKHISTORY:
             var talkHistories = [TalkHistoryData] ()
-            for talkHistory in SangaTalkHistoryAlbum {
+            for talkHistory in SanghaTalkHistoryAlbum {
                 if let _ = FileNameToTalk[talkHistory.FileName] {
                     talkHistories.append(talkHistory)
                 }
@@ -1372,7 +1278,7 @@ class Model {
             
         case KEY_SANGHA_SHAREHISTORY:
             var talkHistories = [TalkHistoryData] ()
-            for talkHistory in SangaShareHistoryAlbum {
+            for talkHistory in SanghaShareHistoryAlbum {
                 if let _ = FileNameToTalk[talkHistory.FileName] {
                     talkHistories.append(talkHistory)
                 }
@@ -1385,6 +1291,7 @@ class Model {
         
         return talkHistoryList
     }
+     */
 
     
     func getUserAlbums() -> [UserAlbumData] {
@@ -1480,7 +1387,7 @@ class Model {
     
     func isMostRecentTalk(talk: TalkData) -> Bool {
     
-        if let talkHistory = UserTalkHistoryAlbum.last {
+        if let talkHistory = UserTalkHistoryAlbum.talkList.last {
             if talkHistory.FileName == talk.FileName {
                 return true
             }
@@ -1488,6 +1395,9 @@ class Model {
         return false
     }
     
+    //
+    // invoked in background by TalkPlayerView
+    //
     func addToTalkHistory(talk: TalkData) {
         
         let date = Date()
@@ -1497,26 +1407,16 @@ class Model {
         
         formatter.dateFormat = "HH:mm:ss"
         let timePlayed = formatter.string(from: date)
-        
-        let cityPlayed = ""
-        let statePlayed = ""
-        let countryPlayed = ""
 
-        // CJM
         self.PlayedTalks[talk.FileName] = true
-        let talkHistory = TalkHistoryData(fileName: talk.FileName,
-                                          datePlayed: datePlayed,
-                                          timePlayed: timePlayed,
-                                          cityPlayed: cityPlayed,
-                                          statePlayed: statePlayed,
-                                          countryPlayed: countryPlayed )
+        talk.DatePlayed = datePlayed
+        talk.TimePlayed = timePlayed
+        UserTalkHistoryAlbum.talkList.append(talk)
         
-        UserTalkHistoryAlbum.append(talkHistory)
-        
-        let excessTalkCount = UserTalkHistoryAlbum.count - MAX_HISTORY_COUNT
+        let excessTalkCount = UserTalkHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {
-                UserTalkHistoryAlbum.remove(at: 0)
+                UserTalkHistoryAlbum.talkList.remove(at: 0)
             }
         }
         
@@ -1536,29 +1436,20 @@ class Model {
         formatter.dateFormat = "HH:mm:ss"
         let timePlayed = formatter.string(from: date)
         
-        let cityPlayed = ""
-        let statePlayed = ""
-        let countryPlayed = ""
+        self.PlayedTalks[talk.FileName] = true
+        talk.DatePlayed = datePlayed
+        talk.TimePlayed = timePlayed
+        UserShareHistoryAlbum.talkList.append(talk)
         
-        let talkHistory = TalkHistoryData(fileName: talk.FileName,
-                                          datePlayed: datePlayed,
-                                          timePlayed: timePlayed,
-                                          cityPlayed: cityPlayed,
-                                          statePlayed: statePlayed,
-                                          countryPlayed: countryPlayed )
-
-        UserShareHistoryAlbum.append(talkHistory)
-        
-        let excessTalkCount = UserShareHistoryAlbum.count - MAX_HISTORY_COUNT
+        let excessTalkCount = UserShareHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {
-                UserShareHistoryAlbum.remove(at: 0)
+                UserShareHistoryAlbum.talkList.remove(at: 0)
             }
         }
         
         // save the data, recompute stats, reload root view to display updated stats
         saveShareHistoryData()
-        //computeShareHistoryStats()
     }
     
      

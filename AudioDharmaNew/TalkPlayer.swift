@@ -141,7 +141,6 @@ class TalkPlayer : NSObject {
     
     @objc func timerUpdate() {
         
-        print("timerUpdate")
         talkPlayerView.updateView()
     }
     

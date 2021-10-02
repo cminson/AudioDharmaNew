@@ -11,6 +11,10 @@ import Foundation
 import UIKit
 import os.log
 
+enum TalkType {
+    case ACTIVE
+    case HISTORICAL
+}
 
 class AlbumData: Identifiable, ObservableObject {
     
@@ -21,13 +25,15 @@ class AlbumData: Identifiable, ObservableObject {
     var Section: String
     var Image: String
     var Date: String
+    
     @Published var totalTalks: Int
     var totalSeconds: Int
     var durationDisplay: String
     
     var albumList: [AlbumData]
     var talkList: [TalkData]
-
+    var talkType: TalkType
+    
 
     init(title: String, key: String, section: String, image: String,  date : String) {
         
@@ -43,12 +49,13 @@ class AlbumData: Identifiable, ObservableObject {
         totalTalks = 0
         totalSeconds = 0
         durationDisplay = "00:00:00"
+        talkType = TalkType.ACTIVE
         
     }
 }
 
 
-class TalkData: Identifiable, Equatable, ObservableObject {
+class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     
     // MARK: Properties
     let id = UUID()
@@ -62,6 +69,12 @@ class TalkData: Identifiable, Equatable, ObservableObject {
     var DurationInSeconds: Int
     var SpeakerPhoto: UIImage
     @Published var isDownloaded: Bool
+    
+    var DatePlayed: String
+    var TimePlayed: String
+    var City: String
+    var Country: String
+  
     
     static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
         return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
@@ -89,7 +102,25 @@ class TalkData: Identifiable, Equatable, ObservableObject {
         
         SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
         isDownloaded = false
+        
+        DatePlayed = ""
+        TimePlayed = ""
+        City = ""
+        Country = ""
      }
+    
+    func copy(with zone: NSZone? = nil) -> Any {
+        let copy = TalkData(title: Title,
+                            url: URL,
+                            fileName: FileName,
+                            date: Date,
+                            durationDisplay: DurationDisplay,
+                            speaker: Speaker,
+                            durationInSeconds: DurationInSeconds,
+                            pdf: PDF)
+        
+        return copy
+    }
     
      
     func toggleTalkAsFavorite() -> Bool {
