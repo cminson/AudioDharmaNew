@@ -135,17 +135,15 @@ struct TalkPlayerView: View {
     func updateView(){
 
         if sliderUpdating == true {
-            displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
+            displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
         }
         else {
             CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
             if CurrentTalkTime > 0 {
                 elapsedTime = Double(CurrentTalkTime)
-                displayedElapsedTime = TheDataModel.secondsToDurationDisplay(seconds: Int(elapsedTime))
-                
+                displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
                 TalkPlayerStatus = .PLAYING
             }
-         
         }
     
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
@@ -279,14 +277,14 @@ struct TalkPlayerView: View {
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
                     .frame(width: 20)
-                Text(talk.DurationDisplay)
+                Text(talk.TotalSeconds.displayInClockFormat())
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
             }
            
             // talk current position control
             Slider(value: $elapsedTime,
-                   in: 0...Double(talk.DurationInSeconds),
+                   in: 0...Double(talk.TotalSeconds),
                    onEditingChanged: { editing in
                         sliderUpdating = editing
                     if sliderUpdating == false {

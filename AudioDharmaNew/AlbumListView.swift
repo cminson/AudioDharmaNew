@@ -9,23 +9,42 @@ import SwiftUI
 import UIKit
 
 
-
-struct AlbumRow: View {
-    @ObservedObject var album: AlbumData
-    
-
-    func getImage(named: String) -> Image {
-       let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
-       return Image(uiImage: uiImage)
-    } 
+struct SectionRow: View {
+    var title: String
 
     var body: some View {
         
         VStack(alignment: .leading) {
             HStack() {
-                getImage(named: album.Image)
+                Spacer()
+                Text(title)
+                    .font(.system(size: 14, weight: .bold))
+                    .background(Color(hex: "555555"))
+                    .foregroundColor(.white)
+                    .padding(.leading, 0)
+                Spacer()
+            }
+            .frame(height: 35)
+
+        }
+        .background(Color(hex: "555555"))
+        .frame(maxWidth: .infinity)
+     }
+}
+
+
+struct AlbumRow: View {
+    
+    @ObservedObject var album: AlbumData
+    @State var selection: String?  = ""
+
+    var body: some View {
+        
+        VStack(alignment: .leading) {
+            HStack() {
+                album.ImageName.toImage()
                     .resizable()
-                    .frame(width: SPEAKER_IMAGE_WIDTH, height:SPEAKER_IMAGE_HEIGHT)
+                    .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")
@@ -33,99 +52,64 @@ struct AlbumRow: View {
                     .background(Color.white)
                     .padding(.leading, 0)
                 Spacer()
-                VStack() {
-                    //Text(String(album.totalTalks))
-                    Text(album.totalTalks.withCommas())
+                VStack(alignment: .trailing, spacing: 8) {
+                    Text(album.totalTalks.displayInCommaFormat())
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
-                    Spacer()
-                        .frame(height: 8)
-                    Text(album.durationDisplay)
+                    //Spacer()
+                        //frame(height: 8)
+                    Text(album.totalSeconds.displayInClockFormat())
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: 10))
                 }
             }
+            .onTapGesture {
+                if KEYS_TO_ALBUMS.contains(album.Key) {
+                    print("RENDER ALBUM")
+                    selection = "ALBUMS"
+                } else {
+                    print("RENDER TALKS")
+                    selection = "TALKS"
+                }
+            }
         }
+        .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
         .frame(height:40)
         .frame(maxWidth: .infinity)
 
      }
 }
 
-/*
- 
- NavigationLink(destination: AlbumListView(album: album)) {
-     AlbumRow(album: album)
-
- NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden()
-
- */
-
 
 struct AlbumListView: View {
+    
     var album: AlbumData
     
     @State var selectedAlbum: AlbumData
-
     @State var selection: String?  = ""
     @State var searchText: String  = ""
-
     @State var noCurrentTalk: Bool = false
     
     
     init(album: AlbumData) {
         self.album = album
-        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", image: "", date: "")
-
-        
-        print("AlbumListView: ", album.Title)
-        
-        print("Album List")
-        /*
-        for album in album.albumList {
-            print(album.Title)
-        }
-         */
-
+        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", imageName: "", date: "")
     }
     
-    func getKey (album: AlbumData) -> Bool {
-        print("ALBUM BODY RENDERING")
-        
-        return album.Key.contains("ALBUM")
     
-    }
-
     var body: some View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-
-        //List(TheDataModel.getAlbumData(key: key, filter: searchText)) { album in
-        List(album.albumList) { album in
+        List(album.getFilteredAlbums(filter: searchText)) { album in
            AlbumRow(album: album)
-                .onTapGesture {
-                    selectedAlbum = album
-                    //if album.Key.contains("ALBUM") {
-                    if getKey(album: album) {
-                        selection = "ALBUMS"
-                    } else {
-                        selection = "TALKS"
-                    }
-                }
         }
-
-        .background(NavigationLink(destination: TalkListView(album: selectedAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: AlbumListView(album: selectedAlbum), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-
         .navigationBarTitle(album.Title, displayMode: .inline)
         .navigationBarHidden(false)
-        
         .listStyle(PlainListStyle())  // ensures fills parent view
-
-
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -157,6 +141,7 @@ struct AlbumListView: View {
                 }
             }
     }
+    
 }
 
 

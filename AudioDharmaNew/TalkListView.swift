@@ -27,6 +27,7 @@ struct TalkRow: View {
     
     @State private var textStyle = UIFont.TextStyle.body
 
+    
     init(album: AlbumData, talk: TalkData) {
         
         self.album = album
@@ -49,6 +50,7 @@ struct TalkRow: View {
         }
     }
     
+    
     func downloadCompleted() -> Void {
         print("downloadCompleted")
 
@@ -56,36 +58,31 @@ struct TalkRow: View {
     }
     
     
-    func getImage(named: String) -> Image {
-       let uiImage =  (UIImage(named: named) ?? UIImage(named: "defaultPhoto"))!
-       return Image(uiImage: uiImage)
-    }
-    
     var body: some View {
-        
+                
         VStack(alignment: .leading) {
             HStack() {
-                getImage(named: talk.Speaker)
+                talk.Speaker.toImage()
                     .resizable()
-                    .frame(width: SPEAKER_IMAGE_WIDTH, height: SPEAKER_IMAGE_HEIGHT)
+                    .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .background(Color.white)
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
-                Text("\(stateTalkTitle)")
+                Text(talk.hasTalkBeenPlayed() ? "* " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: 12))
                     .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
                 VStack() {
-                    Text(String(talk.Date))
+                    Text(talk.TotalSeconds.displayInClockFormat())
                         .background(Color.white)
                         .padding(.trailing, -5)
                         .font(.system(size: 10))
                     Spacer()
                         .frame(height: 8)
-                    Text(talk.DurationDisplay)
+                    Text(String(talk.Date))
                         .background(Color.white)
                         .padding(.trailing, -5)
                         .font(.system(size: 10))
@@ -180,18 +177,14 @@ struct TalkRow: View {
 }
 
 struct TalkListView: View {
-    //@Published var counter: Int = 0
     var album: AlbumData
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
-    
     @State var noCurrentTalk: Bool = false
 
     init(album: AlbumData) {
         self.album = album
-
-
     }
     
 
@@ -199,7 +192,7 @@ struct TalkListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(album.talkList) { talk in
+        List(album.getFilteredTalks(filter: searchText)) { talk in
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
@@ -248,8 +241,6 @@ struct TalkListView: View {
                     }
                 }
             }
-
-        
     }
 }
 

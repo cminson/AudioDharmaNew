@@ -14,8 +14,8 @@ import WebKit
 //
 // Global Constants
 //
-let SPEAKER_IMAGE_HEIGHT : CGFloat = 40.0
-let SPEAKER_IMAGE_WIDTH : CGFloat = 40.0
+let LIST_IMAGE_HEIGHT : CGFloat = 40.0
+let LIST_IMAGE_WIDTH : CGFloat = 40.0
 
 let APP_ICON_COLOR = Color(red:1.00, green:0.55, blue:0.00)     //  green #ff8c00
 let SECTION_BACKGROUND = UIColor.darkGray  // #555555ff
@@ -23,7 +23,7 @@ let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 let SECTION_TEXT = UIColor.white
 
-var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "",durationDisplay: "",speaker: "", durationInSeconds: 1, pdf: "")
+var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
 var CurrentTalkTime : Int = 0
 
 var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
@@ -60,7 +60,6 @@ struct ToolBar: ToolbarContent {
         ToolbarItem(placement: .bottomBar) {
             Button(action: {
                 print("Edit button was tapped")
-                let x = CurrentTalk
                 //selection = "PLAY_TALK"
 
             }) {
@@ -301,13 +300,16 @@ struct DonationPageView: View {
     }
 }
 
+
 /*
  *********************************************************************************
  * Extensions
  *********************************************************************************
  */
+
 extension Int {
-    func withCommas() -> String {
+    
+    func displayInCommaFormat() -> String {
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = .decimal
         return numberFormatter.string(from: NSNumber(value:self))!
@@ -315,7 +317,72 @@ extension Int {
 }
 
 
+extension Int {
+    
+    func displayInClockFormat() -> String {
+        
+        let hours = self / 3600
+        let modHours = self % 3600
+        let minutes = modHours / 60
+        let seconds = modHours % 60
+        
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = NumberFormatter.Style.decimal
+        let hoursStr = numberFormatter.string(from: NSNumber(value:hours)) ?? "0"
+        
+        let minutesStr = String(format: "%02d", minutes)
+        let secondsStr = String(format: "%02d", seconds)
+        
+        return hoursStr + ":" + minutesStr + ":" + secondsStr
+    }
+}
+
+
+extension String {
+    
+    func convertDurationToSeconds() -> Int {
+    
+        var totalSeconds: Int = 0
+        var hours : Int = 0
+        var minutes : Int = 0
+        var seconds : Int = 0
+        
+        if self != "" {
+            let durationArray = self.components(separatedBy: ":")
+            let count = durationArray.count
+            if (count == 3) {
+                hours  = Int(durationArray[0])!
+                minutes  = Int(durationArray[1])!
+                seconds  = Int(durationArray[2])!
+            } else if (count == 2) {
+                hours  = 0
+                minutes  = Int(durationArray[0])!
+                seconds  = Int(durationArray[1])!
+                
+            } else if (count == 1) {
+                hours = 0
+                minutes  = 0
+                seconds  = Int(durationArray[0])!
+                
+            } else {
+            }
+        }
+        totalSeconds = (hours * 3600) + (minutes * 60) + seconds
+        return totalSeconds
+    }
+}
+
+extension String {
+    
+    func toImage() -> Image {
+       let uiImage =  (UIImage(named: self) ?? UIImage(named: "defaultPhoto"))!
+       return Image(uiImage: uiImage)
+    }
+}
+
+
 extension Color {
+    
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0

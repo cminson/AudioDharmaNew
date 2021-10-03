@@ -11,36 +11,34 @@ import Foundation
 import UIKit
 import os.log
 
+
 enum TalkType {
     case ACTIVE
     case HISTORICAL
 }
 
+
 class AlbumData: Identifiable, ObservableObject {
     
-    //MARK: Properties
+    @Published var totalTalks: Int
     let id = UUID()
     var Title: String
     var Key: String
     var Section: String
-    var Image: String
+    var ImageName: String
     var Date: String
-    
-    @Published var totalTalks: Int
     var totalSeconds: Int
-    var durationDisplay: String
-    
     var albumList: [AlbumData]
     var talkList: [TalkData]
     var talkType: TalkType
     
 
-    init(title: String, key: String, section: String, image: String,  date : String) {
+    init(title: String, key: String, section: String, imageName: String,  date : String) {
         
         Title = title
         Key = key
         Section = section
-        Image = image
+        ImageName = imageName
         Date = date
         
         albumList = []
@@ -48,9 +46,49 @@ class AlbumData: Identifiable, ObservableObject {
         
         totalTalks = 0
         totalSeconds = 0
-        durationDisplay = "00:00:00"
         talkType = TalkType.ACTIVE
-        
+    }
+    
+    
+    func getFilteredAlbums(filter: String) -> [AlbumData] {
+
+        var filteredAlbumList = [AlbumData] ()
+
+        if filter == "TEST" {
+            let test = AlbumData(title: "test", key: "test", section: "", imageName: "speaker", date: "01-01-01")
+            var testa = [test]
+            for _ in 1 ... 100 {
+                testa.append(test)
+            }
+            return testa
+        }
+  
+        if filter.isEmpty {
+            return self.albumList
+        } else {
+            for album in self.albumList {
+                let searchedData = album.Title.lowercased()
+                if searchedData.contains(filter.lowercased()) {filteredAlbumList.append(album)}
+            }
+        }
+        return filteredAlbumList
+    }
+    
+    
+    func getFilteredTalks(filter: String) -> [TalkData] {
+
+        var filteredTalkList = [TalkData] ()
+
+        if filter.isEmpty {
+            return self.talkList
+        } else {
+
+            for talk in self.talkList {
+                let searchedData = talk.Title.lowercased()
+                if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
+            }
+        }
+        return filteredTalkList
     }
 }
 
@@ -64,9 +102,8 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     var FileName: String
     var Date: String
     var Speaker: String
-    var DurationDisplay: String
     var PDF: String
-    var DurationInSeconds: Int
+    var TotalSeconds: Int
     var SpeakerPhoto: UIImage
     @Published var isDownloaded: Bool
     
@@ -86,18 +123,16 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
          url: String,
          fileName: String,
          date: String,
-         durationDisplay: String,
          speaker: String,
-         durationInSeconds: Int,
+         totalSeconds: Int,
          pdf: String)
     {
         Title = title
         URL = url
         FileName = fileName
         Date = date
-        DurationDisplay = durationDisplay
         Speaker = speaker
-        DurationInSeconds = durationInSeconds
+        TotalSeconds = totalSeconds
         PDF = pdf
         
         SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
@@ -114,9 +149,8 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
                             url: URL,
                             fileName: FileName,
                             date: Date,
-                            durationDisplay: DurationDisplay,
                             speaker: Speaker,
-                            durationInSeconds: DurationInSeconds,
+                            totalSeconds: TotalSeconds,
                             pdf: PDF)
         
         return copy
@@ -249,6 +283,15 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         }
         return false
     }
+    
+    func hasTalkBeenPlayed() -> Bool {
+    
+        return TheDataModel.PlayedTalks[self.FileName] != nil
+
+    }
+
+    
+     
 
 
 
