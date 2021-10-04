@@ -8,6 +8,9 @@
 import SwiftUI
 import UIKit
 
+let ICON_TALK_FAVORITE = Image("favoritebar")
+let ICON_TALK_NOTATED = Image("notebar")
+
 var TEST : TalkData? = nil
 
 struct TalkRow: View {
@@ -18,13 +21,10 @@ struct TalkRow: View {
     @State private var displayNoteDialog = false
     @State private var displayDownloadDialog = false
     @State private var displayShareSheet = false
-
     @State private var noteText = ""
-    @State var stateImageFavorite : String
-    @State var stateImageNote: String
-    @State var stateTalkTitle: String
-
-    
+    @State private var stateIsFavoriteTalk : Bool
+    @State private var stateIsNotatedTalk : Bool
+    @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
 
     
@@ -33,19 +33,11 @@ struct TalkRow: View {
         self.album = album
         self.talk = talk
         
-        if talk.isFavoriteTalk() {
-            self.stateImageFavorite = "favoritebar"
-        } else {
-            self.stateImageFavorite = "whiterect"
-        }
-        if talk.isNotatedTalk() {
-            self.stateImageNote = "notebar"
-        } else {
-            self.stateImageNote = "whiterect"
-        }
-        
+        self.stateIsFavoriteTalk = talk.isFavoriteTalk()
+        self.stateIsNotatedTalk = talk.isNotatedTalk()
+
         stateTalkTitle = talk.Title
-         if talk.isDownloadInProgress() {
+        if talk.isDownloadInProgress() {
             self.stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
     }
@@ -71,7 +63,7 @@ struct TalkRow: View {
                 Spacer()
                     .frame(width: 6)
                 Text(talk.hasTalkBeenPlayed() ? "* " + stateTalkTitle : stateTalkTitle)
-                    .font(.system(size: 12))
+                    .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
@@ -79,35 +71,30 @@ struct TalkRow: View {
                     Text(talk.TotalSeconds.displayInClockFormat())
                         .background(Color.white)
                         .padding(.trailing, -5)
-                        .font(.system(size: 10))
+                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Spacer()
                         .frame(height: 8)
                     Text(String(talk.Date))
                         .background(Color.white)
                         .padding(.trailing, -5)
-                        .font(.system(size: 10))
+                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
                 VStack() {
- 
-                    Image(self.stateImageFavorite)
+                    ICON_TALK_FAVORITE
                         .resizable()
                         .frame(width: 12, height: 12)
-                    Image(self.stateImageNote)
+                        .hidden(!stateIsFavoriteTalk)
+                    ICON_TALK_NOTATED
                         .resizable()
                         .frame(width: 12, height: 12)
-
+                        .hidden(!stateIsNotatedTalk)
                  }
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
                     }
                     Button("Favorite Talk") {
-                        let isFavorite = talk.toggleTalkAsFavorite()
-                        if isFavorite {
-                            self.stateImageFavorite = "favoritebar"
-                        } else {
-                            self.stateImageFavorite = "whiterect"
-                        }
+                        self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
                     }
                     Button("Make Note") {
                         noteText = talk.getNoteForTalk()
@@ -128,7 +115,6 @@ struct TalkRow: View {
                     message: Text("Download talk to your device."),
                     primaryButton: .destructive(Text("Download")) {
                         stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                        //TheDataModel.download(talk: talk, notifyUI: downloadCompleted)
                         talk.download(notifyUI: downloadCompleted)
                     },
                     secondaryButton: .cancel()
@@ -141,8 +127,6 @@ struct TalkRow: View {
 
                 ShareSheet(activityItems: sharedObjects)
             }
-
-
         }
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
@@ -157,21 +141,14 @@ struct TalkRow: View {
                 Spacer()
                     .frame(height:30)
                 Button("Done") {
-                    print("Done", noteText)
                     talk.addNoteToTalk(noteText: noteText)
+                    self.stateIsNotatedTalk = talk.isNotatedTalk()
                     displayNoteDialog = false
-                    let isNoted = talk.isNotatedTalk()
-                    if isNoted {
-                        self.stateImageNote = "notebar"
-                    } else {
-                        self.stateImageNote = "whiterect"
-                    }
-
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         }
-    .frame(height:40)
+        .frame(height: LIST_ROW_SIZE_STANDARD)
     }
 
 }
@@ -182,6 +159,8 @@ struct TalkListView: View {
     @State var selection: String?  = nil
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
+    @State var selectedTalk: TalkData?
+
 
     init(album: AlbumData) {
         self.album = album
@@ -197,13 +176,11 @@ struct TalkListView: View {
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
                     print("talk selected")
+                    selectedTalk = talk
                     selection = "PLAY_TALK"
-                    CurrentTalk = talk
                 }
         }
-        .background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk, currentTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-
-        //.navigationBarTitle("All Talks", displayMode: .inline)
+        .background(NavigationLink(destination: TalkPlayerView(talk: selectedTalk!, currentTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
 
@@ -218,8 +195,8 @@ struct TalkListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        print(CurrentTalk.Title)
-                        if CurrentTalk.Title == "NO TALK" {
+                        print(CurrentTalk?.Title)
+                        if CurrentTalk?.Title == "NO TALK" {
                             print("none")
                             noCurrentTalk = true
                         } else {
@@ -227,9 +204,7 @@ struct TalkListView: View {
                             selection = "PLAY_TALK"
                         }
                     }) {
-                        Image(systemName: "note")
-                            .renderingMode(.original)
-
+                        Text("Resume Talk")
                     }
                     Spacer()
                     Button(action: {
@@ -237,7 +212,6 @@ struct TalkListView: View {
                     }) {
                         Image(systemName: "heart.fill")
                             .renderingMode(.original)
-
                     }
                 }
             }

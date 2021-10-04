@@ -13,77 +13,47 @@ import os.log
 import ZipArchive
 
 
-// MARK: Global Constants and Vars
-let TheDataModel = Model()
-//@EnvironmentObject var TheDataModel: Model = Model()
-let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
-let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
-let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
+let TheDataModel = Model()  // TheDataModel is the model for all views elsewhere in the program
 
-
-// all possible web config points
+// Web Config Entry Points
 let HostAccessPoints: [String] = [
     "http://www.virtualdharma.org",
     "http://www.audiodharma.org"
 ]
 var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently using
 
-// paths for services
-
-//let CONFIG_JSON_NAME = "CONFIG00.JSON"
-//let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
-
+//
+// Paths for Services
+//
 let CONFIG_JSON_NAME = "CONFIG00.JSON"
 let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
-//let CONFIG_JSON_NAME = "TEST.JSON"
-//let CONFIG_ZIP_NAME = "TEST.ZIP"
-
-
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
-
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
 let CONFIG_GET_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/XGETACTIVITY.php?"           // where to get sangha activity (shares, listens)
-//let CONFIG_GET_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/XTEST.php?"           // where to get sangha activity (shares, listens)
-
-let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.php?KEY="           // where to get similar talks
-let CONFIG_GET_SUGGESTED_TALKS = "/AudioDharmaAppBackend/Access/XGETSUGGESTEDTALKS.php?KEY="           // where to get suggested talks
-
+let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.php?KEY="           // where to get similar talks\
 let CONFIG_GET_HELP = "/AudioDharmaAppBackend/Access/XGETHELP.php?"           // where to get help page
-
-
 let DEFAULT_MP3_PATH = "http://www.audiodharma.org"     // where to get talks
 let DEFAULT_DONATE_PATH = "http://audiodharma.org/donate/"       // where to donate
 
 var HTTPResultCode: Int = 0     // global status of web access
 let MIN_EXPECTED_RESPONSE_SIZE = 300   // to filter for bogus redirect page responses
 
-enum INIT_CODES {          // all possible startup results
-    case SUCCESS
-    case NO_CONNECTION
-}
+var USE_NATIVE_MP3PATHS = true    // true = mp3s are in their native paths in audiodharma, false =  mp3s are in one flat directory
 
-// set default web access points
+
+// Default Web Access Points
 var URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
 var URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
 var URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
 var URL_GET_SIMILAR = HostAccessPoint + CONFIG_GET_SIMILAR_TALKS
-var URL_GET_SUGGESTED = HostAccessPoint + CONFIG_GET_SUGGESTED_TALKS
-var URL_GET_HELP = HostAccessPoint + CONFIG_GET_HELP
-
 var URL_MP3_HOST = DEFAULT_MP3_PATH
 var URL_DONATE = DEFAULT_DONATE_PATH
 
 
-enum ACTIVITIES {          // all possible activities that are reported back to cloud
-    case SHARE_TALK
-    case PLAY_TALK
-}
-
-
-// App Global Constants
-// talk and album display states.  these are used throughout the app to key on state
-let KEY_HELP = "KEY_HELP"
+//
+// Ids for Albums.  Used to map JSON
+//
 let KEY_ALBUMROOT = "KEY_ALBUMROOT"
 let KEY_TALKS = "KEY_TALKS"
 let KEY_ALL_TALKS = "KEY_ALLTALKS"
@@ -108,37 +78,34 @@ let KEY_USER_TALKS = "KEY_USER_TALKS"
 let KEY_USEREDIT_TALKS = "KEY_USEREDIT_TALKS"
 let KEY_PLAY_TALK = "KEY_PLAY_TALK"
 
-
 let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes per second of MP3.  Used to estimate size of download files
-
-// MARK: Global Config Variables.  Values are defaults.  All these can be overriden at boot time by the config
-let REPORT_TALK_THRESHOLD = 90      // how many seconds into a talk before reporting that talk that has been officially played
-
+let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
 let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the interval between talks
-
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-
 var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
 var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
-var USE_NATIVE_MP3PATHS = true    // true = mp3s are in their native paths in audiodharma, false =  mp3s are in one flat directory
-
-let SECTION_HEADER = "SECTION_HEADER"
 let DATA_ALBUMS: [String] = ["DATA00", "DATA01", "DATA02", "DATA03", "DATA04", "DATA05"]    // all possible pluggable data albums we can load
-
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS]
+let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
+
+enum ACTIVITIES {          // all possible activities that are reported back to cloud
+    case SHARE_TALK
+    case PLAY_TALK
+}
+enum INIT_CODES {          // all possible startup results
+    case SUCCESS
+    case NO_CONNECTION
+}
 
 
 class Model {
     
     var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
-
-    //var UserTalkHistoryAlbum: [TalkHistoryData] = []    // history of talks for user
-    var FileNameToUserTalkHistory: [String: TalkHistoryData]   = [String: TalkHistoryData] ()  //
     
     var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "")
     var RecommendedAlbum: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "")
@@ -152,7 +119,6 @@ class Model {
     
     var UserTalkHistoryList: [TalkHistoryData] = []
 
-
     var ListAllTalks: [TalkData] = []
     var ListSpeakerAlbums: [AlbumData] = []
     var ListSeriesAlbums: [AlbumData] = []
@@ -165,7 +131,6 @@ class Model {
 
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
 
-    // MARK: Persistant Data
     var UserAlbums: [UserAlbumData] = []      // all the custom user albums defined by this user.
     var UserNotes: [String: UserNoteData] = [:]      // all the  user notes defined by this user, indexed by fileName
     var UserFavorites: [String: UserFavoriteData] = [:]      // all the favorites defined by this user, indexed by fileName
@@ -173,7 +138,6 @@ class Model {
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
-    // MARK: Init
     func resetData() {
 
         FileNameToTalk = [String: TalkData] ()
@@ -222,9 +186,25 @@ class Model {
         
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(getSanghaActivity), userInfo: nil, repeats: true)
     }
+    
+ 
+    func loadCurrentTalk() {
+
+        CurrentTalk = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
+        CurrentTalkTime = 0
+        
+        if let talkName = UserDefaults.standard.string(forKey: "TalkName")
+        {
+            let currentTalkTime = UserDefaults.standard.integer(forKey: "CurrentTalkTime")
+
+            if  let currentTalk = TheDataModel.getTalkForName(name: talkName) {
+                CurrentTalk = currentTalk
+                CurrentTalkTime = currentTalkTime
+            }
+        }
+    }
             
     
-    // MARK: Configuration
     func downloadAndConfigure(path: String)  {
         
         let config = URLSessionConfiguration.default
@@ -307,17 +287,6 @@ class Model {
             catch {
             }
             
-            /*
-            for album in self.RootAlbum.albumList {
-                self.computeAlbumStats(album: album)
-            }
-            
-            print("signalling semaphore")
-            ModelLoadSemaphore.signal()
-             */
-            
-  
-
             // END CRITICAL SECTION
  
         }
@@ -795,6 +764,7 @@ class Model {
         downloadSanghaActivity()
     }
     
+    
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
         
         var operation : String
@@ -872,44 +842,7 @@ class Model {
         album.totalSeconds = totalSeconds
     }
     
-    
-    func computeUserFavoriteStats() {
-        var talkCount = 0
-        var totalSeconds = 0
-        
-        
-        for (fileName, _) in UserFavorites {
-            
-            if let talk = FileNameToTalk[fileName] {
-                totalSeconds += talk.TotalSeconds
-                talkCount += 1
-            }
-        }
-        
-        print("FAVORITE", talkCount, totalSeconds)
-        UserFavoritesAlbum.totalTalks = talkCount
-        UserFavoritesAlbum.totalSeconds = totalSeconds
-    }
- 
-    func computeNotesStats() {
-        
-        var talkCount = 0
-        var totalSeconds = 0
-        
-        for (fileName, _) in UserNotes {
-            
-            if let talk = FileNameToTalk[fileName] {
-                totalSeconds += talk.TotalSeconds
-                talkCount += 1
-            }
-        }
-        
-        print("NOTES", talkCount, totalSeconds)
-        UserNoteAlbum.totalTalks = talkCount
-        UserNoteAlbum.totalSeconds = totalSeconds
-    }
-
-
+  
     // MARK: Persistant API
     func saveUserAlbumData() {
         
@@ -1212,15 +1145,7 @@ class Model {
         return FileNameToTalk[name]
     }
     
-    func isMostRecentTalk(talk: TalkData) -> Bool {
-    
-        if let talkHistory = UserTalkHistoryAlbum.talkList.last {
-            if talkHistory.FileName == talk.FileName {
-                return true
-            }
-        }
-        return false
-    }
+   
     
     //
     // invoked in background by TalkPlayerView

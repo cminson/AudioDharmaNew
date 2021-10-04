@@ -50,6 +50,24 @@ class AlbumData: Identifiable, ObservableObject {
     }
     
     
+    func getAlbumSections(section: String) -> [AlbumData] {
+
+        var sectionAlbumList = [AlbumData] ()
+
+        if section.isEmpty {
+            return self.albumList
+        } else {
+            sectionAlbumList = self.albumList.filter {$0.Section == section}
+            /*
+            for album in self.albumList {
+                if album.Section == section {sectionAlbumList.append(album)}
+            }
+             */
+        }
+        return sectionAlbumList
+    }
+    
+    
     func getFilteredAlbums(filter: String) -> [AlbumData] {
 
         var filteredAlbumList = [AlbumData] ()
@@ -118,7 +136,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     }
 
         
-    // MARK: Init
     init(title: String,
          url: String,
          fileName: String,
@@ -144,6 +161,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         Country = ""
      }
     
+    
     func copy(with zone: NSZone? = nil) -> Any {
         let copy = TalkData(title: Title,
                             url: URL,
@@ -162,13 +180,14 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         if isFavoriteTalk() {
             TheDataModel.UserFavorites[self.FileName] = nil
             if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: self) {
-                print("toglleTalkAsFavorite removing: ", self.Title)
+                print("toggleTalkAsFavorite removing: ", self.Title)
                 TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
             }
         } else {
             TheDataModel.UserFavorites[self.FileName] = UserFavoriteData(fileName: self.FileName)
-            print("toglleTalkAsFavorite adding: ", self.Title)
-            TheDataModel.UserFavoritesAlbum.talkList.append(self)
+            print("toggleTalkAsFavorite adding: ", self.Title)
+            TheDataModel.UserFavoritesAlbum.talkList.insert(self, at: 0)
+            //CJM Append?
         }
 
         TheDataModel.saveUserFavoritesData()
@@ -180,16 +199,13 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     
     func isFavoriteTalk() -> Bool {
         
-        let isFavorite = TheDataModel.UserFavorites[self.FileName] != nil
-        return isFavorite
+        return TheDataModel.UserFavorites[self.FileName] != nil
     }
     
     
     func download(notifyUI: @escaping  () -> Void) {
         
         TheDataModel.download(talk: self, notifyUI: notifyUI)
-        
-
     }
     
        
@@ -202,7 +218,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         return downloadInProgress
     }
 
-    
     
     func setTalkAsDownloaded() {
         
@@ -240,7 +255,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
         
         self.isDownloaded = false
-
     }
 
     
@@ -251,12 +265,17 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         // otherwise clear this note dictionary entry
         let talkFileName = self.FileName
 
-        let charset = CharacterSet.alphanumerics
-
-        if (noteText.count > 0) && noteText.rangeOfCharacter(from: charset) != nil {
+        if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
+            print("adding note on talk: ", self.Title)
             TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
+            TheDataModel.UserNoteAlbum.talkList.append(self)
         } else {
+            print("remove note on talk: ", self.Title)
             TheDataModel.UserNotes[talkFileName] = nil
+            if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: self) {
+                TheDataModel.UserNoteAlbum.talkList.remove(at: index)
+            }
+
         }
         
         // save the data, recompute stats, reload root view to display updated stats
@@ -284,6 +303,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         return false
     }
     
+    
     func hasTalkBeenPlayed() -> Bool {
     
         return TheDataModel.PlayedTalks[self.FileName] != nil
@@ -291,6 +311,13 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     }
 
     
+    func isMostRecentTalk() -> Bool {
+    
+        if let talk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
+            return talk.FileName == self.FileName
+        }
+        return false
+    }
      
 
 

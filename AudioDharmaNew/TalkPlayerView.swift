@@ -13,29 +13,6 @@ var TheTalkPlayer: TalkPlayer!
 
 
 /*
- let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)
-
- volumeView.showsRouteButton = true
-
- let iconBlack = UIImage(named: "routebuttonblack")
- let iconGreen = UIImage(named: "routebuttongreen")
- 
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.normal)
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.disabled)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.highlighted)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.selected)
-
- volumeView.tintColor = MAIN_FONT_COLOR
- 
- 
- 
- let point = CGPoint(x: MPVolumeParentView.frame.size.width  / 2,y : (MPVolumeParentView.frame.size.height / 2) + 5)
- volumeView.center = point
- MPVolumeParentView.addSubview(volumeView)
- */
-
-
-/*
  ******************************************************************************
  * TalkPlayer
  * UI for talk player console
@@ -53,7 +30,7 @@ struct VolumeSlider: UIViewRepresentable {
 
 struct TalkPlayerView: View {
     var talk: TalkData
-    var currentTime: Int
+    var startTime: Double
     
     @State private var isTalkActive = false
     @State private var elapsedTime: Double = 0
@@ -63,28 +40,24 @@ struct TalkPlayerView: View {
     @State var displayTranscriptPage: Bool = false
 
 
-    
-    /*
-    init(talk: TalkData, currentTime: currentTime) {
+    init(talk: TalkData, startTime: Double) {
         
         self.talk = talk
-        self.currentTime = currentTime
+        self.startTime = startTime
+        self.elapsedTime = 0
         
-        elapsedTime = currentTime
+        CurrentTalk = self.talk
     }
- */
+
     
     func playTalk() {
         
         print(URL_MP3_HOST + talk.URL)
         
-        var startAtTime = 0
+        var startAtTime : Double = 0
         if TalkPlayerStatus == .PAUSED {
-            startAtTime = CurrentTalkTime
+            startAtTime = self.elapsedTime
         }
-        
-        startAtTime = currentTime
-        elapsedTime = Double(currentTime)
         
         if let talkURL = URL(string: URL_MP3_HOST + talk.URL) {
             TheTalkPlayer = TalkPlayer()
@@ -93,11 +66,13 @@ struct TalkPlayerView: View {
         }
     }
     
+    
     func pauseTalk () {
         
         TheTalkPlayer.pause()
         TalkPlayerStatus = .PAUSED
     }
+    
     
     func finishTalk() {
         
@@ -105,6 +80,8 @@ struct TalkPlayerView: View {
         TalkPlayerStatus = .FINISHED
     }
     
+    
+    // invoked upon TheTalkPlayer completion
     func talkHasCompleted () {
         
         print("talkHasCompleted")
@@ -132,63 +109,39 @@ struct TalkPlayerView: View {
  */
     }
     
+    // invoked from background timer in TheTalkPlayer
     func updateView(){
 
         if sliderUpdating == true {
-            displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
+            displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
         }
         else {
-            CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
-            if CurrentTalkTime > 0 {
-                elapsedTime = Double(CurrentTalkTime)
-                displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
-                TalkPlayerStatus = .PLAYING
-            }
+            self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
+            displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
+            TalkPlayerStatus = .PLAYING
         }
     
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
-        CurrentTalkTime = TheTalkPlayer.getCurrentTimeInSeconds()
-        if CurrentTalkTime > 0 {
+        if self.elapsedTime > 0 {
 
             TalkPlayerStatus = .PLAYING
 
-            /*
-            disableActivityIcons()
-            enableScanButtons()
-             */
-
-           /*
-            let currentTime = TheTalkPlayer.getCurrentTimeInSeconds()
-            let duration = TheTalkPlayer.getDurationInSeconds()
-
-            let fractionTimeCompleted = Float(currentTime) / Float(duration)
-            talkProgressSlider.value = fractionTimeCompleted
-
-            updateTitleDisplay()
-            */
-
             // if play time exceeds reporting threshold and not previously reported, report it
-            if CurrentTalkTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: CurrentTalk) == false {
+            if self.elapsedTime > REPORT_TALK_THRESHOLD, talk.isMostRecentTalk() == false {
 
-                TheDataModel.addToTalkHistory(talk: CurrentTalk)
-                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
+                TheDataModel.addToTalkHistory(talk: self.talk)
+                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
             //MARKPLAYED_TALK_THRESHOLD
 
-            UserDefaults.standard.set(CurrentTalkTime, forKey: "CurrentTalkTime")
-            UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
+            // persistent store off the current talk and position in talk
+            UserDefaults.standard.set(self.elapsedTime, forKey: "CurrentTalkTime")
+            UserDefaults.standard.set(self.talk.FileName, forKey: "TalkName")
 
         }
 
     }
 
-    /*
-    if TheDataModel.isDownloaded(talk: talk) {
-        .foreground(Color.black)
-    } else {
-        .foreground(Color.red)
-    }
-    */
 
     var body: some View {
 
@@ -283,7 +236,7 @@ struct TalkPlayerView: View {
             }
            
             // talk current position control
-            Slider(value: $elapsedTime,
+            Slider(value: Double($elapsedTime),
                    in: 0...Double(talk.TotalSeconds),
                    onEditingChanged: { editing in
                         sliderUpdating = editing
@@ -345,3 +298,28 @@ struct TalkPlayerView: View {
 
     
 }
+
+
+
+/*
+ let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)
+
+ volumeView.showsRouteButton = true
+
+ let iconBlack = UIImage(named: "routebuttonblack")
+ let iconGreen = UIImage(named: "routebuttongreen")
+ 
+ volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.normal)
+ volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.disabled)
+ volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.highlighted)
+ volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.selected)
+
+ volumeView.tintColor = MAIN_FONT_COLOR
+ 
+ 
+ 
+ let point = CGPoint(x: MPVolumeParentView.frame.size.width  / 2,y : (MPVolumeParentView.frame.size.height / 2) + 5)
+ volumeView.center = point
+ MPVolumeParentView.addSubview(volumeView)
+ */
+

@@ -11,7 +11,6 @@ import UIKit
 import AVFoundation
 import CoreMedia
 
-// MARK: Constants
 
 enum TalkStates {                   // all possible states of the talk player
     case INITIAL
@@ -23,7 +22,6 @@ enum TalkStates {                   // all possible states of the talk player
     case ALBUMFINISHED
 }
 
-// MARK: Properties
 var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
 var CurrentTalkRow : Int = 0
 var OriginalTalkRow : Int = 0
@@ -31,32 +29,24 @@ var PlayEntireAlbum: Bool = false
 var PlayingDownloadedTalk: Bool = false
 var ResumingLastTalk: Bool = false
 
+//var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
+var CurrentTalk : TalkData?
+
+var CurrentTalkTime : Int = 0
 var TalkList : [TalkData]!
-//var CurrentTalk : TalkData!
-//var CurrentTalkTime : Int = 0
 var TalkTimer : Timer?
-
-
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation
 
 
 class TalkPlayer : NSObject {
     
-    // MARK: Properties
-    //CJM
     var talkPlayerView: TalkPlayerView!
     var Player : AVPlayer = AVPlayer()
     var PlayerItem : AVPlayerItem?
     
-    // MARK: Init
-    override init(){
-        
-        super.init()
-    }
-    
     
     // MARK: Functions
-    func startTalk(talkURL: URL, startAtTime: Int){
+    func startTalk(talkURL: URL, startAtTime: Double){
         
         print("startTalk")
         PlayerItem  = AVPlayerItem(url: talkURL)
@@ -73,7 +63,6 @@ class TalkPlayer : NSObject {
 
         Player.play()
         Player.seek(to: CMTimeMake(value: Int64(startAtTime), timescale: 1))
-        
         startTalkTimer()
     
     }

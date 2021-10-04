@@ -12,24 +12,30 @@ import WebKit
 
 
 //
-// Global Constants
+// Global Vars and Constants
 //
+
+let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
+let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
+
+let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]
+
 let LIST_IMAGE_HEIGHT : CGFloat = 40.0
 let LIST_IMAGE_WIDTH : CGFloat = 40.0
+let FONT_SIZE_SECTION : CGFloat = 14.0
+let LIST_ROW_SIZE_SECTION : CGFloat = 35.0
+let LIST_ROW_SIZE_STANDARD : CGFloat = 40.0
 
-let APP_ICON_COLOR = Color(red:1.00, green:0.55, blue:0.00)     //  green #ff8c00
-let SECTION_BACKGROUND = UIColor.darkGray  // #555555ff
+let FONT_SIZE_ROW_TITLE : CGFloat = 14
+let FONT_SIZE_ROW_ATTRIBUTES : CGFloat = 10
+
+let COLOR_BACKGROUND_SECTION = "555555"
+
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
-let SECTION_TEXT = UIColor.white
-
-var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
-var CurrentTalkTime : Int = 0
 
 var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
 
-
-import SwiftUI
 
 /*
  *********************************************************************************
@@ -314,10 +320,7 @@ extension Int {
         numberFormatter.numberStyle = .decimal
         return numberFormatter.string(from: NSNumber(value:self))!
     }
-}
 
-
-extension Int {
     
     func displayInClockFormat() -> String {
         
@@ -370,9 +373,7 @@ extension String {
         totalSeconds = (hours * 3600) + (minutes * 60) + seconds
         return totalSeconds
     }
-}
-
-extension String {
+    
     
     func toImage() -> Image {
        let uiImage =  (UIImage(named: self) ?? UIImage(named: "defaultPhoto"))!
@@ -409,3 +410,14 @@ extension Color {
     }
 }
 
+
+extension View {
+    
+  @ViewBuilder func hidden(_ shouldHide: Bool) -> some View {
+    switch shouldHide {
+      case true: self.hidden()
+      case false: self
+    }
+  }
+    
+}

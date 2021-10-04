@@ -18,17 +18,15 @@ struct SectionRow: View {
             HStack() {
                 Spacer()
                 Text(title)
-                    .font(.system(size: 14, weight: .bold))
-                    .background(Color(hex: "555555"))
+                    .font(.system(size: FONT_SIZE_SECTION, weight: .bold))
                     .foregroundColor(.white)
-                    .padding(.leading, 0)
                 Spacer()
             }
-            .frame(height: 35)
-
+            .frame(height: LIST_ROW_SIZE_SECTION)
         }
-        .background(Color(hex: "555555"))
+        .background(Color(hex: COLOR_BACKGROUND_SECTION))
         .frame(maxWidth: .infinity)
+        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
      }
 }
 
@@ -48,7 +46,7 @@ struct AlbumRow: View {
                     .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")
-                    .font(.system(size: 14))
+                    .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .background(Color.white)
                     .padding(.leading, 0)
                 Spacer()
@@ -56,30 +54,26 @@ struct AlbumRow: View {
                     Text(album.totalTalks.displayInCommaFormat())
                         .background(Color.white)
                         .padding(.trailing, -10)
-                        .font(.system(size: 10))
-                    //Spacer()
-                        //frame(height: 8)
+                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Text(album.totalSeconds.displayInClockFormat())
                         .background(Color.white)
                         .padding(.trailing, -10)
-                        .font(.system(size: 10))
+                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
             }
             .onTapGesture {
                 if KEYS_TO_ALBUMS.contains(album.Key) {
-                    print("RENDER ALBUM")
                     selection = "ALBUMS"
                 } else {
-                    print("RENDER TALKS")
                     selection = "TALKS"
                 }
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .frame(height:40)
+        .background(Color.white)
+        .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)
-
      }
 }
 
@@ -120,7 +114,7 @@ struct AlbumListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        if CurrentTalk.Title == "NO TALK" {
+                        if CurrentTalk?.Title == "NO TALK" {
                             noCurrentTalk = true
                         } else {
                             noCurrentTalk = false
