@@ -158,12 +158,17 @@ struct TalkListView: View {
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
-    @State var noCurrentTalk: Bool = false
-    @State var selectedTalk: TalkData?
+    @State var isResumableTalk: Bool = false
+    @State var selectedTalkTime: Double = 0
+    @State var selectedTalk: TalkData
 
 
     init(album: AlbumData) {
+        print("INIT: TalkListView")
         self.album = album
+        
+        isResumableTalk = TheDataModel.resumableTalkExists()
+        selectedTalk = TalkData.noop()
     }
     
 
@@ -180,7 +185,9 @@ struct TalkListView: View {
                     selection = "PLAY_TALK"
                 }
         }
-        .background(NavigationLink(destination: TalkPlayerView(talk: selectedTalk!, currentTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
 
@@ -195,17 +202,12 @@ struct TalkListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        print(CurrentTalk?.Title)
-                        if CurrentTalk?.Title == "NO TALK" {
-                            print("none")
-                            noCurrentTalk = true
-                        } else {
-                            noCurrentTalk = false
-                            selection = "PLAY_TALK"
-                        }
+                        selection = "RESUME_TALK"
+                        selectedTalk = ResumableTalk
                     }) {
                         Text("Resume Talk")
                     }
+                    .hidden(!TheDataModel.resumableTalkExists())
                     Spacer()
                     Button(action: {
                         print("Edit button was tapped")

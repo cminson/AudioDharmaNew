@@ -9,8 +9,28 @@ import SwiftUI
 import MediaPlayer
 import UIKit
 
-var TheTalkPlayer: TalkPlayer!
 
+enum TalkStates {                   // all possible states of the talk player
+    case INITIAL
+    case LOADING
+    case PLAYING
+    case PAUSED
+    case STOPPED
+    case FINISHED
+    case ALBUMFINISHED
+}
+
+var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
+
+var TheTalkPlayer: TalkPlayer!
+var ResumableTalk : TalkData!
+var ResumableTalkTime : Double = 0
+var PlayEntireAlbum: Bool = false
+var PlayingDownloadedTalk: Bool = false
+
+
+var CurrentTalk : TalkData = TalkData.noop()
+var CurrentTalkTime : Double = 0
 
 /*
  ******************************************************************************
@@ -29,91 +49,121 @@ struct VolumeSlider: UIViewRepresentable {
 }
 
 struct TalkPlayerView: View {
+    var album: AlbumData
     var talk: TalkData
     var startTime: Double
     
     @State private var isTalkActive = false
-    @State private var elapsedTime: Double = 0
-    @State private var displayedElapsedTime: String = "00:00:00"
+    @State private var elapsedTime: Double
+    @State private var displayedElapsedTime: String
     @State private var sliderUpdating = false
     @State private var selection: String?  = ""
     @State var displayTranscriptPage: Bool = false
+    @State var displayBiographyPage: Bool = false
+    @State var playTalksInSequence: Bool = false
+    @State private var playerTitle: String = "Play Talk"
 
-
-    init(talk: TalkData, startTime: Double) {
+    
+    init(album: AlbumData, talk: TalkData, startTime: Double, displayStartTime: String) {
         
+        self.album = album
         self.talk = talk
         self.startTime = startTime
-        self.elapsedTime = 0
+        
+        self.elapsedTime = startTime
+        self.displayedElapsedTime = displayStartTime
         
         CurrentTalk = self.talk
+        CurrentTalkTime = self.startTime
     }
 
     
     func playTalk() {
         
-        print(URL_MP3_HOST + talk.URL)
         
-        var startAtTime : Double = 0
         if TalkPlayerStatus == .PAUSED {
-            startAtTime = self.elapsedTime
-        }
+            
+            TheTalkPlayer.play()
+            return
         
-        if let talkURL = URL(string: URL_MP3_HOST + talk.URL) {
+        }
+        TalkPlayerStatus = .LOADING
+        playerTitle = "Loading Talk"
+        
+        if let talkURL = URL(string: URL_MP3_HOST + CurrentTalk.URL) {
+            
+            self.elapsedTime = CurrentTalkTime
             TheTalkPlayer = TalkPlayer()
             TheTalkPlayer.talkPlayerView = self
-            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: startAtTime)
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
         }
     }
     
     
     func pauseTalk () {
         
-        TheTalkPlayer.pause()
         TalkPlayerStatus = .PAUSED
+
+        TheTalkPlayer.pause()
     }
     
     
     func finishTalk() {
-        
+    
         TheTalkPlayer?.stop()
         TalkPlayerStatus = .FINISHED
+
+    }
+    
+    
+    func resetTalkDisplay() {
+        
+        print("resetTalkDisplay")
+    }
+    
+    
+    func updateTitleDisplay() {
+        print("updateTitleDisplay")
+        
     }
     
     
     // invoked upon TheTalkPlayer completion
     func talkHasCompleted () {
-        
         print("talkHasCompleted")
+        
         TalkPlayerStatus = .FINISHED
+        TheTalkPlayer.stop()
+        self.resetTalkDisplay()
 
+        // if option is enabled, play the next talk in the current series
+        if self.playTalksInSequence == true {
 
-        /*
-            TalkPlayerStatus = .FINISHED
-
-            MP3TalkPlayer.stop()
-            CurrentTalkTime = 0
-            resetTalkDisplay()
-
-            // if option is enabled, play the next talk in the current series
-            if PlayEntireAlbum == true {
-
-                // create a new MP3 player.  just to ensure state is fully cleared
-                MP3TalkPlayer = MP3Player()
-                MP3TalkPlayer.Delegate = self
-
-                // and then play next talk in SECONDS_TO_NEXT_TALK seconds
-                Timer.scheduledTimer(timeInterval: SECONDS_TO_NEXT_TALK, target: self, selector: #selector(PlayTalkController.playNextTalk), userInfo: nil, repeats: false)
+            if var index = self.album.talkList.firstIndex(of: CurrentTalk) {
+            
+                index += 1
+                if index >= self.album.talkList.count { index = 0}
+                
+                CurrentTalk = self.album.talkList[index]
+                CurrentTalkTime = 0
+                print("New sequence talk: ", CurrentTalk.Title)
             }
-            updateTitleDisplay()
- */
+            self.playTalk()
+        }
+        self.updateTitleDisplay()
     }
+    
     
     // invoked from background timer in TheTalkPlayer
     func updateView(){
 
+        //print("Update View Elapsed Time", self.elapsedTime)
+        TalkPlayerStatus = .PLAYING
+
         if sliderUpdating == true {
             displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
+            print("Updating displayedElapsedTimer: ", displayedElapsedTime)
+
         }
         else {
             self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
@@ -127,26 +177,25 @@ struct TalkPlayerView: View {
             TalkPlayerStatus = .PLAYING
 
             // if play time exceeds reporting threshold and not previously reported, report it
-            if self.elapsedTime > REPORT_TALK_THRESHOLD, talk.isMostRecentTalk() == false {
+            if self.elapsedTime > REPORT_TALK_THRESHOLD, CurrentTalk.isMostRecentTalk() == false {
 
-                TheDataModel.addToTalkHistory(talk: self.talk)
-                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
+                TheDataModel.addToTalkHistory(talk: CurrentTalk)
+                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
             }
-            //MARKPLAYED_TALK_THRESHOLD
 
             // persistent store off the current talk and position in talk
+            print("Updating user defaults")
             UserDefaults.standard.set(self.elapsedTime, forKey: "CurrentTalkTime")
-            UserDefaults.standard.set(self.talk.FileName, forKey: "TalkName")
-
+            UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
+            
+            playerTitle = Int(self.elapsedTime).displayInClockFormat()
+            
         }
-
     }
-
-
+    
+    
     var body: some View {
 
-        
-        //ZStack {Color(.white).opacity(0.2).edgesIgnoringSafeArea(.all)
         VStack(alignment: .center, spacing: 0) {
 
             Group {
@@ -154,14 +203,14 @@ struct TalkPlayerView: View {
                 .frame(height: 5)
                 
            // title of talk and speaker
-           Text(talk.Title)
+           Text(CurrentTalk.Title)
                 .background(Color.white)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            Text(talk.Speaker)
+            Text(CurrentTalk.Speaker)
                 .background(Color.white)
                 .padding(.trailing, 0)
                 .font(.system(size: 20, weight: .regular, design: .default))
@@ -171,45 +220,45 @@ struct TalkPlayerView: View {
             // play, pause, fast-forward,  fast-backward buttons
             HStack() {
                 Button(action: {
-                    print("left pressed")
                     TheTalkPlayer.seekFastBackward()
                 })
                 {
-                    Image(systemName: "arrowtriangle.left")
+                    Image("tri_left_x")
                         .resizable()
                         //.frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
                         .frame(width: 30, height:  30)
 
-                        .disabled(!isTalkActive)
+                        //.disabled(!isTalkActive)
 
                 }
                 Spacer()
                     .frame(width: 20)
-                Button(action: {
-                    print("button pressed")
-                    print(isTalkActive)
-                    isTalkActive = (isTalkActive ? false : true)
-                    if isTalkActive {playTalk()} else {pauseTalk()}
-                    })
-                    {
-                    Image(systemName: isTalkActive ? "square" : "arrowtriangle.right.circle")
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                    }
-                    .buttonStyle(PlainButtonStyle())
+                ZStack() {
+                    ProgressView()
+                        .hidden(TalkPlayerStatus != .LOADING)
+                    Button(action: {
+                        print(isTalkActive)
+                        isTalkActive = (isTalkActive ? false : true)
+                        if isTalkActive {playTalk()} else {pauseTalk()}
+                        })
+                        {
+                        Image(isTalkActive ? "buttontalkpause" : "buttontalkplay")
+                                .resizable()
+                                .frame(width: 60, height: 60)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .hidden(TalkPlayerStatus == .LOADING)
+                }  // end ZStack
                 Spacer()
                     .frame(width: 20)
                 Button(action: {
-                    print("right pressed")
                     TheTalkPlayer.seekFastForward()
                 })
                 {
-                    Image(systemName: "arrowtriangle.right")
+                    Image("tri_right_x")
                         .resizable()
-                        //.frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
                         .frame(width: 30, height:  30)
-
-                        .disabled(!isTalkActive)
+                        //.disabled(!isTalkActive)
                 }
             }  // end HStack
             
@@ -222,7 +271,7 @@ struct TalkPlayerView: View {
                 .frame(height: 30)
             HStack() {
                 Spacer()
-                Text(displayedElapsedTime)
+                Text(self.displayedElapsedTime)
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
                     .frame(width: 20)
@@ -230,13 +279,13 @@ struct TalkPlayerView: View {
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
                     .frame(width: 20)
-                Text(talk.TotalSeconds.displayInClockFormat())
+                Text(CurrentTalk.TotalSeconds.displayInClockFormat())
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
             }
            
             // talk current position control
-            Slider(value: Double($elapsedTime),
+            Slider(value: $elapsedTime,
                    in: 0...Double(talk.TotalSeconds),
                    onEditingChanged: { editing in
                         sliderUpdating = editing
@@ -252,15 +301,45 @@ struct TalkPlayerView: View {
             Spacer()
                 .frame(height: 20)
             HStack() {
-                if TheDataModel.doesTalkHaveTranscript(talk: talk) {
-                    Button("transcript") {
-                        //displayTranscriptPage = true
-                        selection = "TRANSCRIPTS"
+                
+
+                Button("biography") {
+                    //displayTranscriptPage = true
+                    selection = "TRANSCRIPTS"
+                }
+                .font(.system(size: 12, weight: .regular))
+                .padding(.leading, 15)
+                .hidden(false)
+
+                Spacer()
+                
+                VStack(spacing: 5) {
+                    Button(action: {
+                        print("sequence button")
+                        self.playTalksInSequence = playTalksInSequence ? false : true
+                    })
+                    {
+                        Image(playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
+                            .resizable()
+                            .frame(width: 30, height:  30)
+                            //.disabled(!isTalkActive)
                     }
-                    .font(.system(size: 20, weight: .regular))
-                    .padding(.trailing, 15)
+                    Text("play talk sequence")
+                        .font(.system(size: 12, weight: .regular))
 
                 }
+                
+                Spacer()
+                
+                //if TheDataModel.doesTalkHaveTranscript(talk: talk)
+                Button("transcript") {
+                    //displayTranscriptPage = true
+                    selection = "TRANSCRIPTS"
+                }
+                .font(.system(size: 12, weight: .regular))
+                .padding(.trailing, 15)
+                .hidden(false)
+                
             }
                 
             // Standard volume and output device control
@@ -291,12 +370,10 @@ struct TalkPlayerView: View {
             finishTalk()
         }
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPTS", selection: $selection) { EmptyView() } .hidden())
-        //}
-    }
-        //.navigationBarTitle("Play Talk", displayMode: .inline)
-        //.navigationBarHidden(false)
+        .navigationBarTitle(Text(playerTitle))
 
-    
+      
+    }
 }
 
 
@@ -323,3 +400,16 @@ struct TalkPlayerView: View {
  MPVolumeParentView.addSubview(volumeView)
  */
 
+    /*
+     
+     .navigationBarBackButtonHidden(true)
+    .toolbar(content: {
+          ToolbarItem (placement: .navigation)  {
+             Image(systemName: "arrow.left")
+             .foregroundColor(.white)
+             .onTapGesture {
+                 //self.presentation.wrappedValue.dismiss()
+             }
+          }
+    })
+     */

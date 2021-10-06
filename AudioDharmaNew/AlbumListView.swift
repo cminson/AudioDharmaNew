@@ -114,12 +114,9 @@ struct AlbumListView: View {
                     }
                     Spacer()
                     Button(action: {
-                        if CurrentTalk?.Title == "NO TALK" {
-                            noCurrentTalk = true
-                        } else {
-                            noCurrentTalk = false
+ 
                             selection = "PLAY_TALK"
-                        }
+                        
                     }) {
                         Image(systemName: "note")
                             .renderingMode(.original)

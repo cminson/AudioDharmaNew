@@ -134,6 +134,11 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
         return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
     }
+    
+    static func noop () -> TalkData {
+        
+        return TalkData(title: "Default", url: "", fileName: "", date: "", speaker: "", totalSeconds: 0,  pdf: "")
+    }
 
         
     init(title: String,

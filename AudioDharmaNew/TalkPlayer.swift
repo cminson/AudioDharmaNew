@@ -12,27 +12,15 @@ import AVFoundation
 import CoreMedia
 
 
-enum TalkStates {                   // all possible states of the talk player
-    case INITIAL
-    case LOADING
-    case PLAYING
-    case PAUSED
-    case STOPPED
-    case FINISHED
-    case ALBUMFINISHED
-}
 
-var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
 var CurrentTalkRow : Int = 0
 var OriginalTalkRow : Int = 0
-var PlayEntireAlbum: Bool = false
-var PlayingDownloadedTalk: Bool = false
 var ResumingLastTalk: Bool = false
 
 //var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
-var CurrentTalk : TalkData?
+//var CurrentTalk : TalkData?
+//var CurrentTalkTime : Int = 0
 
-var CurrentTalkTime : Int = 0
 var TalkList : [TalkData]!
 var TalkTimer : Timer?
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation
@@ -45,7 +33,6 @@ class TalkPlayer : NSObject {
     var PlayerItem : AVPlayerItem?
     
     
-    // MARK: Functions
     func startTalk(talkURL: URL, startAtTime: Double){
         
         print("startTalk")
@@ -60,12 +47,10 @@ class TalkPlayer : NSObject {
                         object: PlayerItem)
 
         print("playing")
-
-        Player.play()
         Player.seek(to: CMTimeMake(value: Int64(startAtTime), timescale: 1))
-        startTalkTimer()
-    
+        self.play()
     }
+        
     
     func verifyURL (urlString: String?) -> Bool {
         if let urlString = urlString {
@@ -75,39 +60,32 @@ class TalkPlayer : NSObject {
         }
         return false
     }
-    
 
     
     func play() {
         
         Player.play()
+        startTalkTimer()
+
     }
+        
     
     func stop() {
         
-        TalkPlayerStatus = .STOPPED
-
         Player.pause()
         Player.seek(to: CMTime.zero)
         
         //CJM DEV
         stopTalkTimer()
-
     }
+    
     
     func pause() {
         
         Player.pause()
-        
-        //CJM DEV
         stopTalkTimer()
     }
 
-    @objc func talkHasCompleted() {
-        
-       print("Talk Completed")
-        //CJM DEV
-    }
     
     func startTalkTimer() {
 
@@ -116,35 +94,37 @@ class TalkPlayer : NSObject {
 
             // start a new timer.  this calls a method to update the views once each second
             TalkTimer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerUpdate), userInfo: nil, repeats: true)
-
     }
 
+    
     func stopTalkTimer(){
 
-            if let timer = TalkTimer {
+        if let timer = TalkTimer {
 
-                timer.invalidate()
-                TalkTimer = nil
-            }
+            timer.invalidate()
+            TalkTimer = nil
         }
+    }
+    
     
     @objc func timerUpdate() {
         
         talkPlayerView.updateView()
     }
     
-    func toggleFavorite(_ sender: UIBarButtonItem) {
+    
+    @objc func talkHasCompleted() {
         
-        //CJM DEV
-        //TheDataModel.toggleTalkAsFavorite(talk: CurrentTalk, controller: self)
-        
+        stopTalkTimer()
+        talkPlayerView.talkHasCompleted()
     }
-
+    
     
     func seekToTime(seconds: Int64) {
         
         Player.seek(to: CMTimeMake(value: seconds, timescale: 1))
     }
+    
     
     func seekFastForward() {
         
@@ -164,8 +144,8 @@ class TalkPlayer : NSObject {
         if getCurrentTimeInSeconds() >= getDurationInSeconds() {
             talkHasCompleted()
         }
-
     }
+    
     
     func seekFastBackward() {
         
@@ -181,10 +161,12 @@ class TalkPlayer : NSObject {
         }
     }
     
+    
     func currentTime()-> CMTime {
         
         return Player.currentTime()
     }
+    
     
     func convertSecondsToDisplayString(timeInSeconds: Int) -> String {
         
@@ -196,6 +178,7 @@ class TalkPlayer : NSObject {
         return String(format: "%0.2d:%0.2d:%0.2d",hours,minutes,seconds)
     }
     
+    
     func getCurrentTimeInSeconds() -> Int {
         
         var time : Int = 0
@@ -205,6 +188,7 @@ class TalkPlayer : NSObject {
         }
         return time
     }
+    
     
     func getDurationInSeconds() -> Int {
         
@@ -218,6 +202,7 @@ class TalkPlayer : NSObject {
         return time
     }
 
+    
     func getProgress()->Float {
         
         var theCurrentTime = 0.0

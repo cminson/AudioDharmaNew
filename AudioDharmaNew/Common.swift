@@ -17,8 +17,11 @@ import WebKit
 
 let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
 let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
+var BusyIndicator =  UIActivityIndicatorView()
+
 
 let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]
+
 
 let LIST_IMAGE_HEIGHT : CGFloat = 40.0
 let LIST_IMAGE_WIDTH : CGFloat = 40.0
@@ -328,10 +331,13 @@ extension Int {
         let modHours = self % 3600
         let minutes = modHours / 60
         let seconds = modHours % 60
-        
+                
         let numberFormatter = NumberFormatter()
         numberFormatter.numberStyle = NumberFormatter.Style.decimal
-        let hoursStr = numberFormatter.string(from: NSNumber(value:hours)) ?? "0"
+        var hoursStr = numberFormatter.string(from: NSNumber(value:hours)) ?? "00"
+        
+        //hack so that it looks nice
+        if hoursStr.count == 1 { hoursStr = "0" + hoursStr}
         
         let minutesStr = String(format: "%02d", minutes)
         let secondsStr = String(format: "%02d", seconds)

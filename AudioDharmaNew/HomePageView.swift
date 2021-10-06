@@ -28,6 +28,9 @@ struct HomePageView: View {
         UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", imageName: "", date: "")
+        
+        let seconds = TheDataModel.RootAlbum.totalSeconds
+        print("ROOT SECONDS: ", seconds)
     }
 
     

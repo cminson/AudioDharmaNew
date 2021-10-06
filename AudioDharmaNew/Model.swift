@@ -188,22 +188,21 @@ class Model {
     }
     
  
-    func loadCurrentTalk() {
-
-        CurrentTalk = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
-        CurrentTalkTime = 0
+    func resumableTalkExists() -> Bool {
         
-        if let talkName = UserDefaults.standard.string(forKey: "TalkName")
-        {
-            let currentTalkTime = UserDefaults.standard.integer(forKey: "CurrentTalkTime")
-
-            if  let currentTalk = TheDataModel.getTalkForName(name: talkName) {
-                CurrentTalk = currentTalk
-                CurrentTalkTime = currentTalkTime
+        if let talkName = UserDefaults.standard.string(forKey: "TalkName") {
+            if let talkCurrentTime = UserDefaults.standard.string(forKey: "CurrentTalkTime") {
+                if let talk = TheDataModel.getTalkForName(name: talkName) {
+                    
+                    ResumableTalk = talk
+                    ResumableTalkTime = Double(talkCurrentTime) ?? 0
+                    return true
+                }
             }
         }
+        return false
     }
-            
+
     
     func downloadAndConfigure(path: String)  {
         
@@ -365,7 +364,6 @@ class Model {
                 speakerAlbum.totalTalks += 1
                 speakerAlbum.totalSeconds += seconds
 
-                
                 // if a series is specified, create an album if one doesn't exist.  add talk to album
                 if !series.isEmpty {
                     
@@ -490,53 +488,28 @@ class Model {
                 // get the optional talk array for this Album
                 for jsonTalk in jsonTalkList {
                     
-                    var URL = jsonTalk["url"] as? String ?? ""
-                    let terms = URL.components(separatedBy: "/")
-                    let fileName = terms.last ?? ""
+                    let URL = jsonTalk["url"] as? String ?? ""
                     let series = jsonTalk["series"] as? String ?? ""
-                    let title = jsonTalk["title"] as? String ?? ""
-                    let durationDisplay = jsonTalk["duration"] as? String ?? ""
-                    var speaker = ""
-                    var date = ""
-                    var pdf = ""
-                    
+                    let fileName = URL.components(separatedBy: "/").last ?? ""
+                                       
                     if let talk = self.FileNameToTalk[fileName] {
-                        URL = talk.URL
-                        speaker = talk.Speaker
-                        date = talk.Date
-                        pdf = talk.PDF
-                    }
-                    
-                    let seconds = durationDisplay.convertDurationToSeconds()
-                    
-                    let talk =  TalkData(title: title,
-                                     url: URL,
-                                     fileName: fileName,
-                                     date: date,
-                                     speaker: speaker,
-                                     totalSeconds: seconds,
-                                     pdf: pdf)
-                    
-                    if doesTalkHaveTranscript(talk: talk) {
-                        talk.Title = talk.Title + " [transcript]"
-                    }
-                    
-                    // if series specified, these always go into RecommendedAlbum
-                    var seriesAlbum : AlbumData
-                    if !series.isEmpty {
-                         let seriesKey = "RECOMMENDED" + series
-                        if self.KeyToAlbum[seriesKey] == nil {
-                            seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: speaker, date : date)
-                            self.KeyToAlbum[seriesKey] = seriesAlbum
-                            self.RecommendedAlbum.albumList.append(seriesAlbum)
-                        }
-                        seriesAlbum = self.KeyToAlbum[seriesKey]!
-                        seriesAlbum.talkList.append(talk)
-                        seriesAlbum.totalTalks += 1
-                        seriesAlbum.totalSeconds += seconds
+                        // if series specified, these always go into RecommendedAlbum
+                        var seriesAlbum : AlbumData
+                        if !series.isEmpty {
+                             let seriesKey = "RECOMMENDED" + series
+                            if self.KeyToAlbum[seriesKey] == nil {
+                                seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date)
+                                self.KeyToAlbum[seriesKey] = seriesAlbum
+                                self.RecommendedAlbum.albumList.append(seriesAlbum)
+                            }
+                            seriesAlbum = self.KeyToAlbum[seriesKey]!
+                            seriesAlbum.talkList.append(talk)
+                            seriesAlbum.totalTalks += 1
+                            seriesAlbum.totalSeconds += talk.TotalSeconds
 
-                    } else {
-                        album.talkList.append(talk)
+                        } else {
+                            album.talkList.append(talk)
+                        }
                     }
                 } // end talk loop
             
@@ -840,6 +813,9 @@ class Model {
         
         album.totalTalks = totalTalks
         album.totalSeconds = totalSeconds
+        
+        //print("ComputeAlbumStates: ", album.Title, album.totalTalks, album.totalSeconds)
+
     }
     
   

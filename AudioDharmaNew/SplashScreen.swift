@@ -34,7 +34,7 @@ struct SplashScreen : View {
     
     init() {
 
-        TheDataModel.loadCurrentTalk()
+        //TheDataModel.loadCurrentTalk()
         TheDataModel.loadData()
         print("Waiting on Model")
 
