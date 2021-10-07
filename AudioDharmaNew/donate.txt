@@ -1,0 +1,38 @@
+<html>
+    
+<style>
+body {
+background-color: white;
+font-size: 40px;
+margin-left: 40px;
+margin-right: 40px;
+}
+
+h1 {
+color: black;
+font-size: 70px;
+}
+
+h2 {
+color: black;
+font-size: 50px;
+}
+</style>
+
+<body>
+<p><br>
+<center>
+    <h1>Donations</h1>
+</center>
+<p>
+Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs. Our financial support comes from the generosity of people who value what we do.
+<p>
+If you wish to donate please click the Donation link below, or go to https://www.audiodharma.org/donate directly.
+<p><br><p>
+<center>®
+<h2>
+<a href="https://www.audiodharma.org/donate">Donate</a>
+</h2>
+
+</body>
+</html>

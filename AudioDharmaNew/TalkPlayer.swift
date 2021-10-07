@@ -35,7 +35,6 @@ class TalkPlayer : NSObject {
     
     func startTalk(talkURL: URL, startAtTime: Double){
         
-        print("startTalk")
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
@@ -46,7 +45,6 @@ class TalkPlayer : NSObject {
                         name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
                         object: PlayerItem)
 
-        print("playing")
         Player.seek(to: CMTimeMake(value: Int64(startAtTime), timescale: 1))
         self.play()
     }

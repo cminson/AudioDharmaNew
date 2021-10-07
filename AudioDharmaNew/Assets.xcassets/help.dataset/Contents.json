@@ -1,0 +1,12 @@
+{
+  "data" : [
+    {
+      "filename" : "help.txt",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

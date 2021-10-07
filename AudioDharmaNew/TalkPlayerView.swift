@@ -141,12 +141,13 @@ struct TalkPlayerView: View {
 
             if var index = self.album.talkList.firstIndex(of: CurrentTalk) {
             
+                print("Current sequence talk: ", index, CurrentTalk.Title)
                 index += 1
                 if index >= self.album.talkList.count { index = 0}
                 
                 CurrentTalk = self.album.talkList[index]
                 CurrentTalkTime = 0
-                print("New sequence talk: ", CurrentTalk.Title)
+                print("New sequence talk: ", index, CurrentTalk.Title)
             }
             self.playTalk()
         }
@@ -162,7 +163,6 @@ struct TalkPlayerView: View {
 
         if sliderUpdating == true {
             displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
-            print("Updating displayedElapsedTimer: ", displayedElapsedTime)
 
         }
         else {
@@ -184,11 +184,22 @@ struct TalkPlayerView: View {
             }
 
             // persistent store off the current talk and position in talk
-            print("Updating user defaults")
             UserDefaults.standard.set(self.elapsedTime, forKey: "CurrentTalkTime")
             UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
             
-            playerTitle = Int(self.elapsedTime).displayInClockFormat()
+            if playTalksInSequence {
+                
+                playerTitle = Int(self.elapsedTime).displayInClockFormat()
+                if var index = self.album.talkList.firstIndex(of: CurrentTalk) {
+                    index += 1
+                    let count = self.album.talkList.count
+                    let position = String(index) + "/" + String(count) + "  "
+                    playerTitle = position + Int(self.elapsedTime).displayInClockFormat()
+                }
+            } else {
+                playerTitle = Int(self.elapsedTime).displayInClockFormat()
+
+            }
             
         }
     }
@@ -237,7 +248,6 @@ struct TalkPlayerView: View {
                     ProgressView()
                         .hidden(TalkPlayerStatus != .LOADING)
                     Button(action: {
-                        print(isTalkActive)
                         isTalkActive = (isTalkActive ? false : true)
                         if isTalkActive {playTalk()} else {pauseTalk()}
                         })
@@ -315,7 +325,6 @@ struct TalkPlayerView: View {
                 
                 VStack(spacing: 5) {
                     Button(action: {
-                        print("sequence button")
                         self.playTalksInSequence = playTalksInSequence ? false : true
                     })
                     {
@@ -366,7 +375,6 @@ struct TalkPlayerView: View {
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onDisappear {
-            print("DetailView disappeared!")
             finishTalk()
         }
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPTS", selection: $selection) { EmptyView() } .hidden())

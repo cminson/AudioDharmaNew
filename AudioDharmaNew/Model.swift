@@ -444,7 +444,6 @@ class Model {
                     for (fileName, _ ) in self.UserNotes {
                         print("testing if legal")
                         if let talk = FileNameToTalk[fileName] {
-                            print("adding note", talk.Title)
                             talkList.append(talk)
                         }
                     }
@@ -454,7 +453,6 @@ class Model {
                     for (fileName, _ ) in self.UserDownloads {
                         print(fileName)
                         if let talk = FileNameToTalk[fileName] {
-                            print("adding download")
                             talkList.append(talk)
                         }
                     }

@@ -269,8 +269,6 @@ struct TranscriptView: View {
     init(talk: TalkData) {
         
         self.talk = talk
-        print("Talk: ", talk.Title, "  ", talk.PDF)
-        
     }
     
     var body: some View {
@@ -285,9 +283,24 @@ struct TranscriptView: View {
     }
 }
 
+
 struct HelpPageView: View {
     
-    @State var text = "<h1>AudioDharma Help</h1><p><br>Press and Hold"
+    @State var text: String
+    
+    init()
+    {
+        if let filepath = Bundle.main.path(forResource: "help", ofType: "txt") {
+            do {
+                text = try String(contentsOfFile: filepath)
+                print(text)
+            } catch {
+                text = "Temporarily Unavailable"
+            }
+        } else {
+            text = "Temporarily Unavailable"
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -299,7 +312,21 @@ struct HelpPageView: View {
 
 struct DonationPageView: View {
     
-    @State var text = "<h1>Donation Page</h1>"
+    @State var text : String
+    
+    init()
+    {
+        if let filepath = Bundle.main.path(forResource: "donate", ofType: "txt") {
+            do {
+                text = try String(contentsOfFile: filepath)
+                print(text)
+            } catch {
+                text = "Temporarily Unavailable"
+            }
+        } else {
+            text = "Temporarily Unavailable"
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -308,6 +335,9 @@ struct DonationPageView: View {
         }
     }
 }
+
+
+
 
 
 /*

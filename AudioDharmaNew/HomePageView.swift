@@ -48,7 +48,9 @@ struct HomePageView: View {
             .listStyle(PlainListStyle())  // ensures fills parent view
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-            //.background(NavigationLink(destination: TalkPlayerView(talk: CurrentTalk!, currentTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+           
+            //.background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
              .toolbar {
@@ -60,26 +62,19 @@ struct HomePageView: View {
                         Image(systemName: "questionmark.circle")
                     }
                     Spacer()
-                    /*
                     Button(action: {
-                        if CurrentTalk?.Title != "NO TALK" {
-                            noCurrentTalk = false
-                            selection = "PLAY_TALK"
-                            print(CurrentTalk?.Title)
-                        } else {
-                            noCurrentTalk = true
-                        }
+                        selection = "RESUME_TALK"
+                        //selectedTalk = ResumableTalk
                     }) {
                         Text("Resume Talk")
                     }
-                    .hidden(noCurrentTalk)
-                  */
+                    .hidden(!TheDataModel.resumableTalkExists())
                     Spacer()
                     Button(action: {
                         selection = "DONATE"
 
                    }) {
-                        Image(systemName: "suit.heart")
+                        Image(systemName: "heart.circle")
                             .renderingMode(.original)
 
                     }

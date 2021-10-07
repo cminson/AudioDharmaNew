@@ -198,7 +198,7 @@ struct TalkListView: View {
                     Button {
                         // your action here
                     } label: {
-                        Image(systemName: "calendar")
+                        Image(systemName: "questionmark.circle")
                     }
                     Spacer()
                     Button(action: {
@@ -212,7 +212,7 @@ struct TalkListView: View {
                     Button(action: {
                         print("Edit button was tapped")
                     }) {
-                        Image(systemName: "heart.fill")
+                        Image(systemName: "heart.circle")
                             .renderingMode(.original)
                     }
                 }
