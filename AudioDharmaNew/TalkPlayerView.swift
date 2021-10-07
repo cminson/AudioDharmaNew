@@ -33,6 +33,16 @@ var CurrentTalk : TalkData = TalkData.noop()
 var CurrentTalkTime : Double = 0
 
 /*
+ 
+ if TheDataModel.isCompletedDownloadTalk(talk: CurrentTalk) {
+
+     PlayingDownloadedTalk = true
+     talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + CurrentTalk.FileName)!
+ }
+
+ */
+
+/*
  ******************************************************************************
  * TalkPlayer
  * UI for talk player console
@@ -90,13 +100,22 @@ struct TalkPlayerView: View {
         TalkPlayerStatus = .LOADING
         playerTitle = "Loading Talk"
         
-        if let talkURL = URL(string: URL_MP3_HOST + CurrentTalk.URL) {
-            
+        if talk.isDownloadTalk() {
+            print("playing download talk")
+            let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + CurrentTalk.FileName)!
             self.elapsedTime = CurrentTalkTime
             TheTalkPlayer = TalkPlayer()
             TheTalkPlayer.talkPlayerView = self
             TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
         }
+        else if let talkURL = URL(string: URL_MP3_HOST + CurrentTalk.URL)
+        {
+            self.elapsedTime = CurrentTalkTime
+            TheTalkPlayer = TalkPlayer()
+            TheTalkPlayer.talkPlayerView = self
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
+        }
+      
     }
     
     
@@ -211,11 +230,12 @@ struct TalkPlayerView: View {
 
             Group {
             Spacer()
-                .frame(height: 5)
+                .frame(height: 15)
                 
-           // title of talk and speaker
+           // title, speaker
            Text(CurrentTalk.Title)
                 .background(Color.white)
+                .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))
@@ -311,15 +331,12 @@ struct TalkPlayerView: View {
             Spacer()
                 .frame(height: 20)
             HStack() {
-                
-
-                Button("biography") {
-                    //displayTranscriptPage = true
-                    selection = "TRANSCRIPTS"
+                 Button("biography") {
+                    selection = "BIOGRAPHY"
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.leading, 15)
-                .hidden(false)
+                .hidden(!talk.hasBiography())
 
                 Spacer()
                 
@@ -339,15 +356,13 @@ struct TalkPlayerView: View {
                 }
                 
                 Spacer()
-                
-                //if TheDataModel.doesTalkHaveTranscript(talk: talk)
                 Button("transcript") {
                     //displayTranscriptPage = true
                     selection = "TRANSCRIPTS"
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.trailing, 15)
-                .hidden(false)
+                .hidden(!talk.hasTranscript())
                 
             }
                 
@@ -378,6 +393,8 @@ struct TalkPlayerView: View {
             finishTalk()
         }
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPTS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: BiographyView(speaker: talk.Speaker), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
+
         .navigationBarTitle(Text(playerTitle))
 
       

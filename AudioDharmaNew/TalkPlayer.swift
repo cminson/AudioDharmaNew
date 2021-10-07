@@ -17,9 +17,6 @@ var CurrentTalkRow : Int = 0
 var OriginalTalkRow : Int = 0
 var ResumingLastTalk: Bool = false
 
-//var CurrentTalk : TalkData = TalkData(title: "NO TALK",url: "",fileName: "",date: "" ,speaker: "", totalSeconds: 1, pdf: "")
-//var CurrentTalk : TalkData?
-//var CurrentTalkTime : Int = 0
 
 var TalkList : [TalkData]!
 var TalkTimer : Timer?

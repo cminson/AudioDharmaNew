@@ -284,6 +284,37 @@ struct TranscriptView: View {
 }
 
 
+struct BiographyView: View {
+    var speaker: String
+    
+    @State var text: String
+    
+    init(speaker: String)
+    {
+        self.speaker = speaker
+        print("Biography View", self.speaker)
+
+        if let filepath = Bundle.main.path(forResource: self.speaker, ofType: "txt") {
+            do {
+                text = try String(contentsOfFile: filepath)
+                print(text)
+            } catch {
+                text = "Temporarily Unavailable"
+            }
+        } else {
+            text = "Temporarily Unavailable"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HTMLView(text: $text)
+                  .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        }
+    }
+}
+
+
 struct HelpPageView: View {
     
     @State var text: String

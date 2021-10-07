@@ -324,6 +324,30 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         return false
     }
      
+    
+    func hasTranscript() -> Bool {
+        
+        if self.PDF.lowercased().range(of:"http:") != nil {
+            return true
+        }
+        else if self.PDF.lowercased().range(of:"https:") != nil {
+            return true
+        }
+        return false
+    }
+    
+    
+    func isDownloadTalk() -> Bool {
+
+        return TheDataModel.UserDownloads[self.FileName] != nil
+
+    }
+    
+    
+    func hasBiography() -> Bool {
+        
+        return true
+    }
 
 
 

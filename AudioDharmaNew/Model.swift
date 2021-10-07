@@ -168,6 +168,8 @@ class Model {
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
         
         self.PlayedTalks = self.loadPlayedTalksData()
+        self.UserDownloads = TheDataModel.loadUserDownloadData()
+
         downloadAndConfigure(path: URL_CONFIGURATION)
         
         // build the data directories on device, if needed
@@ -266,8 +268,10 @@ class Model {
 
             // get our unzipped json from the local storage and process it
             var jsonData: Data!
-            do {                                                                                                            jsonData = try Data(contentsOf: URL(fileURLWithPath: configJSONPath))
+            do {
+                jsonData = try Data(contentsOf: URL(fileURLWithPath: configJSONPath))
             }
+
             catch let error as NSError {
                 HTTPResultCode = 404
                 self.log(error: error)
@@ -342,8 +346,11 @@ class Model {
                                          totalSeconds: seconds,
                                          pdf: pdf)
                     
-                if doesTalkHaveTranscript(talk: talk) {
+                if talk.hasTranscript() {
                     talk.Title = talk.Title + " [transcript]"
+                }
+                if talk.isDownloadTalk() {
+                    talk.isDownloaded = true
                 }
             
                 self.FileNameToTalk[fileName] = talk
@@ -449,7 +456,6 @@ class Model {
                     }
                 case KEY_USER_DOWNLOADS:
                     self.UserDownloadAlbum = album
-                    self.UserDownloads = TheDataModel.loadUserDownloadData()
                     for (fileName, _ ) in self.UserDownloads {
                         print(fileName)
                         if let talk = FileNameToTalk[fileName] {
@@ -1195,17 +1201,7 @@ class Model {
         return freeSize.int64Value
     }
     
-    func doesTalkHaveTranscript(talk: TalkData) -> Bool {
-        
-        if talk.PDF.lowercased().range(of:"http:") != nil {
-            return true
-        }
-        else if talk.PDF.lowercased().range(of:"https:") != nil {
-            return true
-        } else {
-            return false
-        }
-    }
+   
     
     func isFullURL(url: String) -> Bool {
         
