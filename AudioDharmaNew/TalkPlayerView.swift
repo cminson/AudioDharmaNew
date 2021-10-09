@@ -154,7 +154,7 @@ struct TalkPlayerView: View {
                 self.silderElapsedTime = 0
                 self.talk = self.album.talkList[index]
                 self.elapsedTime = 0
-                TheDataModel.saveCurrentTalk(talk: self.talk, elapsedTime: self.elapsedTime)
+                TheDataModel.saveLastTalkState(talk: self.talk, elapsedTime: self.elapsedTime)
 
                 print("New sequence talk: ", index, self.talk.Title)
             }
@@ -194,7 +194,7 @@ struct TalkPlayerView: View {
             }
 
             // persistent store off the current talk and position in talk
-            TheDataModel.saveCurrentTalk(talk: self.talk, elapsedTime: self.elapsedTime)
+            TheDataModel.saveLastTalkState(talk: self.talk, elapsedTime: self.elapsedTime)
 
             if playTalksInSequence {
                 

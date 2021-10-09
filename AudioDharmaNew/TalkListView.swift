@@ -21,6 +21,7 @@ struct TalkRow: View {
     @State private var displayNoteDialog = false
     @State private var displayDownloadDialog = false
     @State private var displayShareSheet = false
+    @State var selection: String?  = nil
     @State private var noteText = ""
     @State private var stateIsFavoriteTalk : Bool
     @State private var stateIsNotatedTalk : Bool
@@ -94,8 +95,12 @@ struct TalkRow: View {
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
+                        let signalComplete = DispatchSemaphore(value: 0)
+                        TheDataModel.downloadSimilarityData(talk: talk, signalComplete: signalComplete)
+                        signalComplete.wait()
+                        selection = "TALKS"
                     }
-                    Button("Favorite Talk") {
+                    Button(talk.isFavoriteTalk() ? "Unfavorite Talk" : "Favorite Talk") {
                         self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
                     }
                     Button("Make Note") {
@@ -110,6 +115,7 @@ struct TalkRow: View {
                         displayDownloadDialog = true
                     }
                 }
+                
             }
             .alert(isPresented: $displayDownloadDialog) {
                 Alert(
@@ -117,7 +123,7 @@ struct TalkRow: View {
                     message: Text("Download talk to your device."),
                     primaryButton: .destructive(Text("Download")) {
                         stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                        talk.download(notifyUI: downloadCompleted)
+                        talk.startDownload(notifyUI: downloadCompleted)
                     },
                     secondaryButton: .cancel()
                 )
@@ -130,6 +136,8 @@ struct TalkRow: View {
                 ShareSheet(activityItems: sharedObjects)
             }
         }
+      
+        .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
                 Text(talk.Title)
@@ -155,21 +163,19 @@ struct TalkRow: View {
 
 }
 
+
 struct TalkListView: View {
     var album: AlbumData
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
-    @State var isResumableTalk: Bool = false
     @State var selectedTalkTime: Double = 0
     @State var selectedTalk: TalkData
 
 
     init(album: AlbumData) {
-        print("INIT: TalkListView")
-        self.album = album
         
-        isResumableTalk = TheDataModel.currentTalkExists()
+        self.album = album
         selectedTalk = TalkData.empty()
     }
     
@@ -187,7 +193,9 @@ struct TalkListView: View {
                     selectedTalkTime = 0
                     selection = "PLAY_TALK"
                 }
+
         }
+        .navigationBarTitle(album.Title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
 

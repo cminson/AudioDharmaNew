@@ -51,7 +51,7 @@ class AlbumData: Identifiable, ObservableObject {
     
     
     static func empty () -> AlbumData {
-        return AlbumData(title: "", key: "", section: "", imageName: "", date: "")
+        return AlbumData(title: "", key: "", section: "", imageName: "albumDefault", date: "")
     }
 
     
@@ -146,7 +146,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     }
     
     static func empty () -> TalkData {
-        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "", totalSeconds: 0,  pdf: "")
+        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", totalSeconds: 0,  pdf: "")
     }
 
         
@@ -166,7 +166,9 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         TotalSeconds = totalSeconds
         PDF = pdf
         
+
         SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
+            
         isDownloaded = false
         
         DatePlayed = ""
@@ -218,13 +220,15 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     
     func isFavoriteTalk() -> Bool {
         
+        let isFavorite =  TheDataModel.UserFavorites[self.FileName] != nil
+        print("Favorite Talk: ", isFavorite)
         return TheDataModel.UserFavorites[self.FileName] != nil
     }
     
     
-    func download(notifyUI: @escaping  () -> Void) {
+    func startDownload(notifyUI: @escaping  () -> Void) {
         
-        TheDataModel.download(talk: self, notifyUI: notifyUI)
+        TheDataModel.startDownload(talk: self, notifyUI: notifyUI)
     }
     
        

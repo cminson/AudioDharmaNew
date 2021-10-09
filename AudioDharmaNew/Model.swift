@@ -116,6 +116,7 @@ class Model {
     var SanghaShareHistoryAlbum =  AlbumData(title: "Today's Shared Talks", key: KEY_SANGHA_SHAREHISTORY, section: "", imageName: "albumdefault", date: "")
     var UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", imageName: "albumdefault", date: "")
     var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "")
+    var SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "")
     
     var UserTalkHistoryList: [TalkHistoryData] = []
 
@@ -167,11 +168,6 @@ class Model {
         URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
         
-        self.PlayedTalks = self.loadPlayedTalksData()
-        self.UserDownloads = TheDataModel.loadUserDownloadData()
-        
-        downloadAndConfigure(path: URL_CONFIGURATION)
-        
         // build the data directories on device, if needed
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
         MP3_DOWNLOADS_PATH = documentPath + "/DOWNLOADS"
@@ -181,7 +177,14 @@ class Model {
         } catch let error as NSError {
             log(error: error)
         }
+
+        self.PlayedTalks = self.loadPlayedTalksData()
+        self.UserDownloads = TheDataModel.loadUserDownloadData()
+        self.validateUserDownloadData()
         
+        downloadAndConfigure(path: URL_CONFIGURATION)
+        
+             
     }
     
     func startBackgroundTimers() {
@@ -197,11 +200,10 @@ class Model {
     }
     
     
-    func loadCurrentTalk() {
+    func loadLastTalkState() {
         
-        print("loadCurrentTalk")
+        print("loadLastTalkState")
         if let talkName = UserDefaults.standard.string(forKey: "TalkName") {
-            print("talkName: ", talkName)
             if let elapsedTime = UserDefaults.standard.string(forKey: "CurrentTalkTime") {
                 if let talk = TheDataModel.getTalkForName(name: talkName) {
                     
@@ -214,9 +216,9 @@ class Model {
     }
     
     
-    func saveCurrentTalk(talk: TalkData, elapsedTime: Double) {
+    func saveLastTalkState(talk: TalkData, elapsedTime: Double) {
         
-        print("saveCurrentTalk", talk.Title, elapsedTime)
+        print("saveLastTalkState", talk.Title, elapsedTime)
 
         CurrentTalk = talk
         CurrentTalkElapsedTime = elapsedTime
@@ -426,7 +428,7 @@ class Model {
             seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
         
-        self.loadCurrentTalk()
+        self.loadLastTalkState()
 
     }
     
@@ -544,6 +546,61 @@ class Model {
             //print("Setting time: ", album.Title, album.totalSeconds)
         } // end Album loop
     }
+    
+    func downloadSimilarityData(talk: TalkData, signalComplete: DispatchSemaphore) {
+
+         let config = URLSessionConfiguration.default
+         config.requestCachePolicy = .reloadIgnoringLocalCacheData
+         config.urlCache = nil
+         let session = URLSession.init(configuration: config)
+
+        let similarKeyName = talk.FileName.replacingOccurrences(of: ".mp3", with: "")
+         let path = URL_GET_SIMILAR + similarKeyName
+         let requestURL : URL? = URL(string: path)
+         let urlRequest = URLRequest(url : requestURL!)
+
+         TheDataModel.SimilarTalksAlbum.talkList  = []
+         let task = session.dataTask(with: urlRequest) {
+             (data, response, error) -> Void in
+
+             var httpResponse: HTTPURLResponse
+             if let valid_reponse = response {
+                 httpResponse = valid_reponse as! HTTPURLResponse
+                 HTTPResultCode = httpResponse.statusCode
+             } else {
+                 HTTPResultCode = 404
+             }
+
+             if let responseData = data {
+                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
+                     HTTPResultCode = 404
+                 }
+             }
+             else {
+                 HTTPResultCode = 404
+             }
+
+             if HTTPResultCode == 200 {
+                 do {
+                     let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
+                     for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
+
+                         let filename = similarTalk["filename"] as? String ?? ""
+
+                         if let talk = self.FileNameToTalk[filename] {
+                             TheDataModel.SimilarTalksAlbum.talkList.append(talk)
+                         }
+                     }
+                 }
+                 catch {
+                     print(error)
+                 }
+             }
+             signalComplete.signal()
+         }
+         task.resume()
+     }
+
     
     
     func downloadSanghaActivity() {
@@ -675,7 +732,7 @@ class Model {
     }
     
     
-    func download(talk: TalkData, notifyUI: @escaping  () -> Void) {
+    func startDownload(talk: TalkData, notifyUI: @escaping  () -> Void) {
 
         var requestURL: URL
         var localPathMP3: String
@@ -951,6 +1008,7 @@ class Model {
         }
     }
     
+    
     // ensure that no download records get persisted that are incomplete in any way
     // I do this because asynchronous downloads might not complete, leaving systen in inconsistent state
     // this boot-time check ensures data remains stable, hopefully
@@ -975,6 +1033,7 @@ class Model {
         
         for userDownload in badDownloads {
             
+            print("Reomving bad donwload: ", userDownload.FileName)
             UserDownloads[userDownload.FileName] = nil
             let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + userDownload.FileName
 
@@ -1009,6 +1068,7 @@ class Model {
         }
         saveUserDownloadData()
     }
+    
     
     func clearIncompleteDownloads()  {
         
