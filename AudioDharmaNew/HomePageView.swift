@@ -19,15 +19,19 @@ struct HomePageView: View {
     var parentAlbum: AlbumData
     
     @State var selectedAlbum: AlbumData
+    @State var selectedTalk: TalkData
+    @State var selectedTalkTime: Double
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = true
     
     init(parentAlbum: AlbumData) {
         
-        UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
+        //UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         self.parentAlbum = parentAlbum
-        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", imageName: "", date: "")
+        self.selectedAlbum = AlbumData.empty()
+        self.selectedTalk = TalkData.empty()
+        self.selectedTalkTime = 0
         
         let seconds = TheDataModel.RootAlbum.totalSeconds
         print("ROOT SECONDS: ", seconds)
@@ -48,8 +52,7 @@ struct HomePageView: View {
             .listStyle(PlainListStyle())  // ensures fills parent view
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-           
-            //.background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
 
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
@@ -64,11 +67,12 @@ struct HomePageView: View {
                     Spacer()
                     Button(action: {
                         selection = "RESUME_TALK"
-                        //selectedTalk = ResumableTalk
+                        selectedTalk = CurrentTalk
+                        selectedTalkTime = CurrentTalkElapsedTime
                     }) {
                         Text("Resume Talk")
                     }
-                    .hidden(!TheDataModel.resumableTalkExists())
+                    .hidden(!TheDataModel.currentTalkExists())
                     Spacer()
                     Button(action: {
                         selection = "DONATE"

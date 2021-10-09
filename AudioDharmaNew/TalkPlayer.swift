@@ -12,12 +12,6 @@ import AVFoundation
 import CoreMedia
 
 
-
-var CurrentTalkRow : Int = 0
-var OriginalTalkRow : Int = 0
-var ResumingLastTalk: Bool = false
-
-
 var TalkList : [TalkData]!
 var TalkTimer : Timer?
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation

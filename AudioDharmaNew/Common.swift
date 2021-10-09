@@ -19,9 +19,7 @@ let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dic
 let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
 var BusyIndicator =  UIActivityIndicatorView()
 
-
 let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]
-
 
 let LIST_IMAGE_HEIGHT : CGFloat = 40.0
 let LIST_IMAGE_WIDTH : CGFloat = 40.0
@@ -29,15 +27,21 @@ let FONT_SIZE_SECTION : CGFloat = 14.0
 let LIST_ROW_SIZE_SECTION : CGFloat = 35.0
 let LIST_ROW_SIZE_STANDARD : CGFloat = 40.0
 
-let FONT_SIZE_ROW_TITLE : CGFloat = 14
+let FONT_SIZE_ROW_TITLE : CGFloat = 16
 let FONT_SIZE_ROW_ATTRIBUTES : CGFloat = 10
-
+ 
 let COLOR_BACKGROUND_SECTION = "555555"
 
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 
-var HELP_PAGE = "<strong>Help is currently not available. Check your connection or try again later.</strong>"      // where the Help Page data goes
+//
+// Thes globals indicate whats playing now (or last played)
+//
+var CurrentTalk : TalkData = TalkData.empty()  // the last talk played or being played
+var CurrentTalkElapsedTime : Double = 0                // elapsed time in this talk
+var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk being played
+
 
 
 /*
@@ -68,7 +72,6 @@ struct ToolBar: ToolbarContent {
         
         ToolbarItem(placement: .bottomBar) {
             Button(action: {
-                print("Edit button was tapped")
                 //selection = "PLAY_TALK"
 
             }) {
@@ -79,7 +82,6 @@ struct ToolBar: ToolbarContent {
         
         ToolbarItem(placement: .bottomBar) {
             Button(action: {
-                print("Edit button was tapped")
 
             }) {
                 Image(systemName: "note")
@@ -89,7 +91,6 @@ struct ToolBar: ToolbarContent {
 
         ToolbarItem(placement: .bottomBar) {
             Button(action: {
-                print("Edit button was tapped")
 
             }) {
                 Image(systemName: "note")
@@ -292,12 +293,10 @@ struct BiographyView: View {
     init(speaker: String)
     {
         self.speaker = speaker
-        print("Biography View", self.speaker)
 
         if let filepath = Bundle.main.path(forResource: self.speaker, ofType: "txt") {
             do {
                 text = try String(contentsOfFile: filepath)
-                print(text)
             } catch {
                 text = "Temporarily Unavailable"
             }
@@ -306,8 +305,21 @@ struct BiographyView: View {
         }
     }
 
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            Spacer()
+                .frame(height: 20)
+            HStack() {
+                Spacer()
+                self.speaker.toImage()
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 200)
+                Spacer()
+            }
+            Spacer()
+                .frame(height: 20)
             HTMLView(text: $text)
                   .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         }
@@ -324,7 +336,6 @@ struct HelpPageView: View {
         if let filepath = Bundle.main.path(forResource: "help", ofType: "txt") {
             do {
                 text = try String(contentsOfFile: filepath)
-                print(text)
             } catch {
                 text = "Temporarily Unavailable"
             }
@@ -350,7 +361,6 @@ struct DonationPageView: View {
         if let filepath = Bundle.main.path(forResource: "donate", ofType: "txt") {
             do {
                 text = try String(contentsOfFile: filepath)
-                print(text)
             } catch {
                 text = "Temporarily Unavailable"
             }

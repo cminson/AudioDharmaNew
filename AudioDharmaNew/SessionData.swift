@@ -50,6 +50,16 @@ class AlbumData: Identifiable, ObservableObject {
     }
     
     
+    static func empty () -> AlbumData {
+        return AlbumData(title: "", key: "", section: "", imageName: "", date: "")
+    }
+
+    
+    func isEmpty() -> Bool {
+        return self.Title.isEmpty
+    }
+
+    
     func getAlbumSections(section: String) -> [AlbumData] {
 
         var sectionAlbumList = [AlbumData] ()
@@ -135,9 +145,8 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
     }
     
-    static func noop () -> TalkData {
-        
-        return TalkData(title: "Default", url: "", fileName: "", date: "", speaker: "", totalSeconds: 0,  pdf: "")
+    static func empty () -> TalkData {
+        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "", totalSeconds: 0,  pdf: "")
     }
 
         
@@ -177,6 +186,11 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
                             pdf: PDF)
         
         return copy
+    }
+    
+    
+    func isEmpty() -> Bool {
+        return self.Title.isEmpty
     }
     
      

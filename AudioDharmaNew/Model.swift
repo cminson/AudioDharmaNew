@@ -134,7 +134,7 @@ class Model {
     var UserAlbums: [UserAlbumData] = []      // all the custom user albums defined by this user.
     var UserNotes: [String: UserNoteData] = [:]      // all the  user notes defined by this user, indexed by fileName
     var UserFavorites: [String: UserFavoriteData] = [:]      // all the favorites defined by this user, indexed by fileName
-	var UserDownloads: [String: UserDownloadData] = [:]      // all the downloads defined by this user, indexed by fileName
+    var UserDownloads: [String: UserDownloadData] = [:]      // all the downloads defined by this user, indexed by fileName
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
@@ -169,7 +169,7 @@ class Model {
         
         self.PlayedTalks = self.loadPlayedTalksData()
         self.UserDownloads = TheDataModel.loadUserDownloadData()
-
+        
         downloadAndConfigure(path: URL_CONFIGURATION)
         
         // build the data directories on device, if needed
@@ -190,20 +190,41 @@ class Model {
     }
     
  
-    func resumableTalkExists() -> Bool {
+    func currentTalkExists() -> Bool {
         
+        print("currentTalkExists: ", CurrentTalk.Title)
+        return !CurrentTalk.Title.isEmpty
+    }
+    
+    
+    func loadCurrentTalk() {
+        
+        print("loadCurrentTalk")
         if let talkName = UserDefaults.standard.string(forKey: "TalkName") {
-            if let talkCurrentTime = UserDefaults.standard.string(forKey: "CurrentTalkTime") {
+            print("talkName: ", talkName)
+            if let elapsedTime = UserDefaults.standard.string(forKey: "CurrentTalkTime") {
                 if let talk = TheDataModel.getTalkForName(name: talkName) {
                     
-                    ResumableTalk = talk
-                    ResumableTalkTime = Double(talkCurrentTime) ?? 0
-                    return true
+                    CurrentTalk = talk
+                    CurrentTalkElapsedTime = Double(elapsedTime) ?? 0
+                    print("LOADING NEW CURRENT TALK: ", CurrentTalk.Title)
                 }
             }
         }
-        return false
     }
+    
+    
+    func saveCurrentTalk(talk: TalkData, elapsedTime: Double) {
+        
+        print("saveCurrentTalk", talk.Title, elapsedTime)
+
+        CurrentTalk = talk
+        CurrentTalkElapsedTime = elapsedTime
+        UserDefaults.standard.set(CurrentTalkElapsedTime, forKey: "CurrentTalkTime")
+        UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
+
+    }
+ 
 
     
     func downloadAndConfigure(path: String)  {
@@ -404,6 +425,9 @@ class Model {
             let talkList = seriesAlbum.talkList
             seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
+        
+        self.loadCurrentTalk()
+
     }
     
     

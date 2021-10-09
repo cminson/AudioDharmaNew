@@ -10,6 +10,7 @@ import MediaPlayer
 import UIKit
 
 
+
 enum TalkStates {                   // all possible states of the talk player
     case INITIAL
     case LOADING
@@ -23,24 +24,9 @@ enum TalkStates {                   // all possible states of the talk player
 var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
 
 var TheTalkPlayer: TalkPlayer!
-var ResumableTalk : TalkData!
-var ResumableTalkTime : Double = 0
 var PlayEntireAlbum: Bool = false
 var PlayingDownloadedTalk: Bool = false
 
-
-var CurrentTalk : TalkData = TalkData.noop()
-var CurrentTalkTime : Double = 0
-
-/*
- 
- if TheDataModel.isCompletedDownloadTalk(talk: CurrentTalk) {
-
-     PlayingDownloadedTalk = true
-     talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + CurrentTalk.FileName)!
- }
-
- */
 
 /*
  ******************************************************************************
@@ -61,36 +47,38 @@ struct VolumeSlider: UIViewRepresentable {
 struct TalkPlayerView: View {
     var album: AlbumData
     var talk: TalkData
-    var startTime: Double
-    
+    var elapsedTime: Double
+
     @State private var isTalkActive = false
-    @State private var elapsedTime: Double
     @State private var displayedElapsedTime: String
     @State private var sliderUpdating = false
-    @State private var selection: String?  = ""
-    @State var displayTranscriptPage: Bool = false
-    @State var displayBiographyPage: Bool = false
+    @State private var silderElapsedTime: Double = 0
+    @State var displayTranscriptView: Bool = false
+    @State var displayBiographyView: Bool = false
     @State var playTalksInSequence: Bool = false
     @State private var playerTitle: String = "Play Talk"
 
     
-    init(album: AlbumData, talk: TalkData, startTime: Double, displayStartTime: String) {
+    
+    init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
         self.album = album
         self.talk = talk
-        self.startTime = startTime
+        self.elapsedTime = elapsedTime
+        print("TalkPlayerView Init: ", talk.Title)
         
-        self.elapsedTime = startTime
-        self.displayedElapsedTime = displayStartTime
+        self.silderElapsedTime = elapsedTime
+        self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
         
-        CurrentTalk = self.talk
-        CurrentTalkTime = self.startTime
+    
     }
 
     
     func playTalk() {
         
         
+        print("Play TalkPlayerView: ", talk.Title)
+
         if TalkPlayerStatus == .PAUSED {
             
             TheTalkPlayer.play()
@@ -100,21 +88,20 @@ struct TalkPlayerView: View {
         TalkPlayerStatus = .LOADING
         playerTitle = "Loading Talk"
         
-        if talk.isDownloadTalk() {
-            print("playing download talk")
-            let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + CurrentTalk.FileName)!
-            self.elapsedTime = CurrentTalkTime
-            TheTalkPlayer = TalkPlayer()
-            TheTalkPlayer.talkPlayerView = self
-            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
+
+        var talkURL : URL
+        if self.talk.isDownloadTalk() {
+            print("download talk")
+            talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
-        else if let talkURL = URL(string: URL_MP3_HOST + CurrentTalk.URL)
-        {
-            self.elapsedTime = CurrentTalkTime
-            TheTalkPlayer = TalkPlayer()
-            TheTalkPlayer.talkPlayerView = self
-            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
+        else {
+            talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
         }
+            
+        TheTalkPlayer = TalkPlayer()
+        TheTalkPlayer.talkPlayerView = self
+        TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
+
       
     }
     
@@ -140,7 +127,7 @@ struct TalkPlayerView: View {
         print("resetTalkDisplay")
     }
     
-    
+      
     func updateTitleDisplay() {
         print("updateTitleDisplay")
         
@@ -148,7 +135,7 @@ struct TalkPlayerView: View {
     
     
     // invoked upon TheTalkPlayer completion
-    func talkHasCompleted () {
+    mutating func talkHasCompleted () {
         print("talkHasCompleted")
         
         TalkPlayerStatus = .FINISHED
@@ -158,15 +145,18 @@ struct TalkPlayerView: View {
         // if option is enabled, play the next talk in the current series
         if self.playTalksInSequence == true {
 
-            if var index = self.album.talkList.firstIndex(of: CurrentTalk) {
+            if var index = self.album.talkList.firstIndex(of: self.talk) {
             
-                print("Current sequence talk: ", index, CurrentTalk.Title)
+                print("Old sequence talk: ", index, self.talk.Title)
                 index += 1
                 if index >= self.album.talkList.count { index = 0}
                 
-                CurrentTalk = self.album.talkList[index]
-                CurrentTalkTime = 0
-                print("New sequence talk: ", index, CurrentTalk.Title)
+                self.silderElapsedTime = 0
+                self.talk = self.album.talkList[index]
+                self.elapsedTime = 0
+                TheDataModel.saveCurrentTalk(talk: self.talk, elapsedTime: self.elapsedTime)
+
+                print("New sequence talk: ", index, self.talk.Title)
             }
             self.playTalk()
         }
@@ -175,18 +165,19 @@ struct TalkPlayerView: View {
     
     
     // invoked from background timer in TheTalkPlayer
-    func updateView(){
+    mutating func updateView(){
 
         //print("Update View Elapsed Time", self.elapsedTime)
         TalkPlayerStatus = .PLAYING
 
-        if sliderUpdating == true {
-            displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
-
+        if self.sliderUpdating == true {
+            self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
+            self.elapsedTime = self.silderElapsedTime
         }
         else {
             self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
-            displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
+            self.silderElapsedTime = self.elapsedTime
+            self.displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
             TalkPlayerStatus = .PLAYING
         }
     
@@ -196,20 +187,19 @@ struct TalkPlayerView: View {
             TalkPlayerStatus = .PLAYING
 
             // if play time exceeds reporting threshold and not previously reported, report it
-            if self.elapsedTime > REPORT_TALK_THRESHOLD, CurrentTalk.isMostRecentTalk() == false {
+            if self.elapsedTime > REPORT_TALK_THRESHOLD, self.talk.isMostRecentTalk() == false {
 
-                TheDataModel.addToTalkHistory(talk: CurrentTalk)
-                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: CurrentTalk)
+                TheDataModel.addToTalkHistory(talk: self.talk)
+                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
 
             // persistent store off the current talk and position in talk
-            UserDefaults.standard.set(self.elapsedTime, forKey: "CurrentTalkTime")
-            UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
-            
+            TheDataModel.saveCurrentTalk(talk: self.talk, elapsedTime: self.elapsedTime)
+
             if playTalksInSequence {
                 
                 playerTitle = Int(self.elapsedTime).displayInClockFormat()
-                if var index = self.album.talkList.firstIndex(of: CurrentTalk) {
+                if var index = self.album.talkList.firstIndex(of: self.talk) {
                     index += 1
                     let count = self.album.talkList.count
                     let position = String(index) + "/" + String(count) + "  "
@@ -219,7 +209,6 @@ struct TalkPlayerView: View {
                 playerTitle = Int(self.elapsedTime).displayInClockFormat()
 
             }
-            
         }
     }
     
@@ -233,15 +222,15 @@ struct TalkPlayerView: View {
                 .frame(height: 15)
                 
            // title, speaker
-           Text(CurrentTalk.Title)
+           Text(self.talk.Title)
                 .background(Color.white)
-                .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
+                .foregroundColor(self.talk.isDownloaded ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            Text(CurrentTalk.Speaker)
+            Text(self.talk.Speaker)
                 .background(Color.white)
                 .padding(.trailing, 0)
                 .font(.system(size: 20, weight: .regular, design: .default))
@@ -309,18 +298,18 @@ struct TalkPlayerView: View {
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
                     .frame(width: 20)
-                Text(CurrentTalk.TotalSeconds.displayInClockFormat())
+                Text(self.talk.TotalSeconds.displayInClockFormat())
                     .font(.system(size: 12, weight: .regular))
                 Spacer()
             }
            
             // talk current position control
-            Slider(value: $elapsedTime,
-                   in: 0...Double(talk.TotalSeconds),
+            Slider(value: $silderElapsedTime,
+                   in: 0...Double(self.talk.TotalSeconds),
                    onEditingChanged: { editing in
                         sliderUpdating = editing
                     if sliderUpdating == false {
-                        TheTalkPlayer.seekToTime(seconds: Int64(elapsedTime))
+                        TheTalkPlayer.seekToTime(seconds: Int64(silderElapsedTime))
                     }
             })
                 .padding(.trailing, 20)
@@ -332,11 +321,11 @@ struct TalkPlayerView: View {
                 .frame(height: 20)
             HStack() {
                  Button("biography") {
-                    selection = "BIOGRAPHY"
+                     displayBiographyView = true
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.leading, 15)
-                .hidden(!talk.hasBiography())
+                .hidden(!self.talk.hasBiography())
 
                 Spacer()
                 
@@ -357,12 +346,11 @@ struct TalkPlayerView: View {
                 
                 Spacer()
                 Button("transcript") {
-                    //displayTranscriptPage = true
-                    selection = "TRANSCRIPTS"
+                    displayTranscriptView = true
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.trailing, 15)
-                .hidden(!talk.hasTranscript())
+                .hidden(!self.talk.hasTranscript())
                 
             }
                 
@@ -374,27 +362,38 @@ struct TalkPlayerView: View {
             } // end group 2
   
         }  // VStack
-        .popover(isPresented: $displayTranscriptPage) {
+        .popover(isPresented: $displayTranscriptView) {
             VStack() {
                 Spacer()
                     .frame(height: 10)
                 Button("Done") {
-                    displayTranscriptPage = false
+                    displayTranscriptView = false
                 }
                 Spacer()
                     .frame(height: 15)
-                TranscriptView(talk: talk)
+                TranscriptView(talk: self.talk)
             }
         }
+        .popover(isPresented: $displayBiographyView) {
+            VStack() {
+                Spacer()
+                    .frame(height: 10)
+                Button("Done") {
+                    displayBiographyView = false
+                }
+                Spacer()
+                    .frame(height: 15)
+                BiographyView(speaker: self.talk.Speaker)
+            }
+        }
+     
+
 
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onDisappear {
             finishTalk()
         }
-        .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPTS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: BiographyView(speaker: talk.Speaker), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
-
         .navigationBarTitle(Text(playerTitle))
 
       

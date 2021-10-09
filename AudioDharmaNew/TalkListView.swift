@@ -56,6 +56,8 @@ struct TalkRow: View {
             HStack() {
                 talk.Speaker.toImage()
                     .resizable()
+                    //.aspectRatio(contentMode: .fit)
+                    //.frame(width: LIST_IMAGE_HEIGHT)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .background(Color.white)
@@ -167,8 +169,8 @@ struct TalkListView: View {
         print("INIT: TalkListView")
         self.album = album
         
-        isResumableTalk = TheDataModel.resumableTalkExists()
-        selectedTalk = TalkData.noop()
+        isResumableTalk = TheDataModel.currentTalkExists()
+        selectedTalk = TalkData.empty()
     }
     
 
@@ -180,13 +182,14 @@ struct TalkListView: View {
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
-                    print("talk selected")
+                    print("talk selected: ", talk.Title)
                     selectedTalk = talk
+                    selectedTalkTime = 0
                     selection = "PLAY_TALK"
                 }
         }
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime, displayStartTime: Int(selectedTalkTime).displayInClockFormat()), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
@@ -203,11 +206,12 @@ struct TalkListView: View {
                     Spacer()
                     Button(action: {
                         selection = "RESUME_TALK"
-                        selectedTalk = ResumableTalk
+                        selectedTalk = CurrentTalk
+                        selectedTalkTime = CurrentTalkElapsedTime
                     }) {
                         Text("Resume Talk")
                     }
-                    .hidden(!TheDataModel.resumableTalkExists())
+                    .hidden(!TheDataModel.currentTalkExists())
                     Spacer()
                     Button(action: {
                         print("Edit button was tapped")

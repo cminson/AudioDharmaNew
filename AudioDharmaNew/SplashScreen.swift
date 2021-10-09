@@ -62,10 +62,17 @@ struct SplashScreen : View {
             if self.appIsReady {
                 HomePageView(parentAlbum: TheDataModel.RootAlbum)
             } else {
-                Spacer()
-                Image("Earth")
-                    .frame(minWidth: 100, maxWidth: 300, minHeight: 100, maxHeight: 300, alignment: .center)
-                Spacer()
+                VStack() {
+                    Spacer()
+                    HStack() {
+                        Spacer()
+                        Image("Earth")
+                            //.frame(minWidth: 100, maxWidth: 300, minHeight: 100, maxHeight: 300, alignment: .center)
+                        Spacer()
+                    }
+                    Spacer()
+
+                }
             }
         }
         .background(Color.black)
