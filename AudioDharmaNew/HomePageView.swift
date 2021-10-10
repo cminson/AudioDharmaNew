@@ -53,7 +53,6 @@ struct HomePageView: View {
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
-
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle("Audio Dharma", displayMode: .inline)
              .toolbar {
@@ -64,6 +63,7 @@ struct HomePageView: View {
                     } label: {
                         Image(systemName: "questionmark.circle")
                     }
+                    .foregroundColor(.black)
                     Spacer()
                     Button(action: {
                         selection = "RESUME_TALK"
@@ -71,7 +71,9 @@ struct HomePageView: View {
                         selectedTalkTime = CurrentTalkElapsedTime
                     }) {
                         Text("Resume Talk")
+                           
                     }
+                    .foregroundColor(.black)
                     .hidden(!TheDataModel.currentTalkExists())
                     Spacer()
                     Button(action: {
@@ -79,9 +81,9 @@ struct HomePageView: View {
 
                    }) {
                         Image(systemName: "heart.circle")
-                            .renderingMode(.original)
-
                     }
+                   .foregroundColor(.black)
+
                 }
             }
            // end toolbar

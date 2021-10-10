@@ -41,6 +41,7 @@ struct TalkRow: View {
         if talk.isDownloadInProgress() {
             self.stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
+     
     }
     
     
@@ -70,14 +71,12 @@ struct TalkRow: View {
                     .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
-                VStack() {
-                    Text(talk.TotalSeconds.displayInClockFormat())
+                VStack(alignment: .trailing, spacing: 8) {
+                    Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
                         .background(Color.white)
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Spacer()
-                        .frame(height: 8)
-                    Text(String(talk.Date))
+                    Text(String(album.albumType == AlbumType.ACTIVE ?  talk.Date : talk.Country))
                         .background(Color.white)
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
@@ -136,6 +135,7 @@ struct TalkRow: View {
                 ShareSheet(activityItems: sharedObjects)
             }
         }
+        .contentShape(Rectangle())
       
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {
@@ -171,12 +171,14 @@ struct TalkListView: View {
     @State var searchText: String  = ""
     @State var selectedTalkTime: Double = 0
     @State var selectedTalk: TalkData
+    @State var selectedAlbum: AlbumData
 
-
+    
     init(album: AlbumData) {
         
         self.album = album
         selectedTalk = TalkData.empty()
+        selectedAlbum = AlbumData.empty()
     }
     
 
@@ -197,7 +199,9 @@ struct TalkListView: View {
         }
         .navigationBarTitle(album.Title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
@@ -205,30 +209,36 @@ struct TalkListView: View {
 
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button {
-                        // your action here
-                    } label: {
-                        Image(systemName: "questionmark.circle")
-                    }
-                    Spacer()
-                    Button(action: {
-                        selection = "RESUME_TALK"
-                        selectedTalk = CurrentTalk
-                        selectedTalkTime = CurrentTalkElapsedTime
-                    }) {
-                        Text("Resume Talk")
-                    }
-                    .hidden(!TheDataModel.currentTalkExists())
-                    Spacer()
-                    Button(action: {
-                        print("Edit button was tapped")
-                    }) {
-                        Image(systemName: "heart.circle")
-                            .renderingMode(.original)
-                    }
-                }
-            }
+           ToolbarItemGroup(placement: .bottomBar) {
+               Button {
+                   selection = "HELP"
+
+               } label: {
+                   Image(systemName: "questionmark.circle")
+               }
+               .foregroundColor(.black)
+               Spacer()
+               Button(action: {
+                   selection = "RESUME_TALK"
+                   selectedTalk = CurrentTalk
+                   selectedTalkTime = CurrentTalkElapsedTime
+               }) {
+                   Text("Resume Talk")
+                      
+               }
+               .foregroundColor(.black)
+               .hidden(!TheDataModel.currentTalkExists())
+               Spacer()
+               Button(action: {
+                   selection = "DONATE"
+
+              }) {
+                   Image(systemName: "heart.circle")
+               }
+              .foregroundColor(.black)
+
+           }
+       }
     }
 }
 

@@ -12,7 +12,7 @@ import UIKit
 import os.log
 
 
-enum TalkType {
+enum AlbumType {
     case ACTIVE
     case HISTORICAL
 }
@@ -30,28 +30,28 @@ class AlbumData: Identifiable, ObservableObject {
     var totalSeconds: Int
     var albumList: [AlbumData]
     var talkList: [TalkData]
-    var talkType: TalkType
+    var albumType: AlbumType
     
 
-    init(title: String, key: String, section: String, imageName: String,  date : String) {
+    init(title: String, key: String, section: String, imageName: String,  date : String, albumType: AlbumType) {
         
-        Title = title
-        Key = key
-        Section = section
-        ImageName = imageName
-        Date = date
+        self.Title = title
+        self.Key = key
+        self.Section = section
+        self.ImageName = imageName
+        self.Date = date
         
-        albumList = []
-        talkList = []
+        self.albumList = []
+        self.talkList = []
         
-        totalTalks = 0
-        totalSeconds = 0
-        talkType = TalkType.ACTIVE
+        self.totalTalks = 0
+        self.totalSeconds = 0
+        self.albumType = albumType
     }
     
     
     static func empty () -> AlbumData {
-        return AlbumData(title: "", key: "", section: "", imageName: "albumDefault", date: "")
+        return AlbumData(title: "", key: "", section: "", imageName: "albumDefault", date: "", albumType: AlbumType.ACTIVE)
     }
 
     
@@ -83,7 +83,7 @@ class AlbumData: Identifiable, ObservableObject {
         var filteredAlbumList = [AlbumData] ()
 
         if filter == "TEST" {
-            let test = AlbumData(title: "test", key: "test", section: "", imageName: "speaker", date: "01-01-01")
+            let test = AlbumData(title: "test", key: "test", section: "", imageName: "speaker", date: "01-01-01", albumType: AlbumType.ACTIVE)
             var testa = [test]
             for _ in 1 ... 100 {
                 testa.append(test)
@@ -221,7 +221,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     func isFavoriteTalk() -> Bool {
         
         let isFavorite =  TheDataModel.UserFavorites[self.FileName] != nil
-        print("Favorite Talk: ", isFavorite)
+        //print("Favorite Talk: ", isFavorite)
         return TheDataModel.UserFavorites[self.FileName] != nil
     }
     

@@ -43,6 +43,7 @@ struct AlbumRow: View {
                 album.ImageName.toImage()
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
+                    .clipShape(Circle())
                     .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")
@@ -61,6 +62,7 @@ struct AlbumRow: View {
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
             }
+            .contentShape(Rectangle())
             .onTapGesture {
                 if KEYS_TO_ALBUMS.contains(album.Key) {
                     selection = "ALBUMS"
@@ -87,10 +89,16 @@ struct AlbumListView: View {
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
     
+    @State var selectedTalk: TalkData
+    @State var selectedTalkTime: Double
     
     init(album: AlbumData) {
         self.album = album
-        self.selectedAlbum = AlbumData(title: "PLACEHOLDER", key: "", section: "", imageName: "", date: "")
+        self.selectedAlbum = AlbumData.empty()
+        
+        self.selectedTalk = TalkData.empty()
+        self.selectedTalkTime = 0
+
     }
     
     
@@ -101,37 +109,48 @@ struct AlbumListView: View {
         List(album.getFilteredAlbums(filter: searchText)) { album in
            AlbumRow(album: album)
         }
+        .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
+
         .navigationBarTitle(album.Title, displayMode: .inline)
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
-                ToolbarItemGroup(placement: .bottomBar) {
-                    Button {
-                        // your action here
-                    } label: {
-                        Image(systemName: "calendar")
-                    }
-                    Spacer()
-                    Button(action: {
- 
-                            selection = "PLAY_TALK"
-                        
-                    }) {
-                        Image(systemName: "note")
-                            .renderingMode(.original)
+           ToolbarItemGroup(placement: .bottomBar) {
+               Button {
+                   selection = "HELP"
 
-                    }
-                    Spacer()
-                    Button(action: {
-                    }) {
-                        Image(systemName: "heart.fill")
-                            .renderingMode(.original)
+               } label: {
+                   Image(systemName: "questionmark.circle")
+               }
+               .foregroundColor(.black)
+               Spacer()
+               Button(action: {
+                   selection = "RESUME_TALK"
+                   selectedTalk = CurrentTalk
+                   selectedTalkTime = CurrentTalkElapsedTime
+               }) {
+                   Text("Resume Talk")
+                      
+               }
+               .foregroundColor(.black)
+               .hidden(!TheDataModel.currentTalkExists())
+               Spacer()
+               Button(action: {
+                   selection = "DONATE"
 
-                    }
-                }
-            }
+              }) {
+                   Image(systemName: "heart.circle")
+               }
+              .foregroundColor(.black)
+
+           }
+       }
     }
+       
+
     
 }
 

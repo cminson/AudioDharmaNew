@@ -107,16 +107,16 @@ class Model {
     var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
     
-    var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "")
-    var RecommendedAlbum: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "")
-    var UserFavoritesAlbum: AlbumData = AlbumData(title: "USER FAVORITES", key: KEY_USER_FAVORITES, section: "", imageName: "albumdefault", date: "")
-    var UserNoteAlbum: AlbumData = AlbumData(title: "USER NOTES", key: KEY_NOTES, section: "", imageName: "albumdefault", date: "")
-    var UserDownloadAlbum: AlbumData = AlbumData(title: "USER DOWNLOADS", key: KEY_USER_DOWNLOADS, section: "", imageName: "albumdefault", date: "")
-    var SanghaTalkHistoryAlbum =  AlbumData(title: "Today's Talk History", key: KEY_SANGHA_TALKHISTORY, section: "", imageName: "albumdefault", date: "")
-    var SanghaShareHistoryAlbum =  AlbumData(title: "Today's Shared Talks", key: KEY_SANGHA_SHAREHISTORY, section: "", imageName: "albumdefault", date: "")
-    var UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", imageName: "albumdefault", date: "")
-    var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "")
-    var SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "")
+    var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var RecommendedAlbum: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var UserFavoritesAlbum: AlbumData = AlbumData(title: "USER FAVORITES", key: KEY_USER_FAVORITES, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var UserNoteAlbum: AlbumData = AlbumData(title: "USER NOTES", key: KEY_NOTES, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var UserDownloadAlbum: AlbumData = AlbumData(title: "USER DOWNLOADS", key: KEY_USER_DOWNLOADS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var SanghaTalkHistoryAlbum =  AlbumData(title: "Today's Talk History", key: KEY_SANGHA_TALKHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.HISTORICAL)
+    var SanghaShareHistoryAlbum =  AlbumData(title: "Today's Shared Talks", key: KEY_SANGHA_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.HISTORICAL)
+    var UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     
     var UserTalkHistoryList: [TalkHistoryData] = []
 
@@ -167,6 +167,8 @@ class Model {
         URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
         URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
+        
+       
         
         // build the data directories on device, if needed
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
@@ -385,7 +387,7 @@ class Model {
                 var seriesAlbum : AlbumData
 
                 if self.KeyToAlbum[speaker] == nil {
-                    speakerAlbum = AlbumData(title: speaker, key: speaker, section: "", imageName: speaker, date: date)
+                    speakerAlbum = AlbumData(title: speaker, key: speaker, section: "", imageName: speaker, date: date, albumType: AlbumType.ACTIVE)
                     self.KeyToAlbum[speaker] = speakerAlbum
                     ListSpeakerAlbums.append(speakerAlbum)
                 }
@@ -399,7 +401,7 @@ class Model {
                     
                     let seriesKey = "SERIES" + series
                     if self.KeyToAlbum[seriesKey] == nil {
-                        seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: speaker, date : date)
+                        seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: speaker, date : date, albumType: AlbumType.ACTIVE)
                         self.KeyToAlbum[seriesKey] = seriesAlbum
                         ListSeriesAlbums.append(seriesAlbum)
                     }
@@ -445,8 +447,8 @@ class Model {
                 let key = jsonAlbum["content"] as? String ?? ""
                 let image = jsonAlbum["image"] as? String ?? ""
                 let jsonTalkList = jsonAlbum["talks"] as? [AnyObject] ?? []
-                let album =  AlbumData(title: title, key: key, section: albumSection, imageName: image, date: "")
-
+                let album: AlbumData = AlbumData(title: title, key: key, section: albumSection, imageName: image, date: "", albumType: AlbumType.ACTIVE)
+   
                 talkList = []
                 albumList = []
             
@@ -499,13 +501,14 @@ class Model {
                             talkList.append(talk)
                         }
                     }
-
                 case KEY_USER_SHAREHISTORY:
+                    album.albumType = AlbumType.HISTORICAL
                     self.UserShareHistoryAlbum = album
-
                 case KEY_SANGHA_TALKHISTORY:
+                    album.albumType = AlbumType.HISTORICAL
                     self.SanghaTalkHistoryAlbum = album
                 case KEY_SANGHA_SHAREHISTORY:
+                    album.albumType = AlbumType.HISTORICAL
                     self.SanghaShareHistoryAlbum = album
               default:
                     albumList = []
@@ -528,7 +531,7 @@ class Model {
                         if !series.isEmpty {
                              let seriesKey = "RECOMMENDED" + series
                             if self.KeyToAlbum[seriesKey] == nil {
-                                seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date)
+                                seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date, albumType: AlbumType.ACTIVE)
                                 self.KeyToAlbum[seriesKey] = seriesAlbum
                                 self.RecommendedAlbum.albumList.append(seriesAlbum)
                             }
@@ -542,8 +545,6 @@ class Model {
                         }
                     }
                 } // end talk loop
-            
-            //print("Setting time: ", album.Title, album.totalSeconds)
         } // end Album loop
     }
     
