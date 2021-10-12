@@ -90,14 +90,14 @@ struct TalkPlayerView: View {
         
 
         var talkURL : URL
-        if self.talk.isDownloadTalk() {
-            print("download talk")
+        if self.talk.hasBeenDownloaded() {
+            print("pyaling download talk")
             talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
         else {
             talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
         }
-            
+        print(talkURL)
         TheTalkPlayer = TalkPlayer()
         TheTalkPlayer.talkPlayerView = self
         TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
@@ -224,7 +224,7 @@ struct TalkPlayerView: View {
            // title, speaker
            Text(self.talk.Title)
                 .background(Color.white)
-                .foregroundColor(self.talk.isDownloaded ? Color.red : Color.black)
+                .foregroundColor(self.talk.hasBeenDownloaded() ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))
@@ -346,6 +346,7 @@ struct TalkPlayerView: View {
                 
                 Spacer()
                 Button("transcript") {
+                    print("display transcript")
                     displayTranscriptView = true
                 }
                 .font(.system(size: 12, weight: .regular))

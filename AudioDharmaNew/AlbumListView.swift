@@ -125,7 +125,7 @@ struct AlbumListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)
+               .foregroundColor(.black)  // ensure icons don't turn blue
                Spacer()
                Button(action: {
                    selection = "RESUME_TALK"

@@ -39,6 +39,7 @@ struct SplashScreen : View {
         print("Waiting on Model")
 
         ModelLoadSemaphore.wait()
+        TheDataModel.startBackgroundTimers()
         print("MODEL LOADED")
 
         
@@ -75,6 +76,8 @@ struct SplashScreen : View {
                 }
             }
         }
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+        .edgesIgnoringSafeArea(.all)
         .background(Color.black)
         .onAppear {
             
@@ -85,9 +88,13 @@ struct SplashScreen : View {
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        .edgesIgnoringSafeArea(.all)
+
         .background(Color.black)
 
     }
+
+
 
     
 }

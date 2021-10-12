@@ -269,17 +269,21 @@ struct TranscriptView: View {
     
     init(talk: TalkData) {
         
+        print("TranscriptView PDF: ", talk.PDF)
         self.talk = talk
     }
     
     var body: some View {
         
         VStack () {
-        if let requestURL = URL(string: talk.PDF) {
-            PDFKitView(url: requestURL)
-                //.frame(width: 200)
+            //Text("https://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf")
 
-        }
+            //if let requestURL = URL(string: "http://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf") {
+            if let requestURL = URL(string: talk.PDF) {
+                PDFKitView(url: requestURL)
+            }
+
+            
         }
     }
 }

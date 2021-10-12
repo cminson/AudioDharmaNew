@@ -84,7 +84,9 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+//var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
+
 var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
@@ -177,7 +179,7 @@ class Model {
         do {
             try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
         } catch let error as NSError {
-            log(error: error)
+            errorLog(error: error)
         }
 
         self.PlayedTalks = self.loadPlayedTalksData()
@@ -276,7 +278,7 @@ class Model {
                     }
                 }
                 catch let error as NSError {
-                    self.log(error: error)
+                    self.errorLog(error: error)
                     return
                 }
             }
@@ -299,7 +301,7 @@ class Model {
 
             catch let error as NSError {
                 HTTPResultCode = 404
-                self.log(error: error)
+                self.errorLog(error: error)
                 return
             }
                         
@@ -374,9 +376,11 @@ class Model {
                 if talk.hasTranscript() {
                     talk.Title = talk.Title + " [transcript]"
                 }
-                if talk.isDownloadTalk() {
+            /*
+                if talk.hasBeenDownloaded() {
                     talk.isDownloaded = true
                 }
+             */
             
                 self.FileNameToTalk[fileName] = talk
                 
@@ -606,6 +610,7 @@ class Model {
     
     func downloadSanghaActivity() {
         
+        print("downloadSanghaActivity")
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -733,7 +738,7 @@ class Model {
     }
     
     
-    func startDownload(talk: TalkData, notifyUI: @escaping  () -> Void) {
+    func startDownload(talk: TalkData, success: @escaping  () -> Void) {
 
         var requestURL: URL
         var localPathMP3: String
@@ -803,9 +808,10 @@ class Model {
                     TheDataModel.DownloadInProgress = false
                     return
                 }
+                print("Download background done")
                 TheDataModel.DownloadInProgress = false
                 talk.setTalkAsDownloaded()
-                notifyUI()
+                success()
             }
             TheDataModel.DownloadInProgress = false
         }
@@ -897,7 +903,11 @@ class Model {
             }
         }
         
-        album.totalTalks = totalTalks
+        DispatchQueue.main.async {
+                album.totalTalks = totalTalks
+
+           }
+        //album.totalTalks = totalTalks
         album.totalSeconds = totalSeconds
         
         //print("ComputeAlbumStates: ", album.Title, album.totalTalks, album.totalSeconds)
@@ -1042,6 +1052,7 @@ class Model {
                 try FileManager.default.removeItem(atPath: localPathMP3)
             }
             catch let error as NSError {
+                self.errorLog(error: error)
             }
         }
         
@@ -1059,6 +1070,7 @@ class Model {
                             try FileManager.default.removeItem(atPath: mp3FileURL.path)
                         }
                         catch let error as NSError {
+                            self.errorLog(error: error)
                         }
 
                     }
@@ -1089,6 +1101,7 @@ class Model {
                 try FileManager.default.removeItem(atPath: localPathMP3)
             }
             catch let error as NSError {
+                self.errorLog(error: error)
             }
         }
     }
@@ -1379,7 +1392,7 @@ class Model {
             }.resume()
     }
     
-    func log(error: NSError) {
+    func errorLog(error: NSError) {
         
     }
     

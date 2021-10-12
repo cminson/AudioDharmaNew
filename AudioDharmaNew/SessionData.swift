@@ -133,8 +133,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     var PDF: String
     var TotalSeconds: Int
     var SpeakerPhoto: UIImage
-    @Published var isDownloaded: Bool
-    
     var DatePlayed: String
     var TimePlayed: String
     var City: String
@@ -158,23 +156,22 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
          totalSeconds: Int,
          pdf: String)
     {
-        Title = title
-        URL = url
-        FileName = fileName
-        Date = date
-        Speaker = speaker
-        TotalSeconds = totalSeconds
-        PDF = pdf
+        self.Title = title
+        self.URL = url
+        self.FileName = fileName
+        self.Date = date
+        self.Speaker = speaker
+        self.TotalSeconds = totalSeconds
+        self.PDF = pdf
         
 
-        SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
+        self.SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
             
-        isDownloaded = false
         
-        DatePlayed = ""
-        TimePlayed = ""
-        City = ""
-        Country = ""
+        self.DatePlayed = ""
+        self.TimePlayed = ""
+        self.City = ""
+        self.Country = ""
      }
     
     
@@ -213,22 +210,24 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
 
         TheDataModel.saveUserFavoritesData()
         TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
-
-        return TheDataModel.UserFavorites[self.FileName] != nil
+        
+        let isFavorite = TheDataModel.UserFavorites[self.FileName] != nil
+        print("ToggleTalkAsFavorite New Value: ", isFavorite)
+        return isFavorite
     }
     
     
     func isFavoriteTalk() -> Bool {
         
-        let isFavorite =  TheDataModel.UserFavorites[self.FileName] != nil
+        //let isFavorite =  TheDataModel.UserFavorites[self.FileName] != nil
         //print("Favorite Talk: ", isFavorite)
         return TheDataModel.UserFavorites[self.FileName] != nil
     }
     
     
-    func startDownload(notifyUI: @escaping  () -> Void) {
+    func startDownload(success: @escaping  () -> Void) {
         
-        TheDataModel.startDownload(talk: self, notifyUI: notifyUI)
+        TheDataModel.startDownload(talk: self, success: success)
     }
     
        
@@ -247,10 +246,9 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         TheDataModel.UserDownloadAlbum.talkList.append(self)
         TheDataModel.UserDownloads[self.FileName] = UserDownloadData(fileName: self.FileName, downloadCompleted: "YES")
         TheDataModel.saveUserDownloadData()
+
         TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-        
-        // CJM DEV - Must be moved into main UI thread  receive: on:
-        self.isDownloaded = true
+
     }
     
     
@@ -277,7 +275,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         TheDataModel.saveUserDownloadData()
         TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
         
-        self.isDownloaded = false
     }
 
     
@@ -355,7 +352,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     }
     
     
-    func isDownloadTalk() -> Bool {
+    func hasBeenDownloaded() -> Bool {
 
         return TheDataModel.UserDownloads[self.FileName] != nil
 

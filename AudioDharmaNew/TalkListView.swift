@@ -11,9 +11,52 @@ import UIKit
 let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
 
-var TEST : TalkData? = nil
+
+struct TEST: View {
+  
+    var album: AlbumData
+    var talk: TalkData
+
+    @State private var stateIsFavoriteTalk : Bool
+
+    init(album: AlbumData, talk: TalkData) {
+        
+        self.album = album
+        self.talk = talk
+        
+        stateIsFavoriteTalk = talk.isFavoriteTalk()
+    }
+    
+    var body: some View {
+                
+        VStack(alignment: .leading) {
+            HStack() {
+                Text(String(self.stateIsFavoriteTalk) )
+                    .contextMenu {
+                       Button("Favorite") {
+                            self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
+                            print("stateIsFavoriteTalk: ", self.stateIsFavoriteTalk)
+                        }
+                        .hidden(self.stateIsFavoriteTalk)
+                       Button("Unfavorite") {
+                            self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
+                            print("stateIsFavoriteTalk: ", self.stateIsFavoriteTalk)
+                        }
+                        .hidden(!self.stateIsFavoriteTalk)
+
+                    }
+              }
+        }
+        .contentShape(Rectangle())
+        .frame(height: LIST_ROW_SIZE_STANDARD)
+    }
+
+}
+
 
 struct TalkRow: View {
+  
+    //let id = UUID()
     var album: AlbumData
     @ObservedObject var talk: TalkData
     
@@ -27,27 +70,29 @@ struct TalkRow: View {
     @State private var stateIsNotatedTalk : Bool
     @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
+    
+
 
     
     init(album: AlbumData, talk: TalkData) {
         
+        //self.id = UUID()
         self.album = album
         self.talk = talk
-        
-        self.stateIsFavoriteTalk = talk.isFavoriteTalk()
-        self.stateIsNotatedTalk = talk.isNotatedTalk()
+                
+        stateIsFavoriteTalk = talk.isFavoriteTalk()
+        stateIsNotatedTalk = talk.isNotatedTalk()
 
         stateTalkTitle = talk.Title
         if talk.isDownloadInProgress() {
-            self.stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+            stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
      
     }
     
     
-    func downloadCompleted() -> Void {
+    func downloadCompleted() {
         print("downloadCompleted")
-
         stateTalkTitle = self.talk.Title
     }
     
@@ -68,13 +113,14 @@ struct TalkRow: View {
                     .frame(width: 6)
                 Text(talk.hasTalkBeenPlayed() ? "* " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .foregroundColor(talk.isDownloaded ? Color.red : Color.black)
+                    .foregroundColor(talk.hasBeenDownloaded() ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
                     Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
                         .background(Color.white)
                         .padding(.trailing, -5)
+                    
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Text(String(album.albumType == AlbumType.ACTIVE ?  talk.Date : talk.Country))
                         .background(Color.white)
@@ -92,6 +138,7 @@ struct TalkRow: View {
                         .hidden(!stateIsNotatedTalk)
                  }
                 .padding(.trailing, -10)
+                
                 .contextMenu {
                     Button("Get Similar Talks") {
                         let signalComplete = DispatchSemaphore(value: 0)
@@ -99,35 +146,46 @@ struct TalkRow: View {
                         signalComplete.wait()
                         selection = "TALKS"
                     }
-                    Button(talk.isFavoriteTalk() ? "Unfavorite Talk" : "Favorite Talk") {
+                    Button("Favorite | Unfavorite") {
                         self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
                     }
-                    Button("Make Note") {
+                    Button("Note") {
                         noteText = talk.getNoteForTalk()
-                        displayNoteDialog = true
+                        self.displayNoteDialog = true
                     }
                     Button("Share Talk") {
                         self.displayShareSheet = true
                     }
-                    Button("Download Talk") {
-                        print("download talk")
-                        displayDownloadDialog = true
+                    .frame(width: 300)
+ 
+                
+
+                    Button("Download | Remove Download") {
+                        print("download, remove download")
+                        self.displayDownloadDialog = true
+        
                     }
                 }
-                
             }
             .alert(isPresented: $displayDownloadDialog) {
                 Alert(
-                    title: Text("Download Text"),
-                    message: Text("Download talk to your device."),
-                    primaryButton: .destructive(Text("Download")) {
-                        stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                        talk.startDownload(notifyUI: downloadCompleted)
+                    title: Text(talk.hasBeenDownloaded() ? "Remove Downloaded Talk" : "Download Talk"),
+                    message: Text(talk.hasBeenDownloaded() ? "Remove Downloaded Talk" : "Download Talk"),
+                    primaryButton: .destructive(Text("OK")) {
+                        if talk.hasBeenDownloaded() {
+                            talk.unsetTalkAsDownloaded()
+                        } else {
+                            if TheDataModel.DownloadInProgress == false {
+                                stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+                                talk.startDownload(success: downloadCompleted)
+                            }
+                        }
                     },
                     secondaryButton: .cancel()
                 )
+
             }
-            .sheet(isPresented: $displayShareSheet) {
+             .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
                 let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!
                 let sharedObjects:[AnyObject] = [objectsToShare as AnyObject, shareText as AnyObject]
@@ -135,6 +193,21 @@ struct TalkRow: View {
                 ShareSheet(activityItems: sharedObjects)
             }
         }
+        /*
+        .alert(isPresented: $displayDownloadDialog) {
+            Alert(
+                title: Text("Download Talk"),
+                message: Text("Download talk to your device."),
+                primaryButton: .destructive(Text("OK")) {
+                    stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+                    //TheDataModel.startDownload(talk: self.talk, success: downloadCompleted)
+                    talk.startDownload(success: downloadCompleted)
+                },
+                secondaryButton: .cancel()
+            )
+        }
+         */
+
         .contentShape(Rectangle())
       
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
@@ -160,6 +233,7 @@ struct TalkRow: View {
         }
         .frame(height: LIST_ROW_SIZE_STANDARD)
     }
+    
 
 }
 
@@ -235,7 +309,7 @@ struct TalkListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black)
+              .foregroundColor(.black) // to ensure the toolbar icons don't turn blue
 
            }
        }
