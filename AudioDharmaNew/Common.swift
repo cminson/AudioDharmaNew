@@ -15,8 +15,6 @@ import WebKit
 // Global Vars and Constants
 //
 
-let ModelUpdateSemaphore = DispatchSemaphore(value: 1)  // guards underlying dicts and lists
-let ModelLoadSemaphore = DispatchSemaphore(value: 0)  // guards underlying dicts and lists
 var BusyIndicator =  UIActivityIndicatorView()
 
 let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]

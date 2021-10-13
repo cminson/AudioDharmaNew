@@ -90,7 +90,6 @@ var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
-let DATA_ALBUMS: [String] = ["DATA00", "DATA01", "DATA02", "DATA03", "DATA04", "DATA05"]    // all possible pluggable data albums we can load
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS]
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 
@@ -102,6 +101,9 @@ enum INIT_CODES {          // all possible startup results
     case SUCCESS
     case NO_CONNECTION
 }
+
+let ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
+let GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
 
 class Model {
@@ -141,6 +143,8 @@ class Model {
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
+
+    
     func resetData() {
 
         FileNameToTalk = [String: TalkData] ()
@@ -160,7 +164,7 @@ class Model {
        
     }
     
-    func loadData() {
+    func initialize() {
         
         FileNameToTalk = [String: TalkData] ()
         ListAllTalks = []
@@ -170,7 +174,6 @@ class Model {
         URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
         
-       
         
         // build the data directories on device, if needed
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
@@ -185,11 +188,7 @@ class Model {
         self.PlayedTalks = self.loadPlayedTalksData()
         self.UserDownloads = TheDataModel.loadUserDownloadData()
         self.validateUserDownloadData()
-        
-        downloadAndConfigure(path: URL_CONFIGURATION)
-        
-             
-    }
+     }
     
     func startBackgroundTimers() {
         
@@ -199,7 +198,7 @@ class Model {
  
     func currentTalkExists() -> Bool {
         
-        print("currentTalkExists: ", CurrentTalk.Title)
+        //print("currentTalkExists: ", CurrentTalk.Title)
         return !CurrentTalk.Title.isEmpty
     }
     
@@ -233,14 +232,14 @@ class Model {
  
 
     
-    func downloadAndConfigure(path: String)  {
+    func downloadAndConfigure()  {
         
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
         let session = URLSession.init(configuration: config)
         
-        let requestURL : URL? = URL(string: path)
+        let requestURL : URL? = URL(string: URL_CONFIGURATION)
         let urlRequest = URLRequest(url : requestURL!)
         
         
@@ -312,15 +311,16 @@ class Model {
                 self.loadConfig(jsonDict: jsonDict)
                 self.loadTalks(jsonDict: jsonDict)
                 self.loadAlbums(jsonDict: jsonDict)
-                self.downloadSanghaActivity()
             }
             catch {
             }
             
             // END CRITICAL SECTION
+            ModelReadySemaphore.signal()
  
         }
         task.resume()
+
     }
     
     
@@ -559,12 +559,12 @@ class Model {
          config.urlCache = nil
          let session = URLSession.init(configuration: config)
 
-        let similarKeyName = talk.FileName.replacingOccurrences(of: ".mp3", with: "")
+         let similarKeyName = talk.FileName.replacingOccurrences(of: ".mp3", with: "")
          let path = URL_GET_SIMILAR + similarKeyName
          let requestURL : URL? = URL(string: path)
          let urlRequest = URLRequest(url : requestURL!)
 
-         TheDataModel.SimilarTalksAlbum.talkList  = []
+         var talkList: [TalkData] = []
          let task = session.dataTask(with: urlRequest) {
              (data, response, error) -> Void in
 
@@ -593,13 +593,14 @@ class Model {
                          let filename = similarTalk["filename"] as? String ?? ""
 
                          if let talk = self.FileNameToTalk[filename] {
-                             TheDataModel.SimilarTalksAlbum.talkList.append(talk)
+                             talkList.append(talk)
                          }
                      }
                  }
                  catch {
-                     print(error)
+                    
                  }
+                 TheDataModel.SimilarTalksAlbum.talkList = talkList
              }
              signalComplete.signal()
          }
@@ -647,9 +648,10 @@ class Model {
   
             do {
                 // get the community talk history
-                print("Now the Sangha Data")
                 var talkCount = 0
                 var totalSeconds = 0
+                var talkList: [TalkData] = []
+
                 let json =  try JSONSerialization.jsonObject(with: responseData) as! [String: AnyObject]
                 for talkJSON in json["sangha_history"] as? [AnyObject] ?? [] {
                     
@@ -667,17 +669,22 @@ class Model {
 
                         talkCount += 1
                         totalSeconds += talk.TotalSeconds
-                        self.SanghaTalkHistoryAlbum.talkList.append(talkHistory)
+                        talkList.append(talkHistory)
                         
                         if talkCount >= MAX_TALKHISTORY_COUNT {
                             break
                         }
                     }
                 }
+                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
+                self.SanghaTalkHistoryAlbum.talkList = talkList
+                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+
 
                 // get the community share history
                 talkCount = 0
                 totalSeconds = 0
+                talkList = []
                 for talkJSON in json["sangha_shares"] as? [AnyObject] ?? [] {
                     
                     let fileName = talkJSON["filename"] as? String ?? ""
@@ -692,7 +699,7 @@ class Model {
                         talkHistory.City  = city
                         talkHistory.Country = country
 
-                        self.SanghaShareHistoryAlbum.talkList.append(talkHistory)
+                        talkList.append(talkHistory)
                         
                         talkCount += 1
                         totalSeconds += talk.TotalSeconds
@@ -702,36 +709,16 @@ class Model {
                         }
                     }
                  }
+                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
+                self.SanghaShareHistoryAlbum.talkList = talkList
+                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
 
-                
-                // lastly get the pluggable DATA albums.  these are optional
-                for dataContent in DATA_ALBUMS {
-                    
-                    talkCount = 0
-                    totalSeconds = 0
-                    for talkJSON in json[dataContent] as? [AnyObject] ?? [] {
-                    
-                        let fileName = talkJSON["filename"] as? String ?? ""
-                        if let talk = self.FileNameToTalk[fileName] {
-                        
-                            //self.KeyToTalks[dataContent]?.append(talk)
-                            talkCount += 1
-                            totalSeconds += talk.TotalSeconds
-                        }
-                    }
-                    
-                    /* CJM DEV add album assignment*/
-
-                }
             } catch {   // end do catch
             }
             
             for album in self.RootAlbum.albumList {
                 self.computeAlbumStats(album: album)
             }
-            
-            print("signalling semaphore")
-            ModelLoadSemaphore.signal()
             
         }
         task.resume()

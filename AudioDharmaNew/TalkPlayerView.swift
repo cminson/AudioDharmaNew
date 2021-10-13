@@ -65,7 +65,6 @@ struct TalkPlayerView: View {
         self.album = album
         self.talk = talk
         self.elapsedTime = elapsedTime
-        print("TalkPlayerView Init: ", talk.Title)
         
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()

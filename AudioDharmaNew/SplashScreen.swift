@@ -33,17 +33,20 @@ struct SplashScreen : View {
     @State var appIsReady:Bool = false
     
     init() {
-
-        //TheDataModel.loadCurrentTalk()
-        TheDataModel.loadData()
-        print("Waiting on Model")
-
-        ModelLoadSemaphore.wait()
+        
+        configureDataModel()
+        // let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
+    }
+    
+    
+    func configureDataModel() {
+    
+        TheDataModel.initialize()
+        TheDataModel.downloadAndConfigure()
+        //TheDataModel.downloadSanghaActivity()
         TheDataModel.startBackgroundTimers()
         print("MODEL LOADED")
 
-        
-       // let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
     }
     
   
@@ -81,8 +84,9 @@ struct SplashScreen : View {
         .background(Color.black)
         .onAppear {
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 withAnimation {
+                    ModelReadySemaphore.wait()
                     self.appIsReady = true
                 }
             }
