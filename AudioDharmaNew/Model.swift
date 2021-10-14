@@ -91,6 +91,8 @@ var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next updat
 var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS]
+let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
+
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 
 enum ACTIVITIES {          // all possible activities that are reported back to cloud
@@ -121,7 +123,8 @@ class Model {
     var UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     var SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
-    
+    var CustomUserAlbums =  AlbumData(title: "Custom Albums", key: KEY_USER_ALBUMS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+
     var UserTalkHistoryList: [TalkHistoryData] = []
 
     var ListAllTalks: [TalkData] = []
@@ -493,9 +496,22 @@ class Model {
                 case KEY_USER_DOWNLOADS:
                     self.UserDownloadAlbum = album
                     for (fileName, _ ) in self.UserDownloads {
-                        print(fileName)
+                        print("Downloaded: ", fileName)
                         if let talk = FileNameToTalk[fileName] {
                             talkList.append(talk)
+                        }
+                    }
+                case KEY_USER_ALBUMS:
+                    self.CustomUserAlbums = album
+                    self.UserAlbums = TheDataModel.loadUserAlbumData()
+                    for userAlbumData in self.UserAlbums {
+                        var customAlbum = AlbumData(title: userAlbumData.Title, key: "USER_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        print("custom album", customAlbum.Title)
+                        for fileName in userAlbumData.TalkFileNames {
+                            if let talk = FileNameToTalk[fileName] {
+                                customAlbum.talkList.append(talk)
+                                print("adding talk", talk.Title)
+                            }
                         }
                     }
                 case KEY_USER_TALKHISTORY:
@@ -1143,12 +1159,16 @@ class Model {
         }
     }
     
-    func addUserAlbum(album: UserAlbumData) {
+    func addUserAlbum(album: AlbumData) {
         
-        UserAlbums.append(album)
+        let image = UIImage(named: "tri_right_x")
+        let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
+        UserAlbums.append(userAlbum)
+        
+        CustomUserAlbums.albumList.append(album)
+        computeAlbumStats(album: CustomUserAlbums)
         
         saveUserAlbumData()
-        //computeUserAlbumStats()
     }
     
     func removeUserAlbum(at: Int) {
@@ -1238,8 +1258,8 @@ class Model {
 
         let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
 
-        self.UserTalkHistoryAlbum.talkList.append(talk)
-        self.UserTalkHistoryList.append(talkHistory)
+        self.UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
+        self.UserTalkHistoryList.insert(talkHistory, at: 0)
         let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {

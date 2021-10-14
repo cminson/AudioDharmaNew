@@ -242,7 +242,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     
     func setTalkAsDownloaded() {
         
-        TheDataModel.UserDownloadAlbum.talkList.append(self)
+        TheDataModel.UserDownloadAlbum.talkList.insert(self, at: 0)
         TheDataModel.UserDownloads[self.FileName] = UserDownloadData(fileName: self.FileName, downloadCompleted: "YES")
         TheDataModel.saveUserDownloadData()
 

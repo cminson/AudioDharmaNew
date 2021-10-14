@@ -157,13 +157,10 @@ struct TalkRow: View {
                         self.displayShareSheet = true
                     }
                     .frame(width: 300)
- 
-                
-
                     Button("Download | Remove Download") {
-                        print("download, remove download")
-                        self.displayDownloadDialog = true
-        
+                        if TheDataModel.DownloadInProgress == false {
+                            self.displayDownloadDialog = true
+                        }
                     }
                 }
             }
@@ -183,7 +180,6 @@ struct TalkRow: View {
                     },
                     secondaryButton: .cancel()
                 )
-
             }
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
@@ -193,21 +189,6 @@ struct TalkRow: View {
                 ShareSheet(activityItems: sharedObjects)
             }
         }
-        /*
-        .alert(isPresented: $displayDownloadDialog) {
-            Alert(
-                title: Text("Download Talk"),
-                message: Text("Download talk to your device."),
-                primaryButton: .destructive(Text("OK")) {
-                    stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                    //TheDataModel.startDownload(talk: self.talk, success: downloadCompleted)
-                    talk.startDownload(success: downloadCompleted)
-                },
-                secondaryButton: .cancel()
-            )
-        }
-         */
-
         .contentShape(Rectangle())
       
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())

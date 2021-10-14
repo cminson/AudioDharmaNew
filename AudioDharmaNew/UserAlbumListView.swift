@@ -1,37 +1,17 @@
 //
-//  AlbumListView.swift
+//  UserAlbumListView.swift
+//  AudioDharmaNew
 //
-//  Created by Christopher Minson on 9/9/21.
-//  Copyright © 2022 Christopher Minson. All rights reserved.
+//  Created by Christopher on 10/14/21.
 //
 
+import Foundation
 import SwiftUI
 import UIKit
 
 
-struct SectionRow: View {
-    var title: String
 
-    var body: some View {
-        
-        VStack(alignment: .leading) {
-            HStack() {
-                Spacer()
-                Text(title)
-                    .font(.system(size: FONT_SIZE_SECTION, weight: .bold))
-                    .foregroundColor(.white)
-                Spacer()
-            }
-            .frame(height: LIST_ROW_SIZE_SECTION)
-        }
-        .background(Color(hex: COLOR_BACKGROUND_SECTION))
-        .frame(maxWidth: .infinity)
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
-     }
-}
-
-
-struct AlbumRow: View {
+struct UserAlbumRow: View {
     
     @ObservedObject var album: AlbumData
     @State var selection: String?  = ""
@@ -66,9 +46,6 @@ struct AlbumRow: View {
             .onTapGesture {
                 if KEYS_TO_ALBUMS.contains(album.Key) {
                     selection = "ALBUMS"
-                }
-                else if KEYS_TO_USER_ALBUMS.contains(album.Key) {
-                    selection = "USERALBUMS"
                 } else {
                     selection = "TALKS"
                 }
@@ -76,8 +53,6 @@ struct AlbumRow: View {
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UserAlbumListView(album: album), tag: "USERALBUMS", selection: $selection) { EmptyView() } .hidden())
-
         // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .background(Color.white)
@@ -87,7 +62,7 @@ struct AlbumRow: View {
 }
 
 
-struct AlbumListView: View {
+struct UserAlbumListView: View {
     
     var album: AlbumData
     
@@ -98,6 +73,10 @@ struct AlbumListView: View {
     
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double
+    @State var  displayNewCustomAlbum = false
+    @State private var textStyle = UIFont.TextStyle.body
+    @State private var customAlbum = "Custom Album"
+
     
     init(album: AlbumData) {
         self.album = album
@@ -121,6 +100,19 @@ struct AlbumListView: View {
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
+        .toolbar {
+            Button(action: {
+                displayNewCustomAlbum = true
+           }) {
+               Image(systemName: "plus.circle")
+            }
+        }
+        .contextMenu {
+            Button("Edit Talks") {
+     
+            }
+        }
+        
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
@@ -155,7 +147,30 @@ struct AlbumListView: View {
 
            }
        }
+        .popover(isPresented: $displayNewCustomAlbum) {
+            VStack() {
+                Text("New Custom Album")
+                    .padding()
+                Spacer()
+                    .frame(height:30)
+                //TextView(text: $customAlbum, textStyle: $textStyle)
+                TextField("", text: $customAlbum)
+                    .padding(.horizontal)
+                    .frame(height: 40)
+                    .border(Color.gray)
+                Spacer()
+                    .frame(height:30)
+                Button("Done") {
+                    displayNewCustomAlbum = false
+                    let newUserAlbum = AlbumData(title: customAlbum, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                    TheDataModel.addUserAlbum(album: newUserAlbum)
+                }
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        }
+        
     }
+    
        
 
     
