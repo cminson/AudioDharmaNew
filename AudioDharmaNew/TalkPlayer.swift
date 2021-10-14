@@ -26,6 +26,8 @@ class TalkPlayer : NSObject {
     
     func startTalk(talkURL: URL, startAtTime: Double){
         
+        print("talkplayer startTalk")
+
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
@@ -49,10 +51,16 @@ class TalkPlayer : NSObject {
         }
         return false
     }
+    
+    @objc private func onAppWillResignActive() {
+           print("onAppWillResignActive")
+       }
 
     
     func play() {
         
+        print("talkplayer play")
+
         Player.play()
         startTalkTimer()
 
@@ -61,6 +69,7 @@ class TalkPlayer : NSObject {
     
     func stop() {
         
+        print("talkplayer stop")
         Player.pause()
         Player.seek(to: CMTime.zero)
         
@@ -70,7 +79,8 @@ class TalkPlayer : NSObject {
     
     
     func pause() {
-        
+        print("talkplayer pause")
+
         Player.pause()
         stopTalkTimer()
     }
@@ -88,6 +98,8 @@ class TalkPlayer : NSObject {
     
     func stopTalkTimer(){
 
+        print("talkplayer stopTalkTimer")
+
         if let timer = TalkTimer {
 
             timer.invalidate()
@@ -104,6 +116,8 @@ class TalkPlayer : NSObject {
     
     @objc func talkHasCompleted() {
         
+        print("talkplayer talkHasCompleted")
+
         stopTalkTimer()
         talkPlayerView.talkHasCompleted()
     }

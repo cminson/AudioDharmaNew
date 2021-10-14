@@ -27,6 +27,8 @@ var TheTalkPlayer: TalkPlayer!
 var PlayEntireAlbum: Bool = false
 var PlayingDownloadedTalk: Bool = false
 
+var DisplayingBiographyOrTranscript = false
+
 
 /*
  ******************************************************************************
@@ -48,6 +50,8 @@ struct TalkPlayerView: View {
     var album: AlbumData
     var talk: TalkData
     var elapsedTime: Double
+
+    @State var selection: String?  = nil
 
     @State private var isTalkActive = false
     @State private var displayedElapsedTime: String
@@ -115,6 +119,7 @@ struct TalkPlayerView: View {
     
     func finishTalk() {
     
+        print("TalkPlayerView finishTalk")
         TheTalkPlayer?.stop()
         TalkPlayerStatus = .FINISHED
 
@@ -169,6 +174,7 @@ struct TalkPlayerView: View {
         //print("Update View Elapsed Time", self.elapsedTime)
         TalkPlayerStatus = .PLAYING
 
+
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
             self.elapsedTime = self.silderElapsedTime
@@ -179,7 +185,7 @@ struct TalkPlayerView: View {
             self.displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
             TalkPlayerStatus = .PLAYING
         }
-    
+
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
         if self.elapsedTime > 0 {
 
@@ -320,7 +326,8 @@ struct TalkPlayerView: View {
                 .frame(height: 20)
             HStack() {
                  Button("biography") {
-                     displayBiographyView = true
+                     DisplayingBiographyOrTranscript = true
+                     selection = "BIOGRAPHY"
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.leading, 15)
@@ -345,13 +352,12 @@ struct TalkPlayerView: View {
                 
                 Spacer()
                 Button("transcript") {
-                    print("display transcript")
-                    displayTranscriptView = true
+                    DisplayingBiographyOrTranscript = true
+                    selection = "TRANSCRIPT"
                 }
                 .font(.system(size: 12, weight: .regular))
                 .padding(.trailing, 15)
                 .hidden(!self.talk.hasTranscript())
-                
             }
                 
             // Standard volume and output device control
@@ -361,38 +367,22 @@ struct TalkPlayerView: View {
                .padding(.horizontal)
             } // end group 2
   
-        }  // VStack
-        .popover(isPresented: $displayTranscriptView) {
-            VStack() {
-                Spacer()
-                    .frame(height: 10)
-                Button("Done") {
-                    displayTranscriptView = false
-                }
-                Spacer()
-                    .frame(height: 15)
-                TranscriptView(talk: self.talk)
-            }
-        }
-        .popover(isPresented: $displayBiographyView) {
-            VStack() {
-                Spacer()
-                    .frame(height: 10)
-                Button("Done") {
-                    displayBiographyView = false
-                }
-                Spacer()
-                    .frame(height: 15)
-                BiographyView(speaker: self.talk.Speaker)
-            }
-        }
-     
-
-
+        }  // end VStack
+        .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
+        // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
+        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
+        .onAppear {
+            print("TalkPlayerView appeared")
+            DisplayingBiographyOrTranscript = false
+        }
         .onDisappear {
-            finishTalk()
+            print("TalkPlayerView disappearing")
+            if DisplayingBiographyOrTranscript == false {
+                finishTalk()
+            }
         }
         .navigationBarTitle(Text(playerTitle))
 

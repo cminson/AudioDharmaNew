@@ -6,14 +6,33 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 @main
 struct AudioDharmaNewApp: App {
     
+    init() {
+        
+        configureAudioForBackground()
+    }
+    
+    // necessary to allow background playing of audio
+    func configureAudioForBackground() {
+        
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+          try audioSession.setCategory(.playback, mode: .moviePlayback)
+        }
+        catch {
+          print("Setting category to AVAudioSessionCategoryPlayback failed.")
+        }
+    }
+    
+
+    
     var body: some Scene {
         WindowGroup {
            SplashScreen()
-            //HomePageView()
         }
     }
 }

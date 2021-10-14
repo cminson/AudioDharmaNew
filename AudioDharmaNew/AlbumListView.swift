@@ -73,6 +73,8 @@ struct AlbumRow: View {
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
+        // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
+        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .background(Color.white)
         .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)

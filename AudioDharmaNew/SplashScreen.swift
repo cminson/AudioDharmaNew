@@ -25,6 +25,9 @@ Splash = splashScreen
 SplashTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(loadTimer), userInfo: nil, repeats: true)
 */
 
+import UIKit
+import AVFoundation
+
 
 var SplashAppeared = false
 
@@ -32,34 +35,14 @@ struct SplashScreen : View {
     
     @State var appIsReady:Bool = false
     
+    // download and configure DataModel.  WAIT on te completion semaphore in the
+    // DispatchQueue timer in the body before finishing initialization
     init() {
         
-        configureDataModel()
-        // let timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
-    }
-    
-    
-    func configureDataModel() {
-    
         TheDataModel.initialize()
         TheDataModel.downloadAndConfigure()
-        //TheDataModel.downloadSanghaActivity()
-        TheDataModel.startBackgroundTimers()
-        print("MODEL LOADED")
-
     }
     
-  
-    func update() {
-        print("splash fired!")
-        /*
-        if ConfigurationComplete == true {
-            SplashTimer?.invalidate()
-            print("SPLASH DONE")
-            appIsReady = true
-        }
-         */
-    }
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
@@ -87,6 +70,12 @@ struct SplashScreen : View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 withAnimation {
                     ModelReadySemaphore.wait()
+                    print("MODEL LOADED")
+                    TheDataModel.downloadSanghaActivity()
+                    ModelReadySemaphore.wait()
+                    print("SANGHA LOADED")
+                    TheDataModel.startBackgroundTimers()
+
                     self.appIsReady = true
                 }
             }

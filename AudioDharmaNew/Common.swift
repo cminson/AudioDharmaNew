@@ -266,8 +266,6 @@ struct TranscriptView: View {
     var talk: TalkData
     
     init(talk: TalkData) {
-        
-        print("TranscriptView PDF: ", talk.PDF)
         self.talk = talk
     }
     
@@ -276,10 +274,17 @@ struct TranscriptView: View {
         VStack () {
             //Text("https://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf")
 
-            //if let requestURL = URL(string: "http://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf") {
+  /*
+            if let requestURL = URL(string: "http://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf") {
+                PDFKitView(url: requestURL)
+            }
+   */
+
             if let requestURL = URL(string: talk.PDF) {
                 PDFKitView(url: requestURL)
             }
+
+         
 
             
         }
@@ -288,15 +293,14 @@ struct TranscriptView: View {
 
 
 struct BiographyView: View {
-    var speaker: String
-    
+    var talk: TalkData
+
     @State var text: String
     
-    init(speaker: String)
+    init(talk: TalkData)
     {
-        self.speaker = speaker
-
-        if let filepath = Bundle.main.path(forResource: self.speaker, ofType: "txt") {
+        self.talk = talk
+        if let filepath = Bundle.main.path(forResource: self.talk.Speaker, ofType: "txt") {
             do {
                 text = try String(contentsOfFile: filepath)
             } catch {
@@ -314,7 +318,7 @@ struct BiographyView: View {
                 .frame(height: 20)
             HStack() {
                 Spacer()
-                self.speaker.toImage()
+                talk.Speaker.toImage()
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 200)

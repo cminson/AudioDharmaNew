@@ -84,8 +84,8 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-//var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
+var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+//var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 
 var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
@@ -221,7 +221,7 @@ class Model {
     
     func saveLastTalkState(talk: TalkData, elapsedTime: Double) {
         
-        print("saveLastTalkState", talk.Title, elapsedTime)
+        //print("saveLastTalkState", talk.Title, elapsedTime)
 
         CurrentTalk = talk
         CurrentTalkElapsedTime = elapsedTime
@@ -311,6 +311,9 @@ class Model {
                 self.loadConfig(jsonDict: jsonDict)
                 self.loadTalks(jsonDict: jsonDict)
                 self.loadAlbums(jsonDict: jsonDict)
+                for album in self.RootAlbum.albumList {
+                    self.computeAlbumStats(album: album)
+                }
             }
             catch {
             }
@@ -441,6 +444,7 @@ class Model {
     
     func loadAlbums(jsonDict: [String: AnyObject]) {
 
+        print("load albums")
         var albumList : [AlbumData] = []
         var talkList : [TalkData] = []
         
@@ -716,9 +720,12 @@ class Model {
             } catch {   // end do catch
             }
             
-            for album in self.RootAlbum.albumList {
-                self.computeAlbumStats(album: album)
-            }
+            self.computeAlbumStats(album: self.SanghaTalkHistoryAlbum)
+            self.computeAlbumStats(album: self.SanghaShareHistoryAlbum)
+
+            // END CRITICAL SECTION FOR LOADING
+            ModelReadySemaphore.signal()
+
             
         }
         task.resume()
@@ -890,11 +897,11 @@ class Model {
             }
         }
         
+        // album.totalTalks is an observed published var
+        // therefore need to update it via a dispatch to the main thread
         DispatchQueue.main.async {
                 album.totalTalks = totalTalks
-
-           }
-        //album.totalTalks = totalTalks
+        }
         album.totalSeconds = totalSeconds
         
         //print("ComputeAlbumStates: ", album.Title, album.totalTalks, album.totalSeconds)
