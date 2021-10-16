@@ -19,7 +19,7 @@
 		8376AB1726E3EE11000F9848 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8376AB1626E3EE11000F9848 /* AVFoundation.framework */; };
 		8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */; };
 		83974BC82718934A0013FF87 /* UserAlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83974BC72718934A0013FF87 /* UserAlbumListView.swift */; };
-		83974BCA2718935D0013FF87 /* UserTalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83974BC92718935D0013FF87 /* UserTalkListView.swift */; };
+		83974BCA2718935D0013FF87 /* UserEditTalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83974BC92718935D0013FF87 /* UserEditTalkListView.swift */; };
 		83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */; };
 		83A2E4C126E0415700F8B531 /* HomePageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4C026E0415700F8B531 /* HomePageView.swift */; };
 		83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83A2E4C226E0415900F8B531 /* Assets.xcassets */; };
@@ -56,7 +56,7 @@
 		8376AB1626E3EE11000F9848 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayer.swift; sourceTree = "<group>"; };
 		83974BC72718934A0013FF87 /* UserAlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAlbumListView.swift; sourceTree = "<group>"; };
-		83974BC92718935D0013FF87 /* UserTalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTalkListView.swift; sourceTree = "<group>"; };
+		83974BC92718935D0013FF87 /* UserEditTalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEditTalkListView.swift; sourceTree = "<group>"; };
 		83A2E4BB26E0415700F8B531 /* AudioDharmaNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDharmaNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioDharmaNewApp.swift; sourceTree = "<group>"; };
 		83A2E4C026E0415700F8B531 /* HomePageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomePageView.swift; sourceTree = "<group>"; };
@@ -121,7 +121,7 @@
 				83EB42DA26EACE6C00AD069B /* Common.swift */,
 				83B9A5232710C39E00667F2B /* Model.swift */,
 				83974BC72718934A0013FF87 /* UserAlbumListView.swift */,
-				83974BC92718935D0013FF87 /* UserTalkListView.swift */,
+				83974BC92718935D0013FF87 /* UserEditTalkListView.swift */,
 				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
 				83A2E4C226E0415900F8B531 /* Assets.xcassets */,
 				83A2E4C726E0415900F8B531 /* Info.plist */,
@@ -253,7 +253,7 @@
 				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83EB42DB26EACE6C00AD069B /* Common.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* HomePageView.swift in Sources */,
-				83974BCA2718935D0013FF87 /* UserTalkListView.swift in Sources */,
+				83974BCA2718935D0013FF87 /* UserEditTalkListView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
 				83974BC82718934A0013FF87 /* UserAlbumListView.swift in Sources */,
 				831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */,

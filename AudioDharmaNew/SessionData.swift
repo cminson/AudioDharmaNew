@@ -77,15 +77,7 @@ class AlbumData: Identifiable, ObservableObject {
 
         var filteredAlbumList = [AlbumData] ()
 
-        if filter == "TEST" {
-            let test = AlbumData(title: "test", key: "test", section: "", imageName: "speaker", date: "01-01-01", albumType: AlbumType.ACTIVE)
-            var testa = [test]
-            for _ in 1 ... 100 {
-                testa.append(test)
-            }
-            return testa
-        }
-  
+        print("getFilteredAlbums:", self.Title)
         if filter.isEmpty {
             return self.albumList
         } else {
@@ -117,6 +109,22 @@ class AlbumData: Identifiable, ObservableObject {
         
         return filteredTalkList
     }
+    
+    func getFilteredUserTalks(filter: String) -> [TalkData] {
+
+        var filteredTalkList = TheDataModel.ListAllTalks
+        if !filter.isEmpty {
+            filteredTalkList = []
+            for talk in self.talkList {
+                let searchedData = talk.Title.lowercased()
+                if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
+            }
+        }
+        
+        return filteredTalkList
+    }
+
+    
 }
 
 

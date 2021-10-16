@@ -15,6 +15,15 @@ struct UserAlbumRow: View {
     
     @ObservedObject var album: AlbumData
     @State var selection: String?  = ""
+    @State var displayEditCustomAlbum = false
+    @State var albumTitle: String
+    
+    init(album: AlbumData) {
+        self.album = album
+        
+        albumTitle = album.Title
+
+    }
 
     var body: some View {
         
@@ -42,22 +51,54 @@ struct UserAlbumRow: View {
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
             }
+            .contextMenu {
+                Button("Edit Album Talks") {
+                    selection = "EDIT_TALKS_IN__ALBUM"
+                }
+                Button("Edit Album Title") {
+                    displayEditCustomAlbum = true
+                }
+                Button("Delete Album") {
+                    selection = "EDIT_TALKS_IN__ALBUM"
+                }
+
+            }
             .contentShape(Rectangle())
             .onTapGesture {
-                if KEYS_TO_ALBUMS.contains(album.Key) {
-                    selection = "ALBUMS"
-                } else {
-                    selection = "TALKS"
-                }
+                selection = "ALBUMS"
+                
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
+        .background(NavigationLink(destination: UserEditTalkListView(album: album), tag: "EDIT_TALKS_IN__ALBUM", selection: $selection) { EmptyView() } .hidden())
+        // The Following line is NECESSARY.   (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .background(Color.white)
         .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)
+        .popover(isPresented: $displayEditCustomAlbum) {
+            VStack() {
+                Text("Edit Album Title")
+                    .padding()
+                Spacer()
+                    .frame(height:30)
+                //TextView(text: $customAlbum, textStyle: $textStyle)
+                TextField("", text: $albumTitle)
+                    .padding(.horizontal)
+                    .frame(height: 40)
+                    .border(Color.gray)
+                Spacer()
+                    .frame(height:30)
+                Button("Done") {
+                    displayEditCustomAlbum = false
+                    album.Title = albumTitle
+                    TheDataModel.saveCustomUserAlbums()
+                }
+            }
+            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+        }
+
      }
 }
 
@@ -73,7 +114,7 @@ struct UserAlbumListView: View {
     
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double
-    @State var  displayNewCustomAlbum = false
+    @State var displayNewCustomAlbum = false
     @State private var textStyle = UIFont.TextStyle.body
     @State private var customAlbum = "Custom Album"
 
@@ -84,6 +125,13 @@ struct UserAlbumListView: View {
         
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        
+        /*
+        print("LIsting custome albums")
+        for album in TheDataModel.CustomUserAlbums.albumList {
+            print("CUSTOM ALBUM: ", album)
+        }
+         */
 
     }
     
@@ -93,7 +141,7 @@ struct UserAlbumListView: View {
         SearchBar(text: $searchText)
            .padding(.top, 0)
         List(album.getFilteredAlbums(filter: searchText)) { album in
-           AlbumRow(album: album)
+            UserAlbumRow(album: album)
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
@@ -105,11 +153,6 @@ struct UserAlbumListView: View {
                 displayNewCustomAlbum = true
            }) {
                Image(systemName: "plus.circle")
-            }
-        }
-        .contextMenu {
-            Button("Edit Talks") {
-     
             }
         }
         
@@ -168,7 +211,7 @@ struct UserAlbumListView: View {
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         }
-        
+
     }
     
        
