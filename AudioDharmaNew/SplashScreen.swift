@@ -1,59 +1,18 @@
 //
 //  SplashScreen.swift
-//  AudioDharmaNew
+//
+//  The initial splash screen.  Initiate download of configuration and show splash screen
+//  until app is ready.
+//
 //
 //  Created by Christopher Minson on 9/18/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
-
+//
 import SwiftUI
-
-
-/*
- 
- var Splash : SplashScreen!
- var SplashTimer : Timer?
- 
- 
- @objc func loadTimer() {
-     Splash.update()
- }
- 
- 
-ConfigurationComplete = false
-Splash = splashScreen
-SplashTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(loadTimer), userInfo: nil, repeats: true)
-*/
-
 import UIKit
 import AVFoundation
 
-
-var SplashAppeared = false
-
-struct TestView: View {
-    @State private var selection = Set<String>()
-    @State private var isEditMode: EditMode = .active
-    
-    let items = [
-        "Item 1",
-        "Item 2",
-        "Item 3",
-        "Item 4"
-    ]
-
-    var body: some View {
-        NavigationView {
-            List(items, id: \.self, selection: $selection) { name in
-                Text(name)
-            }
-            .toolbar {
-                EditButton()
-            }
-            .environment(\.editMode, self.$isEditMode)
-        }
-    }
-}
 
 struct SplashScreen : View {
     
@@ -72,7 +31,6 @@ struct SplashScreen : View {
         VStack(alignment: .center, spacing: 0) {
             if self.appIsReady {
                 HomePageView(parentAlbum: TheDataModel.RootAlbum)
-                //TestView()
             } else {
                 VStack() {
                     Spacer()
@@ -107,12 +65,6 @@ struct SplashScreen : View {
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         .edgesIgnoringSafeArea(.all)
-
         .background(Color.black)
-
     }
-
-
-
-    
 }

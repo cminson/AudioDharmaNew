@@ -1,5 +1,7 @@
 //
-//  UserTalkListView.swift
+//  UserEditTalkListView.swift
+//
+//  Implements the editable list of talks that can be added to a custom user album.
 //
 //  Created by Christopher Minson on 9/9/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
@@ -26,9 +28,8 @@ struct UserTalkRow: View {
         self.talk = talk
         self.talkSet = talkSet
         self.stateIsInCustomAlbum = talkSet.contains(talk)
-
-
     }
+    
     
     var body: some View {
                 
@@ -44,9 +45,9 @@ struct UserTalkRow: View {
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
-                Text(talk.hasTalkBeenPlayed() ? "* " + talk.Title : talk.Title)
+                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + talk.Title : talk.Title)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .foregroundColor(talk.hasBeenDownloaded() ? Color.red : Color.black)
+                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                     //.background(self.inCustomList ? Color.orange : Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
@@ -61,11 +62,11 @@ struct UserTalkRow: View {
                     ICON_TALK_FAVORITE
                         .resizable()
                         .frame(width: 12, height: 12)
-                        .hidden(!talk.isFavoriteTalk())
+                        .hidden(!TheDataModel.isFavoriteTalk(talk: talk))
                     ICON_TALK_NOTATED
                         .resizable()
                         .frame(width: 12, height: 12)
-                        .hidden(!talk.isNotatedTalk())
+                        .hidden(!TheDataModel.isNotatedTalk(talk: talk))
                  }
                 .padding(.trailing, -10)
             }
@@ -83,6 +84,7 @@ struct UserTalkRow: View {
                         self.album.talkList.remove(at: index)
                     }
                 }
+                TheDataModel.computeAlbumStats(album: album)
             }
         }
         .contentShape(Rectangle())
@@ -116,16 +118,6 @@ struct UserEditTalkListView: View {
         selectedAlbum = AlbumData.empty()
  
         self.talkSet = Set(album.talkList)
-/*
-        print("UserEditTalkListView: ", album.Title)
-        for talk in album.talkList {
-            print("Talk: ", talk.Title)
-            if self.talkSet.contains(talk) {
-                print("SET CONTAINS")
-            }
-        }
- */
-        
     }
     
 

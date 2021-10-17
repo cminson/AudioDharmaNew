@@ -1,5 +1,7 @@
 //
-//  ListTalksView.swift
+//  TalkPlayerView.swift
+//
+//  Drives the audio recorder UI.
 //
 //  Created by Christopher Minson on 9/8/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
@@ -93,7 +95,7 @@ struct TalkPlayerView: View {
         
 
         var talkURL : URL
-        if self.talk.hasBeenDownloaded() {
+        if TheDataModel.hasBeenDownloaded(talk: talk) {
             print("pyaling download talk")
             talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
@@ -192,7 +194,7 @@ struct TalkPlayerView: View {
             TalkPlayerStatus = .PLAYING
 
             // if play time exceeds reporting threshold and not previously reported, report it
-            if self.elapsedTime > REPORT_TALK_THRESHOLD, self.talk.isMostRecentTalk() == false {
+            if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
 
                 TheDataModel.addToTalkHistory(talk: self.talk)
                 TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
@@ -229,7 +231,7 @@ struct TalkPlayerView: View {
            // title, speaker
            Text(self.talk.Title)
                 .background(Color.white)
-                .foregroundColor(self.talk.hasBeenDownloaded() ? Color.red : Color.black)
+                .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: 20, weight: .regular, design: .default))

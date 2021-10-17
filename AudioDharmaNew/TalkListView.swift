@@ -1,6 +1,8 @@
 //
 //  TalkListView.swift
 //
+//  General talks view.
+//
 //  Created by Christopher Minson on 9/9/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
@@ -10,7 +12,6 @@ import UIKit
 
 let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
-
 
 
 struct TalkRow: View {
@@ -37,11 +38,11 @@ struct TalkRow: View {
         self.album = album
         self.talk = talk
                 
-        stateIsFavoriteTalk = talk.isFavoriteTalk()
-        stateIsNotatedTalk = talk.isNotatedTalk()
+        stateIsFavoriteTalk = TheDataModel.isFavoriteTalk(talk: talk)
+        stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
 
         stateTalkTitle = talk.Title
-        if talk.isDownloadInProgress() {
+        if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
      
@@ -68,9 +69,9 @@ struct TalkRow: View {
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
-                Text(talk.hasTalkBeenPlayed() ? "* " + stateTalkTitle : stateTalkTitle)
+                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .foregroundColor(talk.hasBeenDownloaded() ? Color.red : Color.black)
+                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
@@ -95,7 +96,6 @@ struct TalkRow: View {
                         .hidden(!stateIsNotatedTalk)
                  }
                 .padding(.trailing, -10)
-                
                 .contextMenu {
                     Button("Get Similar Talks") {
                         let signalComplete = DispatchSemaphore(value: 0)
@@ -104,10 +104,10 @@ struct TalkRow: View {
                         selection = "TALKS"
                     }
                     Button("Favorite | Unfavorite") {
-                        self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
+                        self.stateIsFavoriteTalk = TheDataModel.toggleTalkAsFavorite(talk: talk)
                     }
                     Button("Note") {
-                        noteText = talk.getNoteForTalk()
+                        noteText = TheDataModel.getNoteForTalk(talk: talk)
                         self.displayNoteDialog = true
                     }
                     Button("Share Talk") {
@@ -121,17 +121,18 @@ struct TalkRow: View {
                     }
                 }
             }
+        
             .alert(isPresented: $displayDownloadDialog) {
                 Alert(
-                    title: Text(talk.hasBeenDownloaded() ? "Remove Downloaded Talk" : "Download Talk"),
-                    message: Text(talk.hasBeenDownloaded() ? "Remove Downloaded Talk" : "Download Talk"),
+                    title: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
+                    message: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
                     primaryButton: .destructive(Text("OK")) {
-                        if talk.hasBeenDownloaded() {
-                            talk.unsetTalkAsDownloaded()
+                        if TheDataModel.hasBeenDownloaded(talk: talk) {
+                            TheDataModel.unsetTalkAsDownloaded(talk:talk)
                         } else {
                             if TheDataModel.DownloadInProgress == false {
                                 stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                                talk.startDownload(success: downloadCompleted)
+                                TheDataModel.startDownload(talk: talk, success: downloadCompleted)
                             }
                         }
                     },
@@ -145,6 +146,7 @@ struct TalkRow: View {
 
                 ShareSheet(activityItems: sharedObjects)
             }
+            
         }
         .contentShape(Rectangle())
       
@@ -162,14 +164,15 @@ struct TalkRow: View {
                 Spacer()
                     .frame(height:30)
                 Button("Done") {
-                    talk.addNoteToTalk(noteText: noteText)
-                    self.stateIsNotatedTalk = talk.isNotatedTalk()
+                    TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
+                    self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
                     displayNoteDialog = false
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         }
         .frame(height: LIST_ROW_SIZE_STANDARD)
+
     }
     
 

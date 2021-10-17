@@ -1,6 +1,8 @@
 //
 //  AlbumListView.swift
 //
+//  General album view.
+//
 //  Created by Christopher Minson on 9/9/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //

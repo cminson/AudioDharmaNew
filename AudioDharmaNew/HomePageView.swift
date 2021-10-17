@@ -1,6 +1,8 @@
 //
-//  ContentView.swift
-//  Home album view
+//  HomePageView.swift
+//
+//  Home page of the app, showing all the top-level albums
+//
 //
 //  Created by Christopher Minson on 8/31/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.

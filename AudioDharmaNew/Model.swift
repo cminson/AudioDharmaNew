@@ -1,6 +1,9 @@
 //
 //  Model.swift
-//  AudioDharma
+//
+//  The data model for the app.  Here are all the functions to download and configure the app,
+//  as well as all functions necessary for updating app state.
+//
 //
 //  Created by Christopher on 6/22/17.
 //  Copyright © 2017 Christopher Minson. All rights reserved.
@@ -147,7 +150,6 @@ class Model {
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
 
-    
     func resetData() {
 
         FileNameToTalk = [String: TalkData] ()
@@ -166,6 +168,7 @@ class Model {
         
        
     }
+    
     
     func initialize() {
         
@@ -233,7 +236,6 @@ class Model {
 
     }
  
-
     
     func downloadAndConfigure()  {
         
@@ -326,7 +328,6 @@ class Model {
  
         }
         task.resume()
-
     }
     
     
@@ -382,11 +383,6 @@ class Model {
                 if talk.hasTranscript() {
                     talk.Title = talk.Title + " [transcript]"
                 }
-            /*
-                if talk.hasBeenDownloaded() {
-                    talk.isDownloaded = true
-                }
-             */
             
                 self.FileNameToTalk[fileName] = talk
                 
@@ -572,6 +568,7 @@ class Model {
         } // end Album loop
     }
     
+    
     func downloadSimilarityData(talk: TalkData, signalComplete: DispatchSemaphore) {
 
          let config = URLSessionConfiguration.default
@@ -627,7 +624,6 @@ class Model {
          task.resume()
      }
 
-    
     
     func downloadSanghaActivity() {
         
@@ -780,7 +776,7 @@ class Model {
             if let valid_reponse = response {
                 httpResponse = valid_reponse as! HTTPURLResponse
             } else {
-                talk.unsetTalkAsDownloaded()
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
             }
@@ -788,7 +784,7 @@ class Model {
             let statusCode = httpResponse.statusCode
             
             if (statusCode != 200) {
-                talk.unsetTalkAsDownloaded()
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
             }
@@ -796,12 +792,12 @@ class Model {
             // make sure we got data
             if let responseData = data {
                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    talk.unsetTalkAsDownloaded()
+                    TheDataModel.unsetTalkAsDownloaded(talk: talk)
                     HTTPResultCode = 404
                 }
             }
             else {
-                talk.unsetTalkAsDownloaded()
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 HTTPResultCode = 404
             }
             
@@ -814,13 +810,13 @@ class Model {
                     }
                 }
                 catch  {
-                    talk.unsetTalkAsDownloaded()
+                    TheDataModel.unsetTalkAsDownloaded(talk: talk)
                     TheDataModel.DownloadInProgress = false
                     return
                 }
                 print("Download background done")
                 TheDataModel.DownloadInProgress = false
-                talk.setTalkAsDownloaded()
+                TheDataModel.setTalkAsDownloaded(talk: talk)
                 success()
             }
             TheDataModel.DownloadInProgress = false
@@ -1012,6 +1008,161 @@ class Model {
             }
         }
     }
+    
+    
+    //
+    // MARK: talk and album functions
+    //
+    
+    func toggleTalkAsFavorite(talk: TalkData) -> Bool {
+
+        if TheDataModel.isFavoriteTalk(talk: talk) {
+            TheDataModel.UserFavorites[talk.FileName] = nil
+            if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: talk) {
+                print("toggleTalkAsFavorite removing: ", talk.Title)
+                TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
+            }
+        } else {
+            TheDataModel.UserFavorites[talk.FileName] = UserFavoriteData(fileName: talk.FileName)
+            print("toggleTalkAsFavorite adding: ", talk.Title)
+            TheDataModel.UserFavoritesAlbum.talkList.insert(talk, at: 0)
+            //CJM Append?
+        }
+
+        TheDataModel.saveUserFavoritesData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
+        
+        let isFavorite = TheDataModel.UserFavorites[talk.FileName] != nil
+        print("ToggleTalkAsFavorite New Value: ", isFavorite)
+        return isFavorite
+    }
+    
+    
+    func isFavoriteTalk(talk: TalkData) -> Bool {
+        
+        return TheDataModel.UserFavorites[talk.FileName] != nil
+    }
+    
+ 
+    
+    func isDownloadInProgress(talk: TalkData) -> Bool {
+        
+        var downloadInProgress = false
+        if let userDownload = TheDataModel.UserDownloads[talk.FileName]  {
+            downloadInProgress = (userDownload.DownloadCompleted == "NO")
+        }
+        return downloadInProgress
+    }
+
+    
+    func setTalkAsDownloaded(talk: TalkData) {
+        
+        TheDataModel.UserDownloadAlbum.talkList.insert(talk, at: 0)
+        TheDataModel.UserDownloads[talk.FileName] = UserDownloadData(fileName: talk.FileName, downloadCompleted: "YES")
+        TheDataModel.saveUserDownloadData()
+
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+
+    }
+    
+    
+    func unsetTalkAsDownloaded(talk: TalkData) {
+        
+        if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: talk) {
+            print("download removing: ", talk.Title)
+            TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
+        }
+        
+        if let userDownload = TheDataModel.UserDownloads[talk.FileName] {
+            if userDownload.DownloadCompleted == "NO" {
+                TheDataModel.DownloadInProgress = false
+            }
+        }
+        TheDataModel.UserDownloads[talk.FileName] = nil
+        let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + talk.FileName
+        do {
+            try FileManager.default.removeItem(atPath: localPathMP3)
+        }
+        catch let error as NSError {
+        }
+        
+        TheDataModel.saveUserDownloadData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+        
+    }
+    
+    
+    func hasBeenDownloaded(talk: TalkData) -> Bool {
+
+        return TheDataModel.UserDownloads[talk.FileName] != nil
+
+    }
+    
+    
+    func addNoteToTalk(talk: TalkData, noteText: String) {
+
+         //
+         // if there is a note text for this talk fileName, then save it in the note dictionary
+         // otherwise clear this note dictionary entry
+         let talkFileName = talk.FileName
+
+         if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
+             print("adding note on talk: ", talk.Title)
+             TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
+             TheDataModel.UserNoteAlbum.talkList.append(talk)
+         } else {
+             print("remove note on talk: ", talk.Title)
+             TheDataModel.UserNotes[talkFileName] = nil
+             if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: talk) {
+                 TheDataModel.UserNoteAlbum.talkList.remove(at: index)
+             }
+
+         }
+         
+         // save the data, recompute stats, reload root view to display updated stats
+         TheDataModel.saveUserNoteData()
+         TheDataModel.computeAlbumStats(album: TheDataModel.UserNoteAlbum)
+     }
+     
+     
+    func getNoteForTalk(talk: TalkData) -> String {
+
+         var noteText = ""
+
+         if let userNoteData = TheDataModel.UserNotes[talk.FileName]   {
+             noteText = userNoteData.Notes
+         }
+         return noteText
+     }
+
+
+    func isNotatedTalk(talk: TalkData) -> Bool {
+         
+         if let _ = TheDataModel.UserNotes[talk.FileName] {
+             return true
+         }
+         return false
+     }
+     
+     
+    func hasTalkBeenPlayed(talk: TalkData) -> Bool {
+     
+         return TheDataModel.PlayedTalks[talk.FileName] != nil
+
+     }
+
+     
+     func isMostRecentTalk(talk: TalkData) -> Bool {
+     
+         if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
+             return talk.FileName == lastTalk.FileName
+         }
+         return false
+     }
+      
+
+   
+
 
     func loadTalkHistoryData() -> [TalkHistoryData]  {
         
@@ -1221,7 +1372,7 @@ class Model {
     
     
     //
-    // MARK: USER ALBUMS
+    // MARK: User Album functions
     //
     func saveCustomUserAlbums() {
     
@@ -1347,7 +1498,7 @@ class Model {
     
     
     //
-    // MARK: LOAD PERSISTENT DATA
+    // MARK: Persistent data loading functions
     //
     func loadPlayedTalksData() -> [String: Bool]  {
         

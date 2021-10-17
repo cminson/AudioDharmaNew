@@ -1,6 +1,7 @@
 //
 //  UserAlbumListView.swift
-//  AudioDharmaNew
+//
+//  Implements the view of custom user albums.
 //
 //  Created by Christopher on 10/14/21.
 //
@@ -105,17 +106,23 @@ struct UserAlbumRow: View {
                     .padding()
                 Spacer()
                     .frame(height:30)
-                //TextView(text: $customAlbum, textStyle: $textStyle)
                 TextField("", text: $albumTitle)
                     .padding(.horizontal)
                     .frame(height: 40)
                     .border(Color.gray)
                 Spacer()
                     .frame(height:30)
-                Button("Done") {
-                    displayEditCustomAlbum = false
-                    album.Title = albumTitle
-                    TheDataModel.saveCustomUserAlbums()
+                HStack() {
+                    Button("Cancel") {
+                        displayEditCustomAlbum = false
+                    }
+                    Spacer()
+                        .frame(width: 30)
+                    Button("Done") {
+                        displayEditCustomAlbum = false
+                        album.Title = albumTitle
+                        TheDataModel.saveCustomUserAlbums()
+                    }
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)

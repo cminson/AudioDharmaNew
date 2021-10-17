@@ -1,5 +1,7 @@
 //
-//  MP3Player.swift
+//  TalkPlayer.swift
+//
+//  Lower-level code to drive the audio playback.  Controlled by TalkPlayerView
 //
 //  Created by Christopher Minson on 9/4/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.

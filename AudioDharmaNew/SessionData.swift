@@ -1,11 +1,13 @@
 //
-//  Data.swift
+//  SessionData.swift
+//
+//  Definitions of talks (TalkData) and albums (ALbumData).  These two classes are used
+//  throughtout the app.
+//
 //
 //  Created by Christopher Minson on 9/3/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
-
-import Foundation
 
 import Foundation
 import UIKit
@@ -18,6 +20,10 @@ enum AlbumType {
 }
 
 
+//
+// AlbumData describes an album.  Containes either a list of talks
+// or a list of albums (never both, by convention)
+//
 class AlbumData: Identifiable, Equatable, ObservableObject {
     
     @Published var totalTalks: Int
@@ -113,39 +119,34 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
         
         return filteredTalkList
     }
+
     
     func getFilteredUserTalks(filter: String) -> [TalkData] {
 
         let talkSet = Set(self.talkList)
-        var allTalks = TheDataModel.ListAllTalks
-        allTalks.removeAll(where: { talkSet.contains($0) })
-        var filteredTalkList = self.talkList + allTalks
-
-        /*
-        var filteredTalkList = TheDataModel.ListAllTalks
-        for talk in filteredTalkList {
-            print(talk.Title)
-        }
-         */
+        var listAllTalks = TheDataModel.ListAllTalks
+        listAllTalks.removeAll(where: { talkSet.contains($0) })
+        var allTalks = self.talkList + listAllTalks
 
         if !filter.isEmpty {
-            filteredTalkList = []
-            for talk in self.talkList {
+            var filteredTalkList: [TalkData] = []
+            for talk in allTalks {
                 let searchedData = talk.Title.lowercased()
                 if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
             }
+            allTalks = filteredTalkList
         }
         
-        return filteredTalkList
+        return allTalks
     }
-
-    
 }
 
 
+//
+// TalkData describes a talk.
+//
 class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     
-    // MARK: Properties
     let id = UUID()
     var Title: String
     var URL: String
@@ -159,12 +160,12 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     var TimePlayed: String
     var City: String
     var Country: String
-    var isMarked: Bool
   
     
     static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
         return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
     }
+    
     
     static func empty () -> TalkData {
         return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", totalSeconds: 0,  pdf: "")
@@ -199,7 +200,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
         self.TimePlayed = ""
         self.City = ""
         self.Country = ""
-        self.isMarked = false
      }
     
     
@@ -221,153 +221,6 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     }
     
      
-    func toggleTalkAsFavorite() -> Bool {
-
-        if isFavoriteTalk() {
-            TheDataModel.UserFavorites[self.FileName] = nil
-            if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: self) {
-                print("toggleTalkAsFavorite removing: ", self.Title)
-                TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
-            }
-        } else {
-            TheDataModel.UserFavorites[self.FileName] = UserFavoriteData(fileName: self.FileName)
-            print("toggleTalkAsFavorite adding: ", self.Title)
-            TheDataModel.UserFavoritesAlbum.talkList.insert(self, at: 0)
-            //CJM Append?
-        }
-
-        TheDataModel.saveUserFavoritesData()
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
-        
-        let isFavorite = TheDataModel.UserFavorites[self.FileName] != nil
-        print("ToggleTalkAsFavorite New Value: ", isFavorite)
-        return isFavorite
-    }
-    
-    
-    func isFavoriteTalk() -> Bool {
-        
-        //let isFavorite =  TheDataModel.UserFavorites[self.FileName] != nil
-        //print("Favorite Talk: ", isFavorite)
-        return TheDataModel.UserFavorites[self.FileName] != nil
-    }
-    
-    
-    func startDownload(success: @escaping  () -> Void) {
-        
-        TheDataModel.startDownload(talk: self, success: success)
-    }
-    
-       
-    func isDownloadInProgress() -> Bool {
-        
-        var downloadInProgress = false
-        if let userDownload = TheDataModel.UserDownloads[self.FileName]  {
-            downloadInProgress = (userDownload.DownloadCompleted == "NO")
-        }
-        return downloadInProgress
-    }
-
-    
-    func setTalkAsDownloaded() {
-        
-        TheDataModel.UserDownloadAlbum.talkList.insert(self, at: 0)
-        TheDataModel.UserDownloads[self.FileName] = UserDownloadData(fileName: self.FileName, downloadCompleted: "YES")
-        TheDataModel.saveUserDownloadData()
-
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-
-    }
-    
-    
-    func unsetTalkAsDownloaded() {
-        
-        if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: self) {
-            print("download removing: ", self.Title)
-            TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
-        }
-        
-        if let userDownload = TheDataModel.UserDownloads[self.FileName] {
-            if userDownload.DownloadCompleted == "NO" {
-                TheDataModel.DownloadInProgress = false
-            }
-        }
-        TheDataModel.UserDownloads[self.FileName] = nil
-        let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + FileName
-        do {
-            try FileManager.default.removeItem(atPath: localPathMP3)
-        }
-        catch let error as NSError {
-        }
-        
-        TheDataModel.saveUserDownloadData()
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-        
-    }
-
-    
-    func addNoteToTalk(noteText: String) {
-
-        //
-        // if there is a note text for this talk fileName, then save it in the note dictionary
-        // otherwise clear this note dictionary entry
-        let talkFileName = self.FileName
-
-        if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
-            print("adding note on talk: ", self.Title)
-            TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
-            TheDataModel.UserNoteAlbum.talkList.append(self)
-        } else {
-            print("remove note on talk: ", self.Title)
-            TheDataModel.UserNotes[talkFileName] = nil
-            if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: self) {
-                TheDataModel.UserNoteAlbum.talkList.remove(at: index)
-            }
-
-        }
-        
-        // save the data, recompute stats, reload root view to display updated stats
-        TheDataModel.saveUserNoteData()
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserNoteAlbum)
-    }
-    
-    
-    func getNoteForTalk() -> String {
-
-        var noteText = ""
-
-        if let userNoteData = TheDataModel.UserNotes[self.FileName]   {
-            noteText = userNoteData.Notes
-        }
-        return noteText
-    }
-
-
-    func isNotatedTalk() -> Bool {
-        
-        if let _ = TheDataModel.UserNotes[self.FileName] {
-            return true
-        }
-        return false
-    }
-    
-    
-    func hasTalkBeenPlayed() -> Bool {
-    
-        return TheDataModel.PlayedTalks[self.FileName] != nil
-
-    }
-
-    
-    func isMostRecentTalk() -> Bool {
-    
-        if let talk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
-            return talk.FileName == self.FileName
-        }
-        return false
-    }
-     
-    
     func hasTranscript() -> Bool {
         
         if self.PDF.lowercased().range(of:"http:") != nil {
@@ -380,19 +233,9 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     }
     
     
-    func hasBeenDownloaded() -> Bool {
-
-        return TheDataModel.UserDownloads[self.FileName] != nil
-
-    }
-    
-    
     func hasBiography() -> Bool {
         
         return true
     }
-
-
-
 }
 
