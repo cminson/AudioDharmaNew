@@ -14,47 +14,46 @@ struct UserTalkRow: View {
     //let id = UUID()
     var album: AlbumData
     @ObservedObject var talk: TalkData
-    
-
+    var talkSet: Set<TalkData>
     @State var selection: String?  = nil
+    @State private var stateIsInCustomAlbum : Bool
 
-    
-    init(album: AlbumData, talk: TalkData) {
+
+    init(album: AlbumData, talk: TalkData, talkSet: Set<TalkData>) {
         
         //self.id = UUID()
         self.album = album
         self.talk = talk
-            
-     
+        self.talkSet = talkSet
+        self.stateIsInCustomAlbum = talkSet.contains(talk)
+
+
     }
     
     var body: some View {
                 
         VStack(alignment: .leading) {
             HStack() {
-                talk.Speaker.toImage()
+                 talk.Speaker.toImage()
                     .resizable()
                     //.aspectRatio(contentMode: .fit)
                     //.frame(width: LIST_IMAGE_HEIGHT)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .background(Color.white)
+                    //.background(self.inCustomList ? Color.orange : Color.white)
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
                 Text(talk.hasTalkBeenPlayed() ? "* " + talk.Title : talk.Title)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(talk.hasBeenDownloaded() ? Color.red : Color.black)
-                    .background(Color.white)
+                    //.background(self.inCustomList ? Color.orange : Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
-                    Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
-                        .background(Color.white)
+                    Text(talk.TotalSeconds.displayInClockFormat())
                         .padding(.trailing, -5)
-                    
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Text(String(album.albumType == AlbumType.ACTIVE ?  talk.Date : talk.Country))
-                        .background(Color.white)
+                    Text(String(talk.Date))
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
@@ -68,19 +67,35 @@ struct UserTalkRow: View {
                         .frame(width: 12, height: 12)
                         .hidden(!talk.isNotatedTalk())
                  }
-
                 .padding(.trailing, -10)
+            }
+            .onTapGesture {
+                print("tap")
+                stateIsInCustomAlbum.toggle()
+                
+                if stateIsInCustomAlbum == true {
+                    print("Adding: ", talk.Title)
+                    self.album.talkList.append(self.talk)
+                } else {
+                    if let index = album.talkList.firstIndex(of: self.talk) {
+                        print("Removing: ", talk.Title)
+
+                        self.album.talkList.remove(at: index)
+                    }
+                }
             }
         }
         .contentShape(Rectangle())
-      
+        .background(stateIsInCustomAlbum ? Color.orange : Color.white)
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-
         .frame(height: LIST_ROW_SIZE_STANDARD)
+
     }
     
 
 }
+
+
 
 
 struct UserEditTalkListView: View {
@@ -92,12 +107,25 @@ struct UserEditTalkListView: View {
     @State var selectedTalk: TalkData
     @State var selectedAlbum: AlbumData
 
+    var talkSet : Set <TalkData>
     
     init(album: AlbumData) {
         
         self.album = album
         selectedTalk = TalkData.empty()
         selectedAlbum = AlbumData.empty()
+ 
+        self.talkSet = Set(album.talkList)
+/*
+        print("UserEditTalkListView: ", album.Title)
+        for talk in album.talkList {
+            print("Talk: ", talk.Title)
+            if self.talkSet.contains(talk) {
+                print("SET CONTAINS")
+            }
+        }
+ */
+        
     }
     
 
@@ -106,15 +134,9 @@ struct UserEditTalkListView: View {
         SearchBar(text: $searchText)
            .padding(.top, 0)
         List(album.getFilteredUserTalks(filter: searchText)) { talk in
+           // List(album.talkList) { talk in
             
-            UserTalkRow(album: album, talk: talk)
-                .onTapGesture {
-                    print("talk selected: ", talk.Title)
-                    selectedTalk = talk
-                    selectedTalkTime = 0
-                    selection = "PLAY_TALK"
-                }
-
+            UserTalkRow(album: album, talk: talk, talkSet: talkSet)
         }
         .navigationBarTitle(album.Title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
@@ -158,5 +180,16 @@ struct UserEditTalkListView: View {
 
            }
        }
+        .onDisappear {
+            TheDataModel.computeAlbumStats(album: album)
+            TheDataModel.saveCustomUserAlbums()
+            print("OnDisappear")
+            for talk in album.talkList {
+                print("talk:", talk.Title)
+            }
+        }
     }
+    
 }
+
+

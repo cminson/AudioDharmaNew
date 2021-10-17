@@ -18,7 +18,7 @@ enum AlbumType {
 }
 
 
-class AlbumData: Identifiable, ObservableObject {
+class AlbumData: Identifiable, Equatable, ObservableObject {
     
     @Published var totalTalks: Int
     let id = UUID()
@@ -32,6 +32,10 @@ class AlbumData: Identifiable, ObservableObject {
     var talkList: [TalkData]
     var albumType: AlbumType
     
+    static func ==(lhs: AlbumData, rhs: AlbumData) -> Bool {
+        return lhs.Key == rhs.Key && lhs.Title == rhs.Title
+    }
+
 
     init(title: String, key: String, section: String, imageName: String,  date : String, albumType: AlbumType) {
         
@@ -112,7 +116,18 @@ class AlbumData: Identifiable, ObservableObject {
     
     func getFilteredUserTalks(filter: String) -> [TalkData] {
 
+        let talkSet = Set(self.talkList)
+        var allTalks = TheDataModel.ListAllTalks
+        allTalks.removeAll(where: { talkSet.contains($0) })
+        var filteredTalkList = self.talkList + allTalks
+
+        /*
         var filteredTalkList = TheDataModel.ListAllTalks
+        for talk in filteredTalkList {
+            print(talk.Title)
+        }
+         */
+
         if !filter.isEmpty {
             filteredTalkList = []
             for talk in self.talkList {
@@ -128,7 +143,7 @@ class AlbumData: Identifiable, ObservableObject {
 }
 
 
-class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
+class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     
     // MARK: Properties
     let id = UUID()
@@ -144,6 +159,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     var TimePlayed: String
     var City: String
     var Country: String
+    var isMarked: Bool
   
     
     static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
@@ -152,6 +168,10 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
     
     static func empty () -> TalkData {
         return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", totalSeconds: 0,  pdf: "")
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(FileName)
     }
 
         
@@ -179,6 +199,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying {
         self.TimePlayed = ""
         self.City = ""
         self.Country = ""
+        self.isMarked = false
      }
     
     

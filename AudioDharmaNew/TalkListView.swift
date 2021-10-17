@@ -12,47 +12,6 @@ let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
 
 
-struct TEST: View {
-  
-    var album: AlbumData
-    var talk: TalkData
-
-    @State private var stateIsFavoriteTalk : Bool
-
-    init(album: AlbumData, talk: TalkData) {
-        
-        self.album = album
-        self.talk = talk
-        
-        stateIsFavoriteTalk = talk.isFavoriteTalk()
-    }
-    
-    var body: some View {
-                
-        VStack(alignment: .leading) {
-            HStack() {
-                Text(String(self.stateIsFavoriteTalk) )
-                    .contextMenu {
-                       Button("Favorite") {
-                            self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
-                            print("stateIsFavoriteTalk: ", self.stateIsFavoriteTalk)
-                        }
-                        .hidden(self.stateIsFavoriteTalk)
-                       Button("Unfavorite") {
-                            self.stateIsFavoriteTalk = talk.toggleTalkAsFavorite()
-                            print("stateIsFavoriteTalk: ", self.stateIsFavoriteTalk)
-                        }
-                        .hidden(!self.stateIsFavoriteTalk)
-
-                    }
-              }
-        }
-        .contentShape(Rectangle())
-        .frame(height: LIST_ROW_SIZE_STANDARD)
-    }
-
-}
-
 
 struct TalkRow: View {
   
@@ -71,8 +30,6 @@ struct TalkRow: View {
     @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
     
-
-
     
     init(album: AlbumData, talk: TalkData) {
         

@@ -16,12 +16,17 @@ struct UserAlbumRow: View {
     @ObservedObject var album: AlbumData
     @State var selection: String?  = ""
     @State var displayEditCustomAlbum = false
+    @State var displayDeleteAlbum = false
     @State var albumTitle: String
     
     init(album: AlbumData) {
         self.album = album
         
         albumTitle = album.Title
+        print("UserAlbum: ", album.Title)
+        for talk in album.talkList {
+            print("Talk: ", talk.Title)
+        }
 
     }
 
@@ -59,13 +64,14 @@ struct UserAlbumRow: View {
                     displayEditCustomAlbum = true
                 }
                 Button("Delete Album") {
-                    selection = "EDIT_TALKS_IN__ALBUM"
+                    print("delete ablum")
+                    displayDeleteAlbum = true
                 }
 
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                selection = "ALBUMS"
+                selection = "TALKS"
                 
             }
         }
@@ -77,6 +83,22 @@ struct UserAlbumRow: View {
         .background(Color.white)
         .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)
+        .alert(isPresented: $displayDeleteAlbum) {
+            Alert(
+                title: Text("Remove Custom Album?"),
+                message: Text("Press OK to delete this album"),
+                primaryButton: .destructive(Text("OK")) {
+                    if let index = TheDataModel.CustomUserAlbums.albumList.firstIndex(of: album) {
+                        
+                        TheDataModel.CustomUserAlbums.albumList.remove(at: index)
+                        TheDataModel.saveCustomUserAlbums()
+                    }
+
+                },
+                secondaryButton: .cancel()
+            )
+        }
+
         .popover(isPresented: $displayEditCustomAlbum) {
             VStack() {
                 Text("Edit Album Title")
@@ -105,8 +127,8 @@ struct UserAlbumRow: View {
 
 struct UserAlbumListView: View {
     
-    var album: AlbumData
-    
+    @ObservedObject var album: AlbumData
+
     @State var selectedAlbum: AlbumData
     @State var selection: String?  = ""
     @State var searchText: String  = ""
@@ -115,6 +137,7 @@ struct UserAlbumListView: View {
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double
     @State var displayNewCustomAlbum = false
+    
     @State private var textStyle = UIFont.TextStyle.body
     @State private var customAlbum = "Custom Album"
 
@@ -140,7 +163,7 @@ struct UserAlbumListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(album.getFilteredAlbums(filter: searchText)) { album in
+        List(TheDataModel.CustomUserAlbums.getFilteredAlbums(filter: searchText)) { album in
             UserAlbumRow(album: album)
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
@@ -159,6 +182,7 @@ struct UserAlbumListView: View {
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
+
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {
@@ -196,7 +220,6 @@ struct UserAlbumListView: View {
                     .padding()
                 Spacer()
                     .frame(height:30)
-                //TextView(text: $customAlbum, textStyle: $textStyle)
                 TextField("", text: $customAlbum)
                     .padding(.horizontal)
                     .frame(height: 40)
@@ -205,8 +228,9 @@ struct UserAlbumListView: View {
                     .frame(height:30)
                 Button("Done") {
                     displayNewCustomAlbum = false
-                    let newUserAlbum = AlbumData(title: customAlbum, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
-                    TheDataModel.addUserAlbum(album: newUserAlbum)
+                    let newAlbum = AlbumData(title: customAlbum, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                    TheDataModel.CustomUserAlbums.albumList.append(newAlbum)
+                    TheDataModel.saveCustomUserAlbums()
                 }
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)

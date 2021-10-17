@@ -505,7 +505,7 @@ class Model {
                     self.CustomUserAlbums = album
                     self.UserAlbums = TheDataModel.loadUserAlbumData()
                     for userAlbumData in self.UserAlbums {
-                        var customAlbum = AlbumData(title: userAlbumData.Title, key: "USER_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        var customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
                         albumList.append(customAlbum)
                         for fileName in userAlbumData.TalkFileNames {
                             if let talk = FileNameToTalk[fileName] {
@@ -1333,6 +1333,15 @@ class Model {
         
         saveUserAlbumData()
         //computeUserAlbumStats()
+    }
+    
+    
+    func randomKey() -> String {
+        
+        let KEY_LENGTH = 10
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        
+        return String((0...KEY_LENGTH ).map{ _ in letters.randomElement()! })
     }
 
     
