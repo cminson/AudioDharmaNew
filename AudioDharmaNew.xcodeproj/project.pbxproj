@@ -13,6 +13,123 @@
 		8322D746270E872400C10ED3 /* donate.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8322D745270E872400C10ED3 /* donate.txt */; };
 		8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924526EA4ECF00F9A006 /* TalkListView.swift */; };
 		8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924726EA4F6000F9A006 /* AlbumListView.swift */; };
+		8342478C271DED8800608543 /* Daigan Gaither.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478B271DED8800608543 /* Daigan Gaither.txt */; };
+		8342478E271DEDA100608543 /* Daniel Bowling.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478D271DEDA100608543 /* Daniel Bowling.txt */; };
+		83424790271DEDAE00608543 /* Dan Landry.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478F271DEDAE00608543 /* Dan Landry.txt */; };
+		83424792271DEDB900608543 /* David Cohn.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424791271DEDB900608543 /* David Cohn.txt */; };
+		83424794271DEDC700608543 /* David Lorey.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424793271DEDC700608543 /* David Lorey.txt */; };
+		83424796271DEDD000608543 /* Dawn Neal.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424795271DEDD000608543 /* Dawn Neal.txt */; };
+		83424798271DEDDA00608543 /* Dawn Scott.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424797271DEDDA00608543 /* Dawn Scott.txt */; };
+		8342479A271DEDF000608543 /* Devin Berry.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424799271DEDF000608543 /* Devin Berry.txt */; };
+		8342479C271DEDFB00608543 /* Devon Hase.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342479B271DEDFB00608543 /* Devon Hase.txt */; };
+		834247A0271DEE1100608543 /* Dhammaruwan.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342479F271DEE1100608543 /* Dhammaruwan.txt */; };
+		834247A2271DEE1D00608543 /* Diana Clark.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247A1271DEE1D00608543 /* Diana Clark.txt */; };
+		834247A4271DEE2700608543 /* Donald Rothberg.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247A3271DEE2700608543 /* Donald Rothberg.txt */; };
+		834247A6271DEE3600608543 /* Eileen Messina.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247A5271DEE3600608543 /* Eileen Messina.txt */; };
+		834247A8271DEE4000608543 /* Eugene Cash.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247A7271DEE4000608543 /* Eugene Cash.txt */; };
+		834247AA271DEE6E00608543 /* Francisco Morillo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247A9271DEE6E00608543 /* Francisco Morillo.txt */; };
+		834247AC271DEE7900608543 /* Frank Ostaseski.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247AB271DEE7900608543 /* Frank Ostaseski.txt */; };
+		834247AE271DEE9D00608543 /* Fu Nancy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247AD271DEE9D00608543 /* Fu Nancy.txt */; };
+		834247B0271DEEA600608543 /* Gay Watson.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247AF271DEEA600608543 /* Gay Watson.txt */; };
+		834247B2271DEEB300608543 /* Gregory Kramer.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247B1271DEEB300608543 /* Gregory Kramer.txt */; };
+		834247B4271DEECF00608543 /* Greg Scharf.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247B3271DEECE00608543 /* Greg Scharf.txt */; };
+		834247B6271DEEEB00608543 /* Gulwinder Gullu.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247B5271DEEEB00608543 /* Gulwinder Gullu.txt */; };
+		834247B8271DEF0300608543 /* Heather Martin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247B7271DEF0300608543 /* Heather Martin.txt */; };
+		834247BC271DEF1D00608543 /* Heather Sundberg.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247BB271DEF1D00608543 /* Heather Sundberg.txt */; };
+		834247BE271DEF2C00608543 /* Ines Freedman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247BD271DEF2C00608543 /* Ines Freedman.txt */; };
+		834247C0271DEF3E00608543 /* Jacques Verduin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247BF271DEF3E00608543 /* Jacques Verduin.txt */; };
+		834247C2271DEF4800608543 /* Jaku Kinst.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247C1271DEF4800608543 /* Jaku Kinst.txt */; };
+		834247C4271DEF5300608543 /* Jason Murphy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247C3271DEF5300608543 /* Jason Murphy.txt */; };
+		834247C6271DEF6400608543 /* JD Doyle.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247C5271DEF6400608543 /* JD Doyle.txt */; };
+		834247C8271DEF7100608543 /* Jeff Hardin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247C7271DEF7100608543 /* Jeff Hardin.txt */; };
+		834247CA271DEF7D00608543 /* Jennifer Block.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247C9271DEF7D00608543 /* Jennifer Block.txt */; };
+		834247CC271DEF8900608543 /* Jennifer Lemas.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247CB271DEF8900608543 /* Jennifer Lemas.txt */; };
+		834247CE271DEF9300608543 /* Jill Hyman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247CD271DEF9300608543 /* Jill Hyman.txt */; };
+		834247D0271DEFA300608543 /* Jill Shepherd.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247CF271DEFA300608543 /* Jill Shepherd.txt */; };
+		834247D2271DEFAF00608543 /* Jim Bronson.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247D1271DEFAF00608543 /* Jim Bronson.txt */; };
+		834247D4271DEFBB00608543 /* Jim Podolske.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247D3271DEFBB00608543 /* Jim Podolske.txt */; };
+		834247D6271DEFC800608543 /* JoAnna Hardy.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247D5271DEFC800608543 /* JoAnna Hardy.txt */; };
+		834247D8271DEFD100608543 /* John Martin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247D7271DEFD100608543 /* John Martin.txt */; };
+		834247DA271DEFDA00608543 /* John Peacock.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247D9271DEFDA00608543 /* John Peacock.txt */; };
+		834247DC271DEFE400608543 /* John Travis.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247DB271DEFE400608543 /* John Travis.txt */; };
+		834247DE271DF01200608543 /* Joseph Goldstein.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247DD271DF01200608543 /* Joseph Goldstein.txt */; };
+		834247E0271DF02B00608543 /* Jozen Tamori.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247DF271DF02B00608543 /* Jozen Tamori.txt */; };
+		834247E2271DF03F00608543 /* Judy Cannon.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247E1271DF03F00608543 /* Judy Cannon.txt */; };
+		834247E4271DF04B00608543 /* Judy Long.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247E3271DF04B00608543 /* Judy Long.txt */; };
+		834247E6271DF05D00608543 /* Kamala Masters.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247E5271DF05D00608543 /* Kamala Masters.txt */; };
+		834247E8271DF06D00608543 /* Kate Munding.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247E7271DF06D00608543 /* Kate Munding.txt */; };
+		834247EA271DF07C00608543 /* Kathy Cheney.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247E9271DF07C00608543 /* Kathy Cheney.txt */; };
+		834247EC271DF09B00608543 /* Kelly McGonigal.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247EB271DF09B00608543 /* Kelly McGonigal.txt */; };
+		834247EE271DF0AB00608543 /* Kevin Griffin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247ED271DF0AB00608543 /* Kevin Griffin.txt */; };
+		834247F0271DF0B700608543 /* Kim Allen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247EF271DF0B700608543 /* Kim Allen.txt */; };
+		834247F2271DF0C000608543 /* Kirsten Rudestam.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247F1271DF0C000608543 /* Kirsten Rudestam.txt */; };
+		834247F4271DF0D800608543 /* Leigh Brasington.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247F3271DF0D800608543 /* Leigh Brasington.txt */; };
+		834247F6271DF0ED00608543 /* Lori Wong.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247F5271DF0ED00608543 /* Lori Wong.txt */; };
+		834247F8271DF0FF00608543 /* Liz Powell.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247F7271DF0FF00608543 /* Liz Powell.txt */; };
+		834247FA271DF10F00608543 /* Maria Straatmann.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247F9271DF10F00608543 /* Maria Straatmann.txt */; };
+		834247FC271DF11C00608543 /* Marjolein Janssen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247FB271DF11C00608543 /* Marjolein Janssen.txt */; };
+		834247FE271DF12500608543 /* Mark Coleman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247FD271DF12500608543 /* Mark Coleman.txt */; };
+		83424800271DF12E00608543 /* Martin Aylward.txt in Resources */ = {isa = PBXBuildFile; fileRef = 834247FF271DF12E00608543 /* Martin Aylward.txt */; };
+		83424802271DF13800608543 /* Martine Batchelor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424801271DF13800608543 /* Martine Batchelor.txt */; };
+		83424804271DF15200608543 /* Mary Grace.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424803271DF15200608543 /* Mary Grace.txt */; };
+		83424806271DF15B00608543 /* Mary Mocine.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424805271DF15B00608543 /* Mary Mocine.txt */; };
+		83424808271DF16400608543 /* Matthew Brensilver.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424807271DF16400608543 /* Matthew Brensilver.txt */; };
+		8342480A271DF17300608543 /* Max Erdstein.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424809271DF17300608543 /* Max Erdstein.txt */; };
+		8342480C271DF17C00608543 /* Meg Gawler.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342480B271DF17C00608543 /* Meg Gawler.txt */; };
+		8342480E271DF18500608543 /* Mel Weitsman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342480D271DF18500608543 /* Mel Weitsman.txt */; };
+		83424810271DF18E00608543 /* Michael Newhall.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342480F271DF18E00608543 /* Michael Newhall.txt */; };
+		83424812271DF19900608543 /* Mirka Knaster.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424811271DF19900608543 /* Mirka Knaster.txt */; };
+		83424814271DF1A200608543 /* Misha Merrill.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424813271DF1A200608543 /* Misha Merrill.txt */; };
+		83424816271DF1BD00608543 /* Mushim Patricia.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424815271DF1BD00608543 /* Mushim Patricia.txt */; };
+		83424818271DF1D100608543 /* Nikki Mirghafori.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424817271DF1D100608543 /* Nikki Mirghafori.txt */; };
+		8342481A271DF1DC00608543 /* Nolitha Tsengiwe.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424819271DF1DC00608543 /* Nolitha Tsengiwe.txt */; };
+		8342481C271DF1E600608543 /* Nona Olivia.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342481B271DF1E600608543 /* Nona Olivia.txt */; };
+		8342481E271DF1F000608543 /* Norman Fischer.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342481D271DF1F000608543 /* Norman Fischer.txt */; };
+		83424820271DF21800608543 /* Pa Auk.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342481F271DF21800608543 /* Pa Auk.txt */; };
+		83424822271DF22400608543 /* Pamela Weiss.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424821271DF22400608543 /* Pamela Weiss.txt */; };
+		83424824271DF22C00608543 /* Paul Haller.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424823271DF22C00608543 /* Paul Haller.txt */; };
+		83424826271DF23600608543 /* Phillip Moffitt.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424825271DF23600608543 /* Phillip Moffitt.txt */; };
+		8342482A271DF25500608543 /* Rebecca Dixon.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424829271DF25500608543 /* Rebecca Dixon.txt */; };
+		8342482C271DF25F00608543 /* Rebekkah LaDyne.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342482B271DF25F00608543 /* Rebekkah LaDyne.txt */; };
+		8342482E271DF27800608543 /* Richard Shankman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342482D271DF27800608543 /* Richard Shankman.txt */; };
+		83424830271DF28200608543 /* Richard Sievers.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342482F271DF28200608543 /* Richard Sievers.txt */; };
+		83424832271DF28D00608543 /* Rick Maddock.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424831271DF28D00608543 /* Rick Maddock.txt */; };
+		83424834271DF29600608543 /* Rita Gross.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424833271DF29600608543 /* Rita Gross.txt */; };
+		83424836271DF29F00608543 /* Robert Cusick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424835271DF29F00608543 /* Robert Cusick.txt */; };
+		83424838271DF2AA00608543 /* Ronna Kabatznick.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424837271DF2AA00608543 /* Ronna Kabatznick.txt */; };
+		8342483A271DF2BE00608543 /* Rose Taylor.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424839271DF2BE00608543 /* Rose Taylor.txt */; };
+		8342483C271DF2C800608543 /* Ruth King.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342483B271DF2C800608543 /* Ruth King.txt */; };
+		8342483E271DF2D600608543 /* Sally Clough.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342483D271DF2D600608543 /* Sally Clough.txt */; };
+		83424840271DF2E000608543 /* Sandra Sanabria.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342483F271DF2E000608543 /* Sandra Sanabria.txt */; };
+		83424842271DF2EE00608543 /* Santikaro.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424841271DF2EE00608543 /* Santikaro.txt */; };
+		83424844271DF30500608543 /* Sayadaw U.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424843271DF30500608543 /* Sayadaw U.txt */; };
+		83424846271DF31F00608543 /* Sean Kerr.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424845271DF31F00608543 /* Sean Kerr.txt */; };
+		83424848271DF32D00608543 /* Shaila Catherine.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424847271DF32D00608543 /* Shaila Catherine.txt */; };
+		8342484A271DF33600608543 /* Shantum Seth.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424849271DF33600608543 /* Shantum Seth.txt */; };
+		8342484C271DF33E00608543 /* Shelley Gault.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342484B271DF33E00608543 /* Shelley Gault.txt */; };
+		8342484E271DF34B00608543 /* Shin Kwan.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342484D271DF34B00608543 /* Shin Kwan.txt */; };
+		83424850271DF35700608543 /* Shinzen Young.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342484F271DF35700608543 /* Shinzen Young.txt */; };
+		83424852271DF36100608543 /* Spring Washam.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424851271DF36100608543 /* Spring Washam.txt */; };
+		83424854271DF36E00608543 /* Stephen Fulder.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424853271DF36E00608543 /* Stephen Fulder.txt */; };
+		83424856271DF37A00608543 /* Steve Armstrong.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424855271DF37A00608543 /* Steve Armstrong.txt */; };
+		83424858271DF38200608543 /* Steve Stucky.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424857271DF38200608543 /* Steve Stucky.txt */; };
+		8342485A271DF38B00608543 /* Susan Ezequelle.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424859271DF38B00608543 /* Susan Ezequelle.txt */; };
+		8342485C271DF39600608543 /* Susie Harrington.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342485B271DF39600608543 /* Susie Harrington.txt */; };
+		8342485E271DF39F00608543 /* Susy Keely.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342485D271DF39F00608543 /* Susy Keely.txt */; };
+		83424860271DF3A600608543 /* Tanya Wiser.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342485F271DF3A600608543 /* Tanya Wiser.txt */; };
+		83424862271DF3B100608543 /* Tara Mulay.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424861271DF3B100608543 /* Tara Mulay.txt */; };
+		83424864271DF3B900608543 /* Teah Strozer.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424863271DF3B900608543 /* Teah Strozer.txt */; };
+		83424866271DF3C100608543 /* Tempel Smith.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424865271DF3C100608543 /* Tempel Smith.txt */; };
+		83424868271DF3D500608543 /* Toni Bernhard.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424867271DF3D500608543 /* Toni Bernhard.txt */; };
+		8342486A271DF3DF00608543 /* Tony Bernhard.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424869271DF3DF00608543 /* Tony Bernhard.txt */; };
+		8342486C271DF3E700608543 /* Tuere Sala.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342486B271DF3E700608543 /* Tuere Sala.txt */; };
+		8342486E271DF3F600608543 /* Venerable Pannavati.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342486D271DF3F600608543 /* Venerable Pannavati.txt */; };
+		83424870271DF3FF00608543 /* Victor Medina.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342486F271DF3FF00608543 /* Victor Medina.txt */; };
+		83424872271DF40C00608543 /* Vinny Ferraro.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424871271DF40C00608543 /* Vinny Ferraro.txt */; };
+		83424874271DF41400608543 /* Walt Opie.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424873271DF41400608543 /* Walt Opie.txt */; };
+		83424878271DF43A00608543 /* Wes Nisker.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424877271DF43A00608543 /* Wes Nisker.txt */; };
+		8342487A271DF44D00608543 /* Will Kabat.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83424879271DF44D00608543 /* Will Kabat.txt */; };
+		8342487C271DF45F00608543 /* Ying Chen.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342487B271DF45F00608543 /* Ying Chen.txt */; };
 		8361D60A26E126500073CC83 /* ZipArchive.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; };
 		8361D60B26E126500073CC83 /* ZipArchive.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 8361D60926E126500073CC83 /* ZipArchive.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1226E3ECAE000F9848 /* StoredData.swift */; };
@@ -91,6 +208,123 @@
 		8322D745270E872400C10ED3 /* donate.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = donate.txt; sourceTree = "<group>"; };
 		8327924526EA4ECF00F9A006 /* TalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkListView.swift; sourceTree = "<group>"; };
 		8327924726EA4F6000F9A006 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
+		8342478B271DED8800608543 /* Daigan Gaither.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Daigan Gaither.txt"; sourceTree = "<group>"; };
+		8342478D271DEDA100608543 /* Daniel Bowling.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Daniel Bowling.txt"; sourceTree = "<group>"; };
+		8342478F271DEDAE00608543 /* Dan Landry.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Dan Landry.txt"; sourceTree = "<group>"; };
+		83424791271DEDB900608543 /* David Cohn.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "David Cohn.txt"; sourceTree = "<group>"; };
+		83424793271DEDC700608543 /* David Lorey.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "David Lorey.txt"; sourceTree = "<group>"; };
+		83424795271DEDD000608543 /* Dawn Neal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Dawn Neal.txt"; sourceTree = "<group>"; };
+		83424797271DEDDA00608543 /* Dawn Scott.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Dawn Scott.txt"; sourceTree = "<group>"; };
+		83424799271DEDF000608543 /* Devin Berry.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Devin Berry.txt"; sourceTree = "<group>"; };
+		8342479B271DEDFB00608543 /* Devon Hase.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Devon Hase.txt"; sourceTree = "<group>"; };
+		8342479F271DEE1100608543 /* Dhammaruwan.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Dhammaruwan.txt; sourceTree = "<group>"; };
+		834247A1271DEE1D00608543 /* Diana Clark.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Diana Clark.txt"; sourceTree = "<group>"; };
+		834247A3271DEE2700608543 /* Donald Rothberg.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Donald Rothberg.txt"; sourceTree = "<group>"; };
+		834247A5271DEE3600608543 /* Eileen Messina.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Eileen Messina.txt"; sourceTree = "<group>"; };
+		834247A7271DEE4000608543 /* Eugene Cash.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Eugene Cash.txt"; sourceTree = "<group>"; };
+		834247A9271DEE6E00608543 /* Francisco Morillo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Francisco Morillo.txt"; sourceTree = "<group>"; };
+		834247AB271DEE7900608543 /* Frank Ostaseski.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Frank Ostaseski.txt"; sourceTree = "<group>"; };
+		834247AD271DEE9D00608543 /* Fu Nancy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Fu Nancy.txt"; sourceTree = "<group>"; };
+		834247AF271DEEA600608543 /* Gay Watson.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Gay Watson.txt"; sourceTree = "<group>"; };
+		834247B1271DEEB300608543 /* Gregory Kramer.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Gregory Kramer.txt"; sourceTree = "<group>"; };
+		834247B3271DEECE00608543 /* Greg Scharf.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Greg Scharf.txt"; sourceTree = "<group>"; };
+		834247B5271DEEEB00608543 /* Gulwinder Gullu.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Gulwinder Gullu.txt"; sourceTree = "<group>"; };
+		834247B7271DEF0300608543 /* Heather Martin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Heather Martin.txt"; sourceTree = "<group>"; };
+		834247BB271DEF1D00608543 /* Heather Sundberg.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Heather Sundberg.txt"; sourceTree = "<group>"; };
+		834247BD271DEF2C00608543 /* Ines Freedman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ines Freedman.txt"; sourceTree = "<group>"; };
+		834247BF271DEF3E00608543 /* Jacques Verduin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jacques Verduin.txt"; sourceTree = "<group>"; };
+		834247C1271DEF4800608543 /* Jaku Kinst.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jaku Kinst.txt"; sourceTree = "<group>"; };
+		834247C3271DEF5300608543 /* Jason Murphy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jason Murphy.txt"; sourceTree = "<group>"; };
+		834247C5271DEF6400608543 /* JD Doyle.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "JD Doyle.txt"; sourceTree = "<group>"; };
+		834247C7271DEF7100608543 /* Jeff Hardin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jeff Hardin.txt"; sourceTree = "<group>"; };
+		834247C9271DEF7D00608543 /* Jennifer Block.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jennifer Block.txt"; sourceTree = "<group>"; };
+		834247CB271DEF8900608543 /* Jennifer Lemas.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jennifer Lemas.txt"; sourceTree = "<group>"; };
+		834247CD271DEF9300608543 /* Jill Hyman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jill Hyman.txt"; sourceTree = "<group>"; };
+		834247CF271DEFA300608543 /* Jill Shepherd.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jill Shepherd.txt"; sourceTree = "<group>"; };
+		834247D1271DEFAF00608543 /* Jim Bronson.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jim Bronson.txt"; sourceTree = "<group>"; };
+		834247D3271DEFBB00608543 /* Jim Podolske.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jim Podolske.txt"; sourceTree = "<group>"; };
+		834247D5271DEFC800608543 /* JoAnna Hardy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "JoAnna Hardy.txt"; sourceTree = "<group>"; };
+		834247D7271DEFD100608543 /* John Martin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "John Martin.txt"; sourceTree = "<group>"; };
+		834247D9271DEFDA00608543 /* John Peacock.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "John Peacock.txt"; sourceTree = "<group>"; };
+		834247DB271DEFE400608543 /* John Travis.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "John Travis.txt"; sourceTree = "<group>"; };
+		834247DD271DF01200608543 /* Joseph Goldstein.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Joseph Goldstein.txt"; sourceTree = "<group>"; };
+		834247DF271DF02B00608543 /* Jozen Tamori.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Jozen Tamori.txt"; sourceTree = "<group>"; };
+		834247E1271DF03F00608543 /* Judy Cannon.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Judy Cannon.txt"; sourceTree = "<group>"; };
+		834247E3271DF04B00608543 /* Judy Long.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Judy Long.txt"; sourceTree = "<group>"; };
+		834247E5271DF05D00608543 /* Kamala Masters.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kamala Masters.txt"; sourceTree = "<group>"; };
+		834247E7271DF06D00608543 /* Kate Munding.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kate Munding.txt"; sourceTree = "<group>"; };
+		834247E9271DF07C00608543 /* Kathy Cheney.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kathy Cheney.txt"; sourceTree = "<group>"; };
+		834247EB271DF09B00608543 /* Kelly McGonigal.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kelly McGonigal.txt"; sourceTree = "<group>"; };
+		834247ED271DF0AB00608543 /* Kevin Griffin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kevin Griffin.txt"; sourceTree = "<group>"; };
+		834247EF271DF0B700608543 /* Kim Allen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kim Allen.txt"; sourceTree = "<group>"; };
+		834247F1271DF0C000608543 /* Kirsten Rudestam.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Kirsten Rudestam.txt"; sourceTree = "<group>"; };
+		834247F3271DF0D800608543 /* Leigh Brasington.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Leigh Brasington.txt"; sourceTree = "<group>"; };
+		834247F5271DF0ED00608543 /* Lori Wong.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Lori Wong.txt"; sourceTree = "<group>"; };
+		834247F7271DF0FF00608543 /* Liz Powell.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Liz Powell.txt"; sourceTree = "<group>"; };
+		834247F9271DF10F00608543 /* Maria Straatmann.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Maria Straatmann.txt"; sourceTree = "<group>"; };
+		834247FB271DF11C00608543 /* Marjolein Janssen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Marjolein Janssen.txt"; sourceTree = "<group>"; };
+		834247FD271DF12500608543 /* Mark Coleman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mark Coleman.txt"; sourceTree = "<group>"; };
+		834247FF271DF12E00608543 /* Martin Aylward.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Martin Aylward.txt"; sourceTree = "<group>"; };
+		83424801271DF13800608543 /* Martine Batchelor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Martine Batchelor.txt"; sourceTree = "<group>"; };
+		83424803271DF15200608543 /* Mary Grace.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mary Grace.txt"; sourceTree = "<group>"; };
+		83424805271DF15B00608543 /* Mary Mocine.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mary Mocine.txt"; sourceTree = "<group>"; };
+		83424807271DF16400608543 /* Matthew Brensilver.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Matthew Brensilver.txt"; sourceTree = "<group>"; };
+		83424809271DF17300608543 /* Max Erdstein.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Max Erdstein.txt"; sourceTree = "<group>"; };
+		8342480B271DF17C00608543 /* Meg Gawler.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Meg Gawler.txt"; sourceTree = "<group>"; };
+		8342480D271DF18500608543 /* Mel Weitsman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mel Weitsman.txt"; sourceTree = "<group>"; };
+		8342480F271DF18E00608543 /* Michael Newhall.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Michael Newhall.txt"; sourceTree = "<group>"; };
+		83424811271DF19900608543 /* Mirka Knaster.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mirka Knaster.txt"; sourceTree = "<group>"; };
+		83424813271DF1A200608543 /* Misha Merrill.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Misha Merrill.txt"; sourceTree = "<group>"; };
+		83424815271DF1BD00608543 /* Mushim Patricia.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Mushim Patricia.txt"; sourceTree = "<group>"; };
+		83424817271DF1D100608543 /* Nikki Mirghafori.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Nikki Mirghafori.txt"; sourceTree = "<group>"; };
+		83424819271DF1DC00608543 /* Nolitha Tsengiwe.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Nolitha Tsengiwe.txt"; sourceTree = "<group>"; };
+		8342481B271DF1E600608543 /* Nona Olivia.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Nona Olivia.txt"; sourceTree = "<group>"; };
+		8342481D271DF1F000608543 /* Norman Fischer.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Norman Fischer.txt"; sourceTree = "<group>"; };
+		8342481F271DF21800608543 /* Pa Auk.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Pa Auk.txt"; sourceTree = "<group>"; };
+		83424821271DF22400608543 /* Pamela Weiss.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Pamela Weiss.txt"; sourceTree = "<group>"; };
+		83424823271DF22C00608543 /* Paul Haller.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Paul Haller.txt"; sourceTree = "<group>"; };
+		83424825271DF23600608543 /* Phillip Moffitt.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Phillip Moffitt.txt"; sourceTree = "<group>"; };
+		83424829271DF25500608543 /* Rebecca Dixon.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Rebecca Dixon.txt"; sourceTree = "<group>"; };
+		8342482B271DF25F00608543 /* Rebekkah LaDyne.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Rebekkah LaDyne.txt"; sourceTree = "<group>"; };
+		8342482D271DF27800608543 /* Richard Shankman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Richard Shankman.txt"; sourceTree = "<group>"; };
+		8342482F271DF28200608543 /* Richard Sievers.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Richard Sievers.txt"; sourceTree = "<group>"; };
+		83424831271DF28D00608543 /* Rick Maddock.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Rick Maddock.txt"; sourceTree = "<group>"; };
+		83424833271DF29600608543 /* Rita Gross.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Rita Gross.txt"; sourceTree = "<group>"; };
+		83424835271DF29F00608543 /* Robert Cusick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Robert Cusick.txt"; sourceTree = "<group>"; };
+		83424837271DF2AA00608543 /* Ronna Kabatznick.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ronna Kabatznick.txt"; sourceTree = "<group>"; };
+		83424839271DF2BE00608543 /* Rose Taylor.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Rose Taylor.txt"; sourceTree = "<group>"; };
+		8342483B271DF2C800608543 /* Ruth King.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ruth King.txt"; sourceTree = "<group>"; };
+		8342483D271DF2D600608543 /* Sally Clough.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Sally Clough.txt"; sourceTree = "<group>"; };
+		8342483F271DF2E000608543 /* Sandra Sanabria.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Sandra Sanabria.txt"; sourceTree = "<group>"; };
+		83424841271DF2EE00608543 /* Santikaro.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Santikaro.txt; sourceTree = "<group>"; };
+		83424843271DF30500608543 /* Sayadaw U.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Sayadaw U.txt"; sourceTree = "<group>"; };
+		83424845271DF31F00608543 /* Sean Kerr.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Sean Kerr.txt"; sourceTree = "<group>"; };
+		83424847271DF32D00608543 /* Shaila Catherine.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Shaila Catherine.txt"; sourceTree = "<group>"; };
+		83424849271DF33600608543 /* Shantum Seth.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Shantum Seth.txt"; sourceTree = "<group>"; };
+		8342484B271DF33E00608543 /* Shelley Gault.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Shelley Gault.txt"; sourceTree = "<group>"; };
+		8342484D271DF34B00608543 /* Shin Kwan.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Shin Kwan.txt"; sourceTree = "<group>"; };
+		8342484F271DF35700608543 /* Shinzen Young.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Shinzen Young.txt"; sourceTree = "<group>"; };
+		83424851271DF36100608543 /* Spring Washam.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Spring Washam.txt"; sourceTree = "<group>"; };
+		83424853271DF36E00608543 /* Stephen Fulder.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Stephen Fulder.txt"; sourceTree = "<group>"; };
+		83424855271DF37A00608543 /* Steve Armstrong.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Steve Armstrong.txt"; sourceTree = "<group>"; };
+		83424857271DF38200608543 /* Steve Stucky.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Steve Stucky.txt"; sourceTree = "<group>"; };
+		83424859271DF38B00608543 /* Susan Ezequelle.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Susan Ezequelle.txt"; sourceTree = "<group>"; };
+		8342485B271DF39600608543 /* Susie Harrington.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Susie Harrington.txt"; sourceTree = "<group>"; };
+		8342485D271DF39F00608543 /* Susy Keely.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Susy Keely.txt"; sourceTree = "<group>"; };
+		8342485F271DF3A600608543 /* Tanya Wiser.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Tanya Wiser.txt"; sourceTree = "<group>"; };
+		83424861271DF3B100608543 /* Tara Mulay.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Tara Mulay.txt"; sourceTree = "<group>"; };
+		83424863271DF3B900608543 /* Teah Strozer.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Teah Strozer.txt"; sourceTree = "<group>"; };
+		83424865271DF3C100608543 /* Tempel Smith.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Tempel Smith.txt"; sourceTree = "<group>"; };
+		83424867271DF3D500608543 /* Toni Bernhard.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Toni Bernhard.txt"; sourceTree = "<group>"; };
+		83424869271DF3DF00608543 /* Tony Bernhard.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Tony Bernhard.txt"; sourceTree = "<group>"; };
+		8342486B271DF3E700608543 /* Tuere Sala.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Tuere Sala.txt"; sourceTree = "<group>"; };
+		8342486D271DF3F600608543 /* Venerable Pannavati.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Venerable Pannavati.txt"; sourceTree = "<group>"; };
+		8342486F271DF3FF00608543 /* Victor Medina.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Victor Medina.txt"; sourceTree = "<group>"; };
+		83424871271DF40C00608543 /* Vinny Ferraro.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Vinny Ferraro.txt"; sourceTree = "<group>"; };
+		83424873271DF41400608543 /* Walt Opie.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Walt Opie.txt"; sourceTree = "<group>"; };
+		83424877271DF43A00608543 /* Wes Nisker.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Wes Nisker.txt"; sourceTree = "<group>"; };
+		83424879271DF44D00608543 /* Will Kabat.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Will Kabat.txt"; sourceTree = "<group>"; };
+		8342487B271DF45F00608543 /* Ying Chen.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ying Chen.txt"; sourceTree = "<group>"; };
 		8361D60926E126500073CC83 /* ZipArchive.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ZipArchive.framework; path = Carthage/Build/iOS/ZipArchive.framework; sourceTree = "<group>"; };
 		8376AB1226E3ECAE000F9848 /* StoredData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredData.swift; sourceTree = "<group>"; };
 		8376AB1626E3EE11000F9848 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -206,6 +440,123 @@
 				83922A79271DCFFC00069AD3 /* Carrie Tamburo.txt */,
 				83922A7B271DD00900069AD3 /* Cheryl Hylton.txt */,
 				83922A7D271DD01300069AD3 /* Chris Clifford.txt */,
+				8342478B271DED8800608543 /* Daigan Gaither.txt */,
+				8342478D271DEDA100608543 /* Daniel Bowling.txt */,
+				8342478F271DEDAE00608543 /* Dan Landry.txt */,
+				83424791271DEDB900608543 /* David Cohn.txt */,
+				83424793271DEDC700608543 /* David Lorey.txt */,
+				83424795271DEDD000608543 /* Dawn Neal.txt */,
+				83424797271DEDDA00608543 /* Dawn Scott.txt */,
+				83424799271DEDF000608543 /* Devin Berry.txt */,
+				8342479B271DEDFB00608543 /* Devon Hase.txt */,
+				8342479F271DEE1100608543 /* Dhammaruwan.txt */,
+				834247A1271DEE1D00608543 /* Diana Clark.txt */,
+				834247A3271DEE2700608543 /* Donald Rothberg.txt */,
+				834247A5271DEE3600608543 /* Eileen Messina.txt */,
+				834247A7271DEE4000608543 /* Eugene Cash.txt */,
+				834247A9271DEE6E00608543 /* Francisco Morillo.txt */,
+				834247AB271DEE7900608543 /* Frank Ostaseski.txt */,
+				834247AD271DEE9D00608543 /* Fu Nancy.txt */,
+				834247AF271DEEA600608543 /* Gay Watson.txt */,
+				834247B1271DEEB300608543 /* Gregory Kramer.txt */,
+				834247B3271DEECE00608543 /* Greg Scharf.txt */,
+				834247B5271DEEEB00608543 /* Gulwinder Gullu.txt */,
+				834247B7271DEF0300608543 /* Heather Martin.txt */,
+				834247BB271DEF1D00608543 /* Heather Sundberg.txt */,
+				834247BD271DEF2C00608543 /* Ines Freedman.txt */,
+				834247BF271DEF3E00608543 /* Jacques Verduin.txt */,
+				834247C1271DEF4800608543 /* Jaku Kinst.txt */,
+				834247C3271DEF5300608543 /* Jason Murphy.txt */,
+				834247C5271DEF6400608543 /* JD Doyle.txt */,
+				834247C7271DEF7100608543 /* Jeff Hardin.txt */,
+				834247C9271DEF7D00608543 /* Jennifer Block.txt */,
+				834247CB271DEF8900608543 /* Jennifer Lemas.txt */,
+				834247CD271DEF9300608543 /* Jill Hyman.txt */,
+				834247CF271DEFA300608543 /* Jill Shepherd.txt */,
+				834247D1271DEFAF00608543 /* Jim Bronson.txt */,
+				834247D3271DEFBB00608543 /* Jim Podolske.txt */,
+				834247D5271DEFC800608543 /* JoAnna Hardy.txt */,
+				834247D7271DEFD100608543 /* John Martin.txt */,
+				834247D9271DEFDA00608543 /* John Peacock.txt */,
+				834247DB271DEFE400608543 /* John Travis.txt */,
+				834247DD271DF01200608543 /* Joseph Goldstein.txt */,
+				834247EB271DF09B00608543 /* Kelly McGonigal.txt */,
+				834247ED271DF0AB00608543 /* Kevin Griffin.txt */,
+				834247EF271DF0B700608543 /* Kim Allen.txt */,
+				834247F1271DF0C000608543 /* Kirsten Rudestam.txt */,
+				834247F3271DF0D800608543 /* Leigh Brasington.txt */,
+				834247F5271DF0ED00608543 /* Lori Wong.txt */,
+				834247F7271DF0FF00608543 /* Liz Powell.txt */,
+				834247F9271DF10F00608543 /* Maria Straatmann.txt */,
+				834247FB271DF11C00608543 /* Marjolein Janssen.txt */,
+				834247FD271DF12500608543 /* Mark Coleman.txt */,
+				834247FF271DF12E00608543 /* Martin Aylward.txt */,
+				83424801271DF13800608543 /* Martine Batchelor.txt */,
+				83424803271DF15200608543 /* Mary Grace.txt */,
+				83424805271DF15B00608543 /* Mary Mocine.txt */,
+				83424807271DF16400608543 /* Matthew Brensilver.txt */,
+				83424809271DF17300608543 /* Max Erdstein.txt */,
+				8342480B271DF17C00608543 /* Meg Gawler.txt */,
+				8342480D271DF18500608543 /* Mel Weitsman.txt */,
+				8342480F271DF18E00608543 /* Michael Newhall.txt */,
+				83424817271DF1D100608543 /* Nikki Mirghafori.txt */,
+				83424819271DF1DC00608543 /* Nolitha Tsengiwe.txt */,
+				8342481B271DF1E600608543 /* Nona Olivia.txt */,
+				8342481D271DF1F000608543 /* Norman Fischer.txt */,
+				8342481F271DF21800608543 /* Pa Auk.txt */,
+				83424821271DF22400608543 /* Pamela Weiss.txt */,
+				83424823271DF22C00608543 /* Paul Haller.txt */,
+				83424825271DF23600608543 /* Phillip Moffitt.txt */,
+				83424829271DF25500608543 /* Rebecca Dixon.txt */,
+				8342482B271DF25F00608543 /* Rebekkah LaDyne.txt */,
+				8342482D271DF27800608543 /* Richard Shankman.txt */,
+				8342482F271DF28200608543 /* Richard Sievers.txt */,
+				83424831271DF28D00608543 /* Rick Maddock.txt */,
+				83424833271DF29600608543 /* Rita Gross.txt */,
+				83424835271DF29F00608543 /* Robert Cusick.txt */,
+				83424837271DF2AA00608543 /* Ronna Kabatznick.txt */,
+				83424839271DF2BE00608543 /* Rose Taylor.txt */,
+				8342483B271DF2C800608543 /* Ruth King.txt */,
+				8342483D271DF2D600608543 /* Sally Clough.txt */,
+				8342483F271DF2E000608543 /* Sandra Sanabria.txt */,
+				83424841271DF2EE00608543 /* Santikaro.txt */,
+				83424843271DF30500608543 /* Sayadaw U.txt */,
+				83424845271DF31F00608543 /* Sean Kerr.txt */,
+				83424847271DF32D00608543 /* Shaila Catherine.txt */,
+				83424849271DF33600608543 /* Shantum Seth.txt */,
+				8342484B271DF33E00608543 /* Shelley Gault.txt */,
+				8342484D271DF34B00608543 /* Shin Kwan.txt */,
+				8342484F271DF35700608543 /* Shinzen Young.txt */,
+				83424851271DF36100608543 /* Spring Washam.txt */,
+				83424853271DF36E00608543 /* Stephen Fulder.txt */,
+				83424855271DF37A00608543 /* Steve Armstrong.txt */,
+				83424857271DF38200608543 /* Steve Stucky.txt */,
+				83424859271DF38B00608543 /* Susan Ezequelle.txt */,
+				8342485B271DF39600608543 /* Susie Harrington.txt */,
+				8342485D271DF39F00608543 /* Susy Keely.txt */,
+				8342485F271DF3A600608543 /* Tanya Wiser.txt */,
+				83424861271DF3B100608543 /* Tara Mulay.txt */,
+				83424863271DF3B900608543 /* Teah Strozer.txt */,
+				83424865271DF3C100608543 /* Tempel Smith.txt */,
+				83424867271DF3D500608543 /* Toni Bernhard.txt */,
+				83424869271DF3DF00608543 /* Tony Bernhard.txt */,
+				8342486B271DF3E700608543 /* Tuere Sala.txt */,
+				8342486D271DF3F600608543 /* Venerable Pannavati.txt */,
+				8342486F271DF3FF00608543 /* Victor Medina.txt */,
+				83424871271DF40C00608543 /* Vinny Ferraro.txt */,
+				83424873271DF41400608543 /* Walt Opie.txt */,
+				83424877271DF43A00608543 /* Wes Nisker.txt */,
+				83424879271DF44D00608543 /* Will Kabat.txt */,
+				8342487B271DF45F00608543 /* Ying Chen.txt */,
+				83424811271DF19900608543 /* Mirka Knaster.txt */,
+				83424813271DF1A200608543 /* Misha Merrill.txt */,
+				83424815271DF1BD00608543 /* Mushim Patricia.txt */,
+				834247DF271DF02B00608543 /* Jozen Tamori.txt */,
+				834247E1271DF03F00608543 /* Judy Cannon.txt */,
+				834247E3271DF04B00608543 /* Judy Long.txt */,
+				834247E5271DF05D00608543 /* Kamala Masters.txt */,
+				834247E7271DF06D00608543 /* Kate Munding.txt */,
+				834247E9271DF07C00608543 /* Kathy Cheney.txt */,
 			);
 			path = Biographies;
 			sourceTree = "<group>";
@@ -330,50 +681,167 @@
 			buildActionMask = 2147483647;
 			files = (
 				83922A56271DC8F700069AD3 /* Ayya Dhammadipa.txt in Resources */,
+				834247B2271DEEB300608543 /* Gregory Kramer.txt in Resources */,
+				834247F4271DF0D800608543 /* Leigh Brasington.txt in Resources */,
 				83922A50271DC8CF00069AD3 /* Ari Crellin.txt in Resources */,
+				83424826271DF23600608543 /* Phillip Moffitt.txt in Resources */,
+				834247CE271DEF9300608543 /* Jill Hyman.txt in Resources */,
+				83424796271DEDD000608543 /* Dawn Neal.txt in Resources */,
 				83922A60271DCF3900069AD3 /* Bhante Buddharakkhita.txt in Resources */,
+				83424824271DF22C00608543 /* Paul Haller.txt in Resources */,
+				83424804271DF15200608543 /* Mary Grace.txt in Resources */,
 				83922A6E271DCFA200069AD3 /* Blanche Hartman.txt in Resources */,
+				834247CA271DEF7D00608543 /* Jennifer Block.txt in Resources */,
+				834247C4271DEF5300608543 /* Jason Murphy.txt in Resources */,
+				834247AA271DEE6E00608543 /* Francisco Morillo.txt in Resources */,
+				834247A4271DEE2700608543 /* Donald Rothberg.txt in Resources */,
+				83424836271DF29F00608543 /* Robert Cusick.txt in Resources */,
+				8342478E271DEDA100608543 /* Daniel Bowling.txt in Resources */,
+				834247F6271DF0ED00608543 /* Lori Wong.txt in Resources */,
+				834247B4271DEECF00608543 /* Greg Scharf.txt in Resources */,
+				8342478C271DED8800608543 /* Daigan Gaither.txt in Resources */,
+				8342479C271DEDFB00608543 /* Devon Hase.txt in Resources */,
+				83424856271DF37A00608543 /* Steve Armstrong.txt in Resources */,
+				834247D4271DEFBB00608543 /* Jim Podolske.txt in Resources */,
+				83424848271DF32D00608543 /* Shaila Catherine.txt in Resources */,
+				834247E6271DF05D00608543 /* Kamala Masters.txt in Resources */,
 				83922A34271DC7A100069AD3 /* Adrianne Ross.txt in Resources */,
+				834247E0271DF02B00608543 /* Jozen Tamori.txt in Resources */,
 				83922A3A271DC7EF00069AD3 /* Ajahn Chandako.txt in Resources */,
+				83424816271DF1BD00608543 /* Mushim Patricia.txt in Resources */,
+				83424822271DF22400608543 /* Pamela Weiss.txt in Resources */,
+				83424818271DF1D100608543 /* Nikki Mirghafori.txt in Resources */,
+				834247EA271DF07C00608543 /* Kathy Cheney.txt in Resources */,
+				83424794271DEDC700608543 /* David Lorey.txt in Resources */,
+				83424832271DF28D00608543 /* Rick Maddock.txt in Resources */,
+				834247D8271DEFD100608543 /* John Martin.txt in Resources */,
+				834247B0271DEEA600608543 /* Gay Watson.txt in Resources */,
+				83424812271DF19900608543 /* Mirka Knaster.txt in Resources */,
 				83922A2E271DBF7E00069AD3 /* Template.txt in Resources */,
 				83922A4A271DC89100069AD3 /* Angie Boissevain.txt in Resources */,
+				834247FA271DF10F00608543 /* Maria Straatmann.txt in Resources */,
+				83424850271DF35700608543 /* Shinzen Young.txt in Resources */,
+				834247DA271DEFDA00608543 /* John Peacock.txt in Resources */,
+				83424852271DF36100608543 /* Spring Washam.txt in Resources */,
+				83424874271DF41400608543 /* Walt Opie.txt in Resources */,
+				83424810271DF18E00608543 /* Michael Newhall.txt in Resources */,
+				8342480A271DF17300608543 /* Max Erdstein.txt in Resources */,
+				83424854271DF36E00608543 /* Stephen Fulder.txt in Resources */,
+				8342483A271DF2BE00608543 /* Rose Taylor.txt in Resources */,
+				8342486A271DF3DF00608543 /* Tony Bernhard.txt in Resources */,
+				834247EE271DF0AB00608543 /* Kevin Griffin.txt in Resources */,
 				83922A64271DCF5100069AD3 /* Bhante Sujato.txt in Resources */,
+				83424868271DF3D500608543 /* Toni Bernhard.txt in Resources */,
+				8342487A271DF44D00608543 /* Will Kabat.txt in Resources */,
 				83922A3C271DC80100069AD3 /* Ajahn Pasanno.txt in Resources */,
+				83424834271DF29600608543 /* Rita Gross.txt in Resources */,
+				83424830271DF28200608543 /* Richard Sievers.txt in Resources */,
+				8342480C271DF17C00608543 /* Meg Gawler.txt in Resources */,
+				834247D6271DEFC800608543 /* JoAnna Hardy.txt in Resources */,
 				83922A4E271DC8AA00069AD3 /* Anushka Fernandopulle.txt in Resources */,
+				834247A8271DEE4000608543 /* Eugene Cash.txt in Resources */,
+				834247DC271DEFE400608543 /* John Travis.txt in Resources */,
 				83922A54271DC8EC00069AD3 /* Ayya Anandabodhi.txt in Resources */,
+				834247B6271DEEEB00608543 /* Gulwinder Gullu.txt in Resources */,
+				834247BE271DEF2C00608543 /* Ines Freedman.txt in Resources */,
+				83424862271DF3B100608543 /* Tara Mulay.txt in Resources */,
+				834247C6271DEF6400608543 /* JD Doyle.txt in Resources */,
+				8342487C271DF45F00608543 /* Ying Chen.txt in Resources */,
 				83922A40271DC82600069AD3 /* Alan Senauke.txt in Resources */,
+				8342481C271DF1E600608543 /* Nona Olivia.txt in Resources */,
+				83424792271DEDB900608543 /* David Cohn.txt in Resources */,
+				834247AE271DEE9D00608543 /* Fu Nancy.txt in Resources */,
+				83424866271DF3C100608543 /* Tempel Smith.txt in Resources */,
 				83922A62271DCF4300069AD3 /* Bhante Piyananda.txt in Resources */,
+				83424798271DEDDA00608543 /* Dawn Scott.txt in Resources */,
 				83922A70271DCFAD00069AD3 /* Bob Stahl.txt in Resources */,
 				83922A7E271DD01300069AD3 /* Chris Clifford.txt in Resources */,
+				834247CC271DEF8900608543 /* Jennifer Lemas.txt in Resources */,
+				83424800271DF12E00608543 /* Martin Aylward.txt in Resources */,
+				8342482E271DF27800608543 /* Richard Shankman.txt in Resources */,
+				834247F0271DF0B700608543 /* Kim Allen.txt in Resources */,
 				83922A42271DC83200069AD3 /* Alex Haley.txt in Resources */,
+				83424864271DF3B900608543 /* Teah Strozer.txt in Resources */,
+				8342484E271DF34B00608543 /* Shin Kwan.txt in Resources */,
+				8342483E271DF2D600608543 /* Sally Clough.txt in Resources */,
+				834247AC271DEE7900608543 /* Frank Ostaseski.txt in Resources */,
+				8342482A271DF25500608543 /* Rebecca Dixon.txt in Resources */,
+				8342482C271DF25F00608543 /* Rebekkah LaDyne.txt in Resources */,
 				83922A5E271DCF2A00069AD3 /* Beth Goldring.txt in Resources */,
 				83922A46271DC86600069AD3 /* Amana Brembry.txt in Resources */,
+				83424844271DF30500608543 /* Sayadaw U.txt in Resources */,
+				834247E4271DF04B00608543 /* Judy Long.txt in Resources */,
+				834247FE271DF12500608543 /* Mark Coleman.txt in Resources */,
 				83922A76271DCFCF00069AD3 /* Carla Brennan.txt in Resources */,
+				834247A6271DEE3600608543 /* Eileen Messina.txt in Resources */,
+				834247F8271DF0FF00608543 /* Liz Powell.txt in Resources */,
 				83922A3E271DC80D00069AD3 /* Ajahn Sucitto.txt in Resources */,
+				834247DE271DF01200608543 /* Joseph Goldstein.txt in Resources */,
 				83922A74271DCFC300069AD3 /* Bruce Hyman.txt in Resources */,
+				8342485E271DF39F00608543 /* Susy Keely.txt in Resources */,
+				834247C0271DEF3E00608543 /* Jacques Verduin.txt in Resources */,
+				834247C2271DEF4800608543 /* Jaku Kinst.txt in Resources */,
+				83424846271DF31F00608543 /* Sean Kerr.txt in Resources */,
 				83922A5A271DC91200069AD3 /* Ayya Santussika.txt in Resources */,
+				83424790271DEDAE00608543 /* Dan Landry.txt in Resources */,
+				834247F2271DF0C000608543 /* Kirsten Rudestam.txt in Resources */,
+				8342485A271DF38B00608543 /* Susan Ezequelle.txt in Resources */,
 				83922A6A271DCF7100069AD3 /* Bill Hart.txt in Resources */,
 				83922A58271DC90900069AD3 /* Ayya Santacitta.txt in Resources */,
+				83424838271DF2AA00608543 /* Ronna Kabatznick.txt in Resources */,
+				8342484A271DF33600608543 /* Shantum Seth.txt in Resources */,
+				83424840271DF2E000608543 /* Sandra Sanabria.txt in Resources */,
 				83A2E4C626E0415900F8B531 /* Preview Assets.xcassets in Resources */,
 				83922A4C271DC89E00069AD3 /* Annie Nugent.txt in Resources */,
 				83922A36271DC7D000069AD3 /* Ajaan Thanissaro.txt in Resources */,
+				83424860271DF3A600608543 /* Tanya Wiser.txt in Resources */,
 				832031CE270E48010042CF47 /* help.txt in Resources */,
+				834247C8271DEF7100608543 /* Jeff Hardin.txt in Resources */,
 				83922A66271DCF5A00069AD3 /* Bhikkhu Analayo.txt in Resources */,
+				834247FC271DF11C00608543 /* Marjolein Janssen.txt in Resources */,
 				83922A68271DCF6600069AD3 /* Bhikkhu Bodhi.txt in Resources */,
 				8302EC2D270F384B00F67EAD /* Gil Fronsdal.txt in Resources */,
+				83424878271DF43A00608543 /* Wes Nisker.txt in Resources */,
+				83424842271DF2EE00608543 /* Santikaro.txt in Resources */,
+				834247B8271DEF0300608543 /* Heather Martin.txt in Resources */,
 				83922A78271DCFF100069AD3 /* Carolyn Dille.txt in Resources */,
+				83424806271DF15B00608543 /* Mary Mocine.txt in Resources */,
+				8342481A271DF1DC00608543 /* Nolitha Tsengiwe.txt in Resources */,
 				83922A44271DC83B00069AD3 /* Alexis Santos.txt in Resources */,
+				8342479A271DEDF000608543 /* Devin Berry.txt in Resources */,
 				83922A32271DC6D300069AD3 /* Andrea Fella.txt in Resources */,
+				8342483C271DF2C800608543 /* Ruth King.txt in Resources */,
+				8342481E271DF1F000608543 /* Norman Fischer.txt in Resources */,
+				83424808271DF16400608543 /* Matthew Brensilver.txt in Resources */,
 				83922A38271DC7DD00069AD3 /* Ajahn Amaro.txt in Resources */,
 				83922A5C271DCF1500069AD3 /* Berget Jelane.txt in Resources */,
+				834247BC271DEF1D00608543 /* Heather Sundberg.txt in Resources */,
+				8342484C271DF33E00608543 /* Shelley Gault.txt in Resources */,
 				83922A7C271DD00900069AD3 /* Cheryl Hylton.txt in Resources */,
+				834247A2271DEE1D00608543 /* Diana Clark.txt in Resources */,
+				8342486E271DF3F600608543 /* Venerable Pannavati.txt in Resources */,
+				83424872271DF40C00608543 /* Vinny Ferraro.txt in Resources */,
 				83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */,
 				8322D746270E872400C10ED3 /* donate.txt in Resources */,
 				83922A52271DC8DA00069AD3 /* Ari Goldfield.txt in Resources */,
+				8342486C271DF3E700608543 /* Tuere Sala.txt in Resources */,
+				834247E8271DF06D00608543 /* Kate Munding.txt in Resources */,
+				834247A0271DEE1100608543 /* Dhammaruwan.txt in Resources */,
+				834247E2271DF03F00608543 /* Judy Cannon.txt in Resources */,
+				83424870271DF3FF00608543 /* Victor Medina.txt in Resources */,
 				83922A6C271DCF7C00069AD3 /* Bill Kostura.txt in Resources */,
 				83922A48271DC87400069AD3 /* Andrea Castillo.txt in Resources */,
+				83424814271DF1A200608543 /* Misha Merrill.txt in Resources */,
+				834247D0271DEFA300608543 /* Jill Shepherd.txt in Resources */,
 				83922A7A271DCFFC00069AD3 /* Carrie Tamburo.txt in Resources */,
+				83424820271DF21800608543 /* Pa Auk.txt in Resources */,
+				834247D2271DEFAF00608543 /* Jim Bronson.txt in Resources */,
+				83424802271DF13800608543 /* Martine Batchelor.txt in Resources */,
+				83424858271DF38200608543 /* Steve Stucky.txt in Resources */,
+				8342485C271DF39600608543 /* Susie Harrington.txt in Resources */,
 				83922A72271DCFB800069AD3 /* Brian Lesage.txt in Resources */,
+				8342480E271DF18500608543 /* Mel Weitsman.txt in Resources */,
+				834247EC271DF09B00608543 /* Kelly McGonigal.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
