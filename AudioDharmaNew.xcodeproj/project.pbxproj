@@ -18,6 +18,46 @@
 		8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1226E3ECAE000F9848 /* StoredData.swift */; };
 		8376AB1726E3EE11000F9848 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8376AB1626E3EE11000F9848 /* AVFoundation.framework */; };
 		8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */; };
+		83922A2E271DBF7E00069AD3 /* Template.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A2D271DBF7E00069AD3 /* Template.txt */; };
+		83922A32271DC6D300069AD3 /* Andrea Fella.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A31271DC6D300069AD3 /* Andrea Fella.txt */; };
+		83922A34271DC7A100069AD3 /* Adrianne Ross.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A33271DC7A100069AD3 /* Adrianne Ross.txt */; };
+		83922A36271DC7D000069AD3 /* Ajaan Thanissaro.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A35271DC7D000069AD3 /* Ajaan Thanissaro.txt */; };
+		83922A38271DC7DD00069AD3 /* Ajahn Amaro.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A37271DC7DD00069AD3 /* Ajahn Amaro.txt */; };
+		83922A3A271DC7EF00069AD3 /* Ajahn Chandako.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A39271DC7EF00069AD3 /* Ajahn Chandako.txt */; };
+		83922A3C271DC80100069AD3 /* Ajahn Pasanno.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A3B271DC80100069AD3 /* Ajahn Pasanno.txt */; };
+		83922A3E271DC80D00069AD3 /* Ajahn Sucitto.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A3D271DC80D00069AD3 /* Ajahn Sucitto.txt */; };
+		83922A40271DC82600069AD3 /* Alan Senauke.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A3F271DC82600069AD3 /* Alan Senauke.txt */; };
+		83922A42271DC83200069AD3 /* Alex Haley.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A41271DC83200069AD3 /* Alex Haley.txt */; };
+		83922A44271DC83B00069AD3 /* Alexis Santos.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A43271DC83B00069AD3 /* Alexis Santos.txt */; };
+		83922A46271DC86600069AD3 /* Amana Brembry.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A45271DC86600069AD3 /* Amana Brembry.txt */; };
+		83922A48271DC87400069AD3 /* Andrea Castillo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A47271DC87400069AD3 /* Andrea Castillo.txt */; };
+		83922A4A271DC89100069AD3 /* Angie Boissevain.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A49271DC89100069AD3 /* Angie Boissevain.txt */; };
+		83922A4C271DC89E00069AD3 /* Annie Nugent.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A4B271DC89E00069AD3 /* Annie Nugent.txt */; };
+		83922A4E271DC8AA00069AD3 /* Anushka Fernandopulle.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A4D271DC8AA00069AD3 /* Anushka Fernandopulle.txt */; };
+		83922A50271DC8CF00069AD3 /* Ari Crellin.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A4F271DC8CF00069AD3 /* Ari Crellin.txt */; };
+		83922A52271DC8DA00069AD3 /* Ari Goldfield.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A51271DC8DA00069AD3 /* Ari Goldfield.txt */; };
+		83922A54271DC8EC00069AD3 /* Ayya Anandabodhi.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A53271DC8EC00069AD3 /* Ayya Anandabodhi.txt */; };
+		83922A56271DC8F700069AD3 /* Ayya Dhammadipa.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A55271DC8F700069AD3 /* Ayya Dhammadipa.txt */; };
+		83922A58271DC90900069AD3 /* Ayya Santacitta.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A57271DC90900069AD3 /* Ayya Santacitta.txt */; };
+		83922A5A271DC91200069AD3 /* Ayya Santussika.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A59271DC91200069AD3 /* Ayya Santussika.txt */; };
+		83922A5C271DCF1500069AD3 /* Berget Jelane.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A5B271DCF1500069AD3 /* Berget Jelane.txt */; };
+		83922A5E271DCF2A00069AD3 /* Beth Goldring.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A5D271DCF2A00069AD3 /* Beth Goldring.txt */; };
+		83922A60271DCF3900069AD3 /* Bhante Buddharakkhita.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A5F271DCF3900069AD3 /* Bhante Buddharakkhita.txt */; };
+		83922A62271DCF4300069AD3 /* Bhante Piyananda.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A61271DCF4300069AD3 /* Bhante Piyananda.txt */; };
+		83922A64271DCF5100069AD3 /* Bhante Sujato.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A63271DCF5100069AD3 /* Bhante Sujato.txt */; };
+		83922A66271DCF5A00069AD3 /* Bhikkhu Analayo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A65271DCF5A00069AD3 /* Bhikkhu Analayo.txt */; };
+		83922A68271DCF6600069AD3 /* Bhikkhu Bodhi.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A67271DCF6600069AD3 /* Bhikkhu Bodhi.txt */; };
+		83922A6A271DCF7100069AD3 /* Bill Hart.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A69271DCF7100069AD3 /* Bill Hart.txt */; };
+		83922A6C271DCF7C00069AD3 /* Bill Kostura.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A6B271DCF7C00069AD3 /* Bill Kostura.txt */; };
+		83922A6E271DCFA200069AD3 /* Blanche Hartman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A6D271DCFA200069AD3 /* Blanche Hartman.txt */; };
+		83922A70271DCFAD00069AD3 /* Bob Stahl.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A6F271DCFAD00069AD3 /* Bob Stahl.txt */; };
+		83922A72271DCFB800069AD3 /* Brian Lesage.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A71271DCFB800069AD3 /* Brian Lesage.txt */; };
+		83922A74271DCFC300069AD3 /* Bruce Hyman.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A73271DCFC300069AD3 /* Bruce Hyman.txt */; };
+		83922A76271DCFCF00069AD3 /* Carla Brennan.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A75271DCFCF00069AD3 /* Carla Brennan.txt */; };
+		83922A78271DCFF100069AD3 /* Carolyn Dille.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A77271DCFF100069AD3 /* Carolyn Dille.txt */; };
+		83922A7A271DCFFC00069AD3 /* Carrie Tamburo.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A79271DCFFC00069AD3 /* Carrie Tamburo.txt */; };
+		83922A7C271DD00900069AD3 /* Cheryl Hylton.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A7B271DD00900069AD3 /* Cheryl Hylton.txt */; };
+		83922A7E271DD01300069AD3 /* Chris Clifford.txt in Resources */ = {isa = PBXBuildFile; fileRef = 83922A7D271DD01300069AD3 /* Chris Clifford.txt */; };
 		83974BC82718934A0013FF87 /* UserAlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83974BC72718934A0013FF87 /* UserAlbumListView.swift */; };
 		83974BCA2718935D0013FF87 /* UserEditTalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83974BC92718935D0013FF87 /* UserEditTalkListView.swift */; };
 		83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */; };
@@ -55,6 +95,46 @@
 		8376AB1226E3ECAE000F9848 /* StoredData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredData.swift; sourceTree = "<group>"; };
 		8376AB1626E3EE11000F9848 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayer.swift; sourceTree = "<group>"; };
+		83922A2D271DBF7E00069AD3 /* Template.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Template.txt; sourceTree = "<group>"; };
+		83922A31271DC6D300069AD3 /* Andrea Fella.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Andrea Fella.txt"; sourceTree = "<group>"; };
+		83922A33271DC7A100069AD3 /* Adrianne Ross.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Adrianne Ross.txt"; sourceTree = "<group>"; };
+		83922A35271DC7D000069AD3 /* Ajaan Thanissaro.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ajaan Thanissaro.txt"; sourceTree = "<group>"; };
+		83922A37271DC7DD00069AD3 /* Ajahn Amaro.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ajahn Amaro.txt"; sourceTree = "<group>"; };
+		83922A39271DC7EF00069AD3 /* Ajahn Chandako.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ajahn Chandako.txt"; sourceTree = "<group>"; };
+		83922A3B271DC80100069AD3 /* Ajahn Pasanno.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ajahn Pasanno.txt"; sourceTree = "<group>"; };
+		83922A3D271DC80D00069AD3 /* Ajahn Sucitto.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ajahn Sucitto.txt"; sourceTree = "<group>"; };
+		83922A3F271DC82600069AD3 /* Alan Senauke.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Alan Senauke.txt"; sourceTree = "<group>"; };
+		83922A41271DC83200069AD3 /* Alex Haley.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Alex Haley.txt"; sourceTree = "<group>"; };
+		83922A43271DC83B00069AD3 /* Alexis Santos.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Alexis Santos.txt"; sourceTree = "<group>"; };
+		83922A45271DC86600069AD3 /* Amana Brembry.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Amana Brembry.txt"; sourceTree = "<group>"; };
+		83922A47271DC87400069AD3 /* Andrea Castillo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Andrea Castillo.txt"; sourceTree = "<group>"; };
+		83922A49271DC89100069AD3 /* Angie Boissevain.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Angie Boissevain.txt"; sourceTree = "<group>"; };
+		83922A4B271DC89E00069AD3 /* Annie Nugent.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Annie Nugent.txt"; sourceTree = "<group>"; };
+		83922A4D271DC8AA00069AD3 /* Anushka Fernandopulle.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Anushka Fernandopulle.txt"; sourceTree = "<group>"; };
+		83922A4F271DC8CF00069AD3 /* Ari Crellin.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ari Crellin.txt"; sourceTree = "<group>"; };
+		83922A51271DC8DA00069AD3 /* Ari Goldfield.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ari Goldfield.txt"; sourceTree = "<group>"; };
+		83922A53271DC8EC00069AD3 /* Ayya Anandabodhi.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ayya Anandabodhi.txt"; sourceTree = "<group>"; };
+		83922A55271DC8F700069AD3 /* Ayya Dhammadipa.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ayya Dhammadipa.txt"; sourceTree = "<group>"; };
+		83922A57271DC90900069AD3 /* Ayya Santacitta.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ayya Santacitta.txt"; sourceTree = "<group>"; };
+		83922A59271DC91200069AD3 /* Ayya Santussika.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Ayya Santussika.txt"; sourceTree = "<group>"; };
+		83922A5B271DCF1500069AD3 /* Berget Jelane.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Berget Jelane.txt"; sourceTree = "<group>"; };
+		83922A5D271DCF2A00069AD3 /* Beth Goldring.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Beth Goldring.txt"; sourceTree = "<group>"; };
+		83922A5F271DCF3900069AD3 /* Bhante Buddharakkhita.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bhante Buddharakkhita.txt"; sourceTree = "<group>"; };
+		83922A61271DCF4300069AD3 /* Bhante Piyananda.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bhante Piyananda.txt"; sourceTree = "<group>"; };
+		83922A63271DCF5100069AD3 /* Bhante Sujato.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bhante Sujato.txt"; sourceTree = "<group>"; };
+		83922A65271DCF5A00069AD3 /* Bhikkhu Analayo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bhikkhu Analayo.txt"; sourceTree = "<group>"; };
+		83922A67271DCF6600069AD3 /* Bhikkhu Bodhi.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bhikkhu Bodhi.txt"; sourceTree = "<group>"; };
+		83922A69271DCF7100069AD3 /* Bill Hart.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bill Hart.txt"; sourceTree = "<group>"; };
+		83922A6B271DCF7C00069AD3 /* Bill Kostura.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bill Kostura.txt"; sourceTree = "<group>"; };
+		83922A6D271DCFA200069AD3 /* Blanche Hartman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Blanche Hartman.txt"; sourceTree = "<group>"; };
+		83922A6F271DCFAD00069AD3 /* Bob Stahl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bob Stahl.txt"; sourceTree = "<group>"; };
+		83922A71271DCFB800069AD3 /* Brian Lesage.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Brian Lesage.txt"; sourceTree = "<group>"; };
+		83922A73271DCFC300069AD3 /* Bruce Hyman.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Bruce Hyman.txt"; sourceTree = "<group>"; };
+		83922A75271DCFCF00069AD3 /* Carla Brennan.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Carla Brennan.txt"; sourceTree = "<group>"; };
+		83922A77271DCFF100069AD3 /* Carolyn Dille.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Carolyn Dille.txt"; sourceTree = "<group>"; };
+		83922A79271DCFFC00069AD3 /* Carrie Tamburo.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Carrie Tamburo.txt"; sourceTree = "<group>"; };
+		83922A7B271DD00900069AD3 /* Cheryl Hylton.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Cheryl Hylton.txt"; sourceTree = "<group>"; };
+		83922A7D271DD01300069AD3 /* Chris Clifford.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Chris Clifford.txt"; sourceTree = "<group>"; };
 		83974BC72718934A0013FF87 /* UserAlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserAlbumListView.swift; sourceTree = "<group>"; };
 		83974BC92718935D0013FF87 /* UserEditTalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserEditTalkListView.swift; sourceTree = "<group>"; };
 		83A2E4BB26E0415700F8B531 /* AudioDharmaNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioDharmaNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,6 +166,46 @@
 			isa = PBXGroup;
 			children = (
 				8302EC2C270F384B00F67EAD /* Gil Fronsdal.txt */,
+				83922A2D271DBF7E00069AD3 /* Template.txt */,
+				83922A31271DC6D300069AD3 /* Andrea Fella.txt */,
+				83922A33271DC7A100069AD3 /* Adrianne Ross.txt */,
+				83922A35271DC7D000069AD3 /* Ajaan Thanissaro.txt */,
+				83922A37271DC7DD00069AD3 /* Ajahn Amaro.txt */,
+				83922A39271DC7EF00069AD3 /* Ajahn Chandako.txt */,
+				83922A3B271DC80100069AD3 /* Ajahn Pasanno.txt */,
+				83922A3D271DC80D00069AD3 /* Ajahn Sucitto.txt */,
+				83922A3F271DC82600069AD3 /* Alan Senauke.txt */,
+				83922A41271DC83200069AD3 /* Alex Haley.txt */,
+				83922A43271DC83B00069AD3 /* Alexis Santos.txt */,
+				83922A45271DC86600069AD3 /* Amana Brembry.txt */,
+				83922A47271DC87400069AD3 /* Andrea Castillo.txt */,
+				83922A49271DC89100069AD3 /* Angie Boissevain.txt */,
+				83922A4B271DC89E00069AD3 /* Annie Nugent.txt */,
+				83922A4D271DC8AA00069AD3 /* Anushka Fernandopulle.txt */,
+				83922A4F271DC8CF00069AD3 /* Ari Crellin.txt */,
+				83922A51271DC8DA00069AD3 /* Ari Goldfield.txt */,
+				83922A53271DC8EC00069AD3 /* Ayya Anandabodhi.txt */,
+				83922A55271DC8F700069AD3 /* Ayya Dhammadipa.txt */,
+				83922A57271DC90900069AD3 /* Ayya Santacitta.txt */,
+				83922A59271DC91200069AD3 /* Ayya Santussika.txt */,
+				83922A5B271DCF1500069AD3 /* Berget Jelane.txt */,
+				83922A5D271DCF2A00069AD3 /* Beth Goldring.txt */,
+				83922A5F271DCF3900069AD3 /* Bhante Buddharakkhita.txt */,
+				83922A61271DCF4300069AD3 /* Bhante Piyananda.txt */,
+				83922A63271DCF5100069AD3 /* Bhante Sujato.txt */,
+				83922A65271DCF5A00069AD3 /* Bhikkhu Analayo.txt */,
+				83922A67271DCF6600069AD3 /* Bhikkhu Bodhi.txt */,
+				83922A69271DCF7100069AD3 /* Bill Hart.txt */,
+				83922A6B271DCF7C00069AD3 /* Bill Kostura.txt */,
+				83922A6D271DCFA200069AD3 /* Blanche Hartman.txt */,
+				83922A6F271DCFAD00069AD3 /* Bob Stahl.txt */,
+				83922A71271DCFB800069AD3 /* Brian Lesage.txt */,
+				83922A73271DCFC300069AD3 /* Bruce Hyman.txt */,
+				83922A75271DCFCF00069AD3 /* Carla Brennan.txt */,
+				83922A77271DCFF100069AD3 /* Carolyn Dille.txt */,
+				83922A79271DCFFC00069AD3 /* Carrie Tamburo.txt */,
+				83922A7B271DD00900069AD3 /* Cheryl Hylton.txt */,
+				83922A7D271DD01300069AD3 /* Chris Clifford.txt */,
 			);
 			path = Biographies;
 			sourceTree = "<group>";
@@ -209,11 +329,51 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83922A56271DC8F700069AD3 /* Ayya Dhammadipa.txt in Resources */,
+				83922A50271DC8CF00069AD3 /* Ari Crellin.txt in Resources */,
+				83922A60271DCF3900069AD3 /* Bhante Buddharakkhita.txt in Resources */,
+				83922A6E271DCFA200069AD3 /* Blanche Hartman.txt in Resources */,
+				83922A34271DC7A100069AD3 /* Adrianne Ross.txt in Resources */,
+				83922A3A271DC7EF00069AD3 /* Ajahn Chandako.txt in Resources */,
+				83922A2E271DBF7E00069AD3 /* Template.txt in Resources */,
+				83922A4A271DC89100069AD3 /* Angie Boissevain.txt in Resources */,
+				83922A64271DCF5100069AD3 /* Bhante Sujato.txt in Resources */,
+				83922A3C271DC80100069AD3 /* Ajahn Pasanno.txt in Resources */,
+				83922A4E271DC8AA00069AD3 /* Anushka Fernandopulle.txt in Resources */,
+				83922A54271DC8EC00069AD3 /* Ayya Anandabodhi.txt in Resources */,
+				83922A40271DC82600069AD3 /* Alan Senauke.txt in Resources */,
+				83922A62271DCF4300069AD3 /* Bhante Piyananda.txt in Resources */,
+				83922A70271DCFAD00069AD3 /* Bob Stahl.txt in Resources */,
+				83922A7E271DD01300069AD3 /* Chris Clifford.txt in Resources */,
+				83922A42271DC83200069AD3 /* Alex Haley.txt in Resources */,
+				83922A5E271DCF2A00069AD3 /* Beth Goldring.txt in Resources */,
+				83922A46271DC86600069AD3 /* Amana Brembry.txt in Resources */,
+				83922A76271DCFCF00069AD3 /* Carla Brennan.txt in Resources */,
+				83922A3E271DC80D00069AD3 /* Ajahn Sucitto.txt in Resources */,
+				83922A74271DCFC300069AD3 /* Bruce Hyman.txt in Resources */,
+				83922A5A271DC91200069AD3 /* Ayya Santussika.txt in Resources */,
+				83922A6A271DCF7100069AD3 /* Bill Hart.txt in Resources */,
+				83922A58271DC90900069AD3 /* Ayya Santacitta.txt in Resources */,
 				83A2E4C626E0415900F8B531 /* Preview Assets.xcassets in Resources */,
+				83922A4C271DC89E00069AD3 /* Annie Nugent.txt in Resources */,
+				83922A36271DC7D000069AD3 /* Ajaan Thanissaro.txt in Resources */,
 				832031CE270E48010042CF47 /* help.txt in Resources */,
+				83922A66271DCF5A00069AD3 /* Bhikkhu Analayo.txt in Resources */,
+				83922A68271DCF6600069AD3 /* Bhikkhu Bodhi.txt in Resources */,
 				8302EC2D270F384B00F67EAD /* Gil Fronsdal.txt in Resources */,
+				83922A78271DCFF100069AD3 /* Carolyn Dille.txt in Resources */,
+				83922A44271DC83B00069AD3 /* Alexis Santos.txt in Resources */,
+				83922A32271DC6D300069AD3 /* Andrea Fella.txt in Resources */,
+				83922A38271DC7DD00069AD3 /* Ajahn Amaro.txt in Resources */,
+				83922A5C271DCF1500069AD3 /* Berget Jelane.txt in Resources */,
+				83922A7C271DD00900069AD3 /* Cheryl Hylton.txt in Resources */,
 				83A2E4C326E0415900F8B531 /* Assets.xcassets in Resources */,
 				8322D746270E872400C10ED3 /* donate.txt in Resources */,
+				83922A52271DC8DA00069AD3 /* Ari Goldfield.txt in Resources */,
+				83922A6C271DCF7C00069AD3 /* Bill Kostura.txt in Resources */,
+				83922A48271DC87400069AD3 /* Andrea Castillo.txt in Resources */,
+				83922A7A271DCFFC00069AD3 /* Carrie Tamburo.txt in Resources */,
+				83922A72271DCFB800069AD3 /* Brian Lesage.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -327,7 +327,7 @@ struct TalkPlayerView: View {
             Spacer()
                 .frame(height: 20)
             HStack() {
-                 Button("biography") {
+                 Button("About This Speaker") {
                      DisplayingBiographyOrTranscript = true
                      selection = "BIOGRAPHY"
                 }

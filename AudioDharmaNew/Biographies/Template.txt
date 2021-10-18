@@ -1,0 +1,30 @@
+<html>
+
+<style>
+
+body {
+    background-color: white;
+    font-family: "Helvetica";
+    font-size: 45;
+    margin: auto;
+}
+
+h1 {
+    color: black;
+    font-size: 60px;
+}
+
+</style>
+
+<body>
+<p><br>
+<center>
+    <h1>$SPEAKER</h1>
+</center>
+<p>
+
+$TEXT
+
+
+</body>
+</html>

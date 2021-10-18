@@ -149,27 +149,9 @@ class Model {
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
-
-    func resetData() {
-
-        FileNameToTalk = [String: TalkData] ()
-
-        
-        ListAllTalks = []
-        
-        DownloadInProgress = false
-        
-        UpdatedTalksJSON = [String: AnyObject] ()
-        
-        UserAlbums = []
-        UserNotes = [:]
-        UserFavorites = [:]
-        UserDownloads = [:]
-        
-       
-    }
     
     
+    // MARK:  Initialization and Configuration
     func initialize() {
         
         FileNameToTalk = [String: TalkData] ()
@@ -825,7 +807,6 @@ class Model {
     }
 
     
-    // TIMER FUNCTION
     @objc func getSanghaActivity() {
     
         if isInternetAvailable() == false {
@@ -867,31 +848,8 @@ class Model {
         
         task.resume()
     }
-
     
-    // MARK: Support Functions
-    func isInternetAvailable() -> Bool
-    {
-        var zeroAddress = sockaddr_in()
-        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
-        zeroAddress.sin_family = sa_family_t(AF_INET)
-        
-        let defaultRouteReachability = withUnsafePointer(to: &zeroAddress) {
-            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {zeroSockAddress in
-                SCNetworkReachabilityCreateWithAddress(nil, zeroSockAddress)
-            }
-        }
-        
-        var flags = SCNetworkReachabilityFlags()
-        if !SCNetworkReachabilityGetFlags(defaultRouteReachability!, &flags) {
-            return false
-        }
-        let isReachable = flags.contains(.reachable)
-        let needsConnection = flags.contains(.connectionRequired)
-        return (isReachable && !needsConnection)
-    }
     
-   
     func computeAlbumStats(album: AlbumData) {
         
         //print("computeAlbumStats: ", album.Title)
@@ -921,6 +879,32 @@ class Model {
 
     }
     
+
+    
+    // MARK: Support Functions
+    func isInternetAvailable() -> Bool
+    {
+        var zeroAddress = sockaddr_in()
+        zeroAddress.sin_len = UInt8(MemoryLayout.size(ofValue: zeroAddress))
+        zeroAddress.sin_family = sa_family_t(AF_INET)
+        
+        let defaultRouteReachability = withUnsafePointer(to: &zeroAddress) {
+            $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {zeroSockAddress in
+                SCNetworkReachabilityCreateWithAddress(nil, zeroSockAddress)
+            }
+        }
+        
+        var flags = SCNetworkReachabilityFlags()
+        if !SCNetworkReachabilityGetFlags(defaultRouteReachability!, &flags) {
+            return false
+        }
+        let isReachable = flags.contains(.reachable)
+        let needsConnection = flags.contains(.connectionRequired)
+        return (isReachable && !needsConnection)
+    }
+    
+   
+   
   
         
     // ensure that no download records get persisted that are incomplete in any way
@@ -1008,12 +992,131 @@ class Model {
             }
         }
     }
+
+    
+    func deviceRemainingFreeSpaceInBytes() -> Int64? {
+        let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last!
+        guard
+            let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: documentDirectory),
+            let freeSize = systemAttributes[.systemFreeSize] as? NSNumber
+            else {
+                // something failed
+                return nil
+        }
+        return freeSize.int64Value
+    }
+    
+   
+    
+    func isFullURL(url: String) -> Bool {
+        
+        if url.lowercased().range(of:"http:") != nil {
+            return true
+        }
+        else if url.lowercased().range(of:"https:") != nil {
+            return true
+        } else {
+            return false
+        }
+        
+    }
+    
+    func remoteTalkExists(talk: TalkData, completion:@escaping (Bool, TalkData)->()){
+        
+        var talkURL: URL    // where the MP3 lives
+        
+        if isFullURL(url: talk.URL) {
+            talkURL  = URL(string: talk.URL)!
+        }
+        else if USE_NATIVE_MP3PATHS == true {
+            talkURL  = URL(string: URL_MP3_HOST +  talk.URL)!
+            
+        } else {
+            talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
+        }
+        
+        var request: URLRequest = URLRequest(url: talkURL as URL)
+        request.httpMethod = "HEAD"
+        
+        var exists: Bool = true
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                if httpResponse.statusCode == 404 {
+                    
+                    exists =  false
+                }else{
+                    exists  = true
+                }
+                
+            }
+            
+            DispatchQueue.main.async {
+                completion(exists, talk)
+            }
+            }.resume()
+        
+    }
+
+
+    func remoteURLExists(url: URL, completion:@escaping (Bool, URL)->()){
+        
+        var request: URLRequest = URLRequest(url: url as URL)
+        request.httpMethod = "HEAD"
+        
+        var exists: Bool = true
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                
+                if httpResponse.statusCode == 404 {
+                    exists =  false
+                }else{
+                    exists  = true
+                }
+                
+            }
+            
+            DispatchQueue.main.async {
+                completion(exists, url)
+            }
+        }.resume()
+    
+    }
+    
+    
+    func sendRequest (request: URLRequest,completion:@escaping (URLResponse?)->()){
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if error != nil{
+                return completion(response)
+            }else{
+                return completion(nil)
+            }
+            }.resume()
+    }
+    
+
+    func getTalkForName(name: String) -> TalkData? {
+        
+        return FileNameToTalk[name]
+    }
+
+
+    
+    func errorLog(error: NSError) {
+        
+    }
+    
+
     
     
     //
     // MARK: talk and album functions
     //
-    
     func toggleTalkAsFavorite(talk: TalkData) -> Bool {
 
         if TheDataModel.isFavoriteTalk(talk: talk) {
@@ -1190,15 +1293,7 @@ class Model {
     }
         
     
-        
-    
-    func getTalkForName(name: String) -> TalkData? {
-        
-        return FileNameToTalk[name]
-    }
-    
-   
-    
+      
     //
     // invoked in background by TalkPlayerView
     //
@@ -1261,115 +1356,8 @@ class Model {
     }
     
     
-    func deviceRemainingFreeSpaceInBytes() -> Int64? {
-        let documentDirectory = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last!
-        guard
-            let systemAttributes = try? FileManager.default.attributesOfFileSystem(forPath: documentDirectory),
-            let freeSize = systemAttributes[.systemFreeSize] as? NSNumber
-            else {
-                // something failed
-                return nil
-        }
-        return freeSize.int64Value
-    }
-    
-   
-    
-    func isFullURL(url: String) -> Bool {
-        
-        if url.lowercased().range(of:"http:") != nil {
-            return true
-        }
-        else if url.lowercased().range(of:"https:") != nil {
-            return true
-        } else {
-            return false
-        }
-        
-    }
-    
-    func remoteTalkExists(talk: TalkData, completion:@escaping (Bool, TalkData)->()){
-        
-        var talkURL: URL    // where the MP3 lives
-        
-        if isFullURL(url: talk.URL) {
-            talkURL  = URL(string: talk.URL)!
-        }
-        else if USE_NATIVE_MP3PATHS == true {
-            talkURL  = URL(string: URL_MP3_HOST +  talk.URL)!
-            
-        } else {
-            talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
-        }
-        
-        var request: URLRequest = URLRequest(url: talkURL as URL)
-        request.httpMethod = "HEAD"
-        
-        var exists: Bool = true
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                
-                if httpResponse.statusCode == 404 {
-                    
-                    exists =  false
-                }else{
-                    exists  = true
-                }
-                
-            }
-            
-            DispatchQueue.main.async {
-                completion(exists, talk)
-            }
-            }.resume()
-        
-    }
-
-
-    func remoteURLExists(url: URL, completion:@escaping (Bool, URL)->()){
-        
-        var request: URLRequest = URLRequest(url: url as URL)
-        request.httpMethod = "HEAD"
-        
-        var exists: Bool = true
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                
-                if httpResponse.statusCode == 404 {
-                    exists =  false
-                }else{
-                    exists  = true
-                }
-                
-            }
-            
-            DispatchQueue.main.async {
-                completion(exists, url)
-            }
-        }.resume()
-    
-    }
-    
-    
-    func sendRequest (request: URLRequest,completion:@escaping (URLResponse?)->()){
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if error != nil{
-                return completion(response)
-            }else{
-                return completion(nil)
-            }
-            }.resume()
-    }
-    
-    func errorLog(error: NSError) {
-        
-    }
-    
+       
+  
     
     //
     // MARK: User Album functions
@@ -1397,6 +1385,7 @@ class Model {
         
     }
     
+    
     func getUserAlbums() -> [UserAlbumData] {
         
         return UserAlbums
@@ -1413,6 +1402,7 @@ class Model {
             }
         }
     }
+    
     
     func addUserAlbum(album: AlbumData) {
         
@@ -1494,11 +1484,12 @@ class Model {
         
         return String((0...KEY_LENGTH ).map{ _ in letters.randomElement()! })
     }
-
+    
+    
     
     
     //
-    // MARK: Persistent data loading functions
+    // MARK: Load Persistent Data
     //
     func loadPlayedTalksData() -> [String: Bool]  {
         
@@ -1563,7 +1554,7 @@ class Model {
 
     
     //
-    // MARK: SAVE PERSISTENT DATA
+    // MARK: Save Persistent Data
     //
     func saveUserAlbumData() {
         

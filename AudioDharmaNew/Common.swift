@@ -273,21 +273,11 @@ struct TranscriptView: View {
     var body: some View {
         
         VStack () {
-            //Text("https://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf")
-
-  /*
-            if let requestURL = URL(string: "http://virtualdharma.org/AudioDharmaAppBackend/data/PDF/20210407_Gil_Fronsdal_IMC_MIndfulness_of_Breathing_71_Seven_Factors_of_Awakening-edits-JAS-lk-mg_app.pdf") {
-                PDFKitView(url: requestURL)
-            }
-   */
 
             if let requestURL = URL(string: talk.PDF) {
                 PDFKitView(url: requestURL)
             }
-
-         
-
-            
+          
         }
     }
 }
@@ -296,20 +286,36 @@ struct TranscriptView: View {
 struct BiographyView: View {
     var talk: TalkData
 
-    @State var text: String
+    var templateText: String
+    var contentText: String
+
+    @State var stateBiographyText: String
     
     init(talk: TalkData)
     {
         self.talk = talk
-        if let filepath = Bundle.main.path(forResource: self.talk.Speaker, ofType: "txt") {
+        if let templateFilePath = Bundle.main.path(forResource: "Template", ofType: "txt") {
             do {
-                text = try String(contentsOfFile: filepath)
+                templateText = try String(contentsOfFile: templateFilePath)
             } catch {
-                text = "Temporarily Unavailable"
+                templateText = ""
             }
         } else {
-            text = "Temporarily Unavailable"
+            templateText = ""
         }
+
+        if let filepath = Bundle.main.path(forResource: self.talk.Speaker, ofType: "txt") {
+            do {
+                contentText = try String(contentsOfFile: filepath)
+            } catch {
+                contentText = ""
+            }
+        } else {
+            contentText = ""
+        }
+        let text  = templateText.replacingOccurrences(of: "$SPEAKER", with: talk.Speaker)
+        stateBiographyText = text.replacingOccurrences(of: "$TEXT", with: contentText)
+        stateBiographyText = text
     }
 
     
@@ -327,8 +333,9 @@ struct BiographyView: View {
             }
             Spacer()
                 .frame(height: 20)
-            HTMLView(text: $text)
-                  .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            HTMLView(text: $stateBiographyText)
+                .padding(.leading, 30)
+                .padding(.trailing, 30)
         }
     }
 }
@@ -355,6 +362,8 @@ struct HelpPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             HTMLView(text: $text)
                   .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+
+
         }
     }
 }
@@ -377,10 +386,17 @@ struct DonationPageView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        //VStack(alignment: .leading, spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+
             HTMLView(text: $text)
-                  .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+
+
+
         }
+
+
     }
 }
 
