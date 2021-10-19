@@ -87,7 +87,7 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 120     // amount of time (in seconds) between each poll of the cloud for updated sangha info
 //var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 
 var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
@@ -233,6 +233,7 @@ class Model {
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
+            print("downloadAndConfig:  inside task return")
             let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
             let configZipPath = documentPath + "/" + CONFIG_ZIP_NAME
             let configJSONPath = documentPath + "/" + CONFIG_JSON_NAME
@@ -265,17 +266,15 @@ class Model {
                 }
                 catch let error as NSError {
                     self.errorLog(error: error)
+                    ModelReadySemaphore.signal()
                     return
                 }
             }
 
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
-                HTTPResultCode = 404
                 
-                //CJM DEV
-                let alert = UIAlertController(title: "No Internet Connection", message: "Please check your connection.", preferredStyle: UIAlertController.Style.alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertAction.Style.default, handler: nil))
-
+                HTTPResultCode = 404
+                ModelReadySemaphore.signal()
                 return
             }
 
@@ -286,8 +285,10 @@ class Model {
             }
 
             catch let error as NSError {
+                
                 HTTPResultCode = 404
                 self.errorLog(error: error)
+                ModelReadySemaphore.signal()
                 return
             }
                         
@@ -483,7 +484,7 @@ class Model {
                     self.CustomUserAlbums = album
                     self.UserAlbums = TheDataModel.loadUserAlbumData()
                     for userAlbumData in self.UserAlbums {
-                        var customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
                         albumList.append(customAlbum)
                         for fileName in userAlbumData.TalkFileNames {
                             if let talk = FileNameToTalk[fileName] {
@@ -627,12 +628,16 @@ class Model {
             if let valid_reponse = response {
                 httpResponse = valid_reponse as! HTTPURLResponse
             } else {
+                ModelReadySemaphore.signal()
+
                 return
             }
             //let httpResponse = response as! HTTPURLResponse
             let statusCode = httpResponse.statusCode
             
             if (statusCode != 200) {
+                ModelReadySemaphore.signal()
+
                 return
             }
             
@@ -641,6 +646,8 @@ class Model {
                 return
             }
             if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
+                ModelReadySemaphore.signal()
+
                 return
             }
   
@@ -880,8 +887,493 @@ class Model {
     }
     
 
+
+        
+    //
+    // MARK: talk and album functions
+    //
+    func toggleTalkAsFavorite(talk: TalkData) -> Bool {
+
+        if TheDataModel.isFavoriteTalk(talk: talk) {
+            TheDataModel.UserFavorites[talk.FileName] = nil
+            if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: talk) {
+                print("toggleTalkAsFavorite removing: ", talk.Title)
+                TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
+            }
+        } else {
+            TheDataModel.UserFavorites[talk.FileName] = UserFavoriteData(fileName: talk.FileName)
+            print("toggleTalkAsFavorite adding: ", talk.Title)
+            TheDataModel.UserFavoritesAlbum.talkList.insert(talk, at: 0)
+            //CJM Append?
+        }
+
+        TheDataModel.saveUserFavoritesData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
+        
+        let isFavorite = TheDataModel.UserFavorites[talk.FileName] != nil
+        print("ToggleTalkAsFavorite New Value: ", isFavorite)
+        return isFavorite
+    }
     
+    
+    func isFavoriteTalk(talk: TalkData) -> Bool {
+        
+        return TheDataModel.UserFavorites[talk.FileName] != nil
+    }
+    
+ 
+    
+    func isDownloadInProgress(talk: TalkData) -> Bool {
+        
+        var downloadInProgress = false
+        if let userDownload = TheDataModel.UserDownloads[talk.FileName]  {
+            downloadInProgress = (userDownload.DownloadCompleted == "NO")
+        }
+        return downloadInProgress
+    }
+
+    
+    func setTalkAsDownloaded(talk: TalkData) {
+        
+        TheDataModel.UserDownloadAlbum.talkList.insert(talk, at: 0)
+        TheDataModel.UserDownloads[talk.FileName] = UserDownloadData(fileName: talk.FileName, downloadCompleted: "YES")
+        TheDataModel.saveUserDownloadData()
+
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+
+    }
+    
+    
+    func unsetTalkAsDownloaded(talk: TalkData) {
+        
+        if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: talk) {
+            print("download removing: ", talk.Title)
+            TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
+        }
+        
+        if let userDownload = TheDataModel.UserDownloads[talk.FileName] {
+            if userDownload.DownloadCompleted == "NO" {
+                TheDataModel.DownloadInProgress = false
+            }
+        }
+        TheDataModel.UserDownloads[talk.FileName] = nil
+        let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + talk.FileName
+        do {
+            try FileManager.default.removeItem(atPath: localPathMP3)
+        }
+        catch let error as NSError {
+        }
+        
+        TheDataModel.saveUserDownloadData()
+        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
+        
+    }
+    
+    
+    func hasBeenDownloaded(talk: TalkData) -> Bool {
+
+        return TheDataModel.UserDownloads[talk.FileName] != nil
+
+    }
+    
+    
+    func addNoteToTalk(talk: TalkData, noteText: String) {
+
+         //
+         // if there is a note text for this talk fileName, then save it in the note dictionary
+         // otherwise clear this note dictionary entry
+         let talkFileName = talk.FileName
+
+         if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
+             print("adding note on talk: ", talk.Title)
+             TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
+             TheDataModel.UserNoteAlbum.talkList.append(talk)
+         } else {
+             print("remove note on talk: ", talk.Title)
+             TheDataModel.UserNotes[talkFileName] = nil
+             if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: talk) {
+                 TheDataModel.UserNoteAlbum.talkList.remove(at: index)
+             }
+
+         }
+         
+         // save the data, recompute stats, reload root view to display updated stats
+         TheDataModel.saveUserNoteData()
+         TheDataModel.computeAlbumStats(album: TheDataModel.UserNoteAlbum)
+     }
+     
+     
+    func getNoteForTalk(talk: TalkData) -> String {
+
+         var noteText = ""
+
+         if let userNoteData = TheDataModel.UserNotes[talk.FileName]   {
+             noteText = userNoteData.Notes
+         }
+         return noteText
+     }
+
+
+    func isNotatedTalk(talk: TalkData) -> Bool {
+         
+         if let _ = TheDataModel.UserNotes[talk.FileName] {
+             return true
+         }
+         return false
+     }
+     
+     
+    func hasTalkBeenPlayed(talk: TalkData) -> Bool {
+     
+         return TheDataModel.PlayedTalks[talk.FileName] != nil
+
+     }
+
+     
+     func isMostRecentTalk(talk: TalkData) -> Bool {
+     
+         if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
+             return talk.FileName == lastTalk.FileName
+         }
+         return false
+     }
+      
+      
+    //
+    // invoked in background by TalkPlayerView
+    //
+    func addToTalkHistory(talk: TalkData) {
+        
+        self.PlayedTalks[talk.FileName] = true
+
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd"
+        let datePlayed = formatter.string(from: date)
+        formatter.dateFormat = "HH:mm:ss"
+        let timePlayed = formatter.string(from: date)
+
+        talk.DatePlayed = datePlayed
+        talk.TimePlayed = timePlayed
+
+        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
+
+        self.UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
+        self.UserTalkHistoryList.insert(talkHistory, at: 0)
+        let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
+        if excessTalkCount > 0 {
+            for _ in 0 ... excessTalkCount {
+                UserTalkHistoryList.remove(at: 0)
+            }
+        }
+ 
+
+        
+        savePlayedTalksData()
+        saveTalkHistoryData()
+        self.computeAlbumStats(album: self.UserTalkHistoryAlbum)
+    }
+    
+    func addToShareHistory(talk: TalkData) {
+        
+        
+        let date = Date()
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy.MM.dd"
+        let datePlayed = formatter.string(from: date)
+        formatter.dateFormat = "HH:mm:ss"
+        let timePlayed = formatter.string(from: date)
+        
+        self.PlayedTalks[talk.FileName] = true
+        talk.DatePlayed = datePlayed
+        talk.TimePlayed = timePlayed
+        UserShareHistoryAlbum.talkList.append(talk)
+        
+        let excessTalkCount = UserShareHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
+        if excessTalkCount > 0 {
+            for _ in 0 ... excessTalkCount {
+                UserShareHistoryAlbum.talkList.remove(at: 0)
+            }
+        }
+        
+        // save the data, recompute stats, reload root view to display updated stats
+        saveShareHistoryData()
+    }
+    
+    
+       
+  
+    
+    //
+    // MARK: User Album functions
+    //
+    func saveCustomUserAlbums() {
+    
+        let image = UIImage(named: "tri_right_x")
+        UserAlbums = []
+        for album in self.CustomUserAlbums.albumList {
+            
+            let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
+            
+            var talkFileNameList: [String] = []
+            for talk in album.talkList {
+                
+                if let _ = self.getTalkForName(name: talk.FileName) {
+                    talkFileNameList.append(talk.FileName)
+                }
+            }
+            userAlbum.TalkFileNames = talkFileNameList
+            UserAlbums.append(userAlbum)
+        }
+        self.saveUserAlbumData()
+        self.computeAlbumStats(album: self.CustomUserAlbums)
+        
+    }
+    
+    
+    func getUserAlbums() -> [UserAlbumData] {
+        
+        return UserAlbums
+    }
+    
+    func updateUserAlbum(updatedAlbum: UserAlbumData) {
+        
+        for (index, album) in UserAlbums.enumerated() {
+            
+            if album.Content == updatedAlbum.Content {
+                
+                UserAlbums[index] = updatedAlbum
+                break
+            }
+        }
+    }
+    
+    
+    func addUserAlbum(album: AlbumData) {
+        
+        let image = UIImage(named: "tri_right_x")
+        let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
+        UserAlbums.append(userAlbum)
+        
+        CustomUserAlbums.albumList.append(album)
+        computeAlbumStats(album: CustomUserAlbums)
+        
+        saveUserAlbumData()
+    }
+    
+    func removeUserAlbum(at: Int) {
+        
+        UserAlbums.remove(at: at)
+        
+        saveUserAlbumData()
+        //computeUserAlbumStats()
+    }
+    
+    func removeUserAlbum(userAlbum: UserAlbumData) {
+        
+        for (index, album) in UserAlbums.enumerated() {
+            
+            if album.Content == userAlbum.Content {
+                
+                UserAlbums.remove(at: index)
+                break
+            }
+        }
+    }
+    
+    func getUserAlbumTalks(userAlbum: UserAlbumData) -> [TalkData]{
+        
+        var userAlbumTalks = [TalkData] ()
+        
+        for talkFileName in userAlbum.TalkFileNames {
+            if let talk = getTalkForName(name: talkFileName) {
+                userAlbumTalks.append(talk)
+            }
+        }
+        
+        return userAlbumTalks
+    }
+    
+    func saveUserAlbumTalks(userAlbum: UserAlbumData, talks: [TalkData]) {
+        
+        var userAlbumIndex = 0
+        for album in UserAlbums {
+            
+            if album.Content == userAlbum.Content {
+                break
+            }
+            userAlbumIndex += 1
+        }
+        
+        if userAlbumIndex == UserAlbums.count {
+            return
+        }
+        
+        var talkFileNames = [String]()
+        for talk in talks {
+            talkFileNames.append(talk.FileName)
+        }
+        
+        // save the resulting array into the userlist and then persist into storage
+        UserAlbums[userAlbumIndex].TalkFileNames = talkFileNames
+        
+        saveUserAlbumData()
+        //computeUserAlbumStats()
+    }
+    
+    
+    func randomKey() -> String {
+        
+        let KEY_LENGTH = 10
+        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+        
+        return String((0...KEY_LENGTH ).map{ _ in letters.randomElement()! })
+    }
+    
+    
+    
+    
+    //
+    // MARK: Load Persistent Data
+    //
+    func loadTalkHistoryData() -> [TalkHistoryData]  {
+        
+        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
+            as? [TalkHistoryData] {
+            
+            return talkHistory
+        } else {
+            
+            return [TalkHistoryData] ()
+        }
+        
+    }
+
+    
+    func loadShareHistoryData() -> [TalkHistoryData]  {
+        
+        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveShareHistoryURL.path)
+            as? [TalkHistoryData] {
+            
+            return talkHistory
+        } else {
+            
+            return [TalkHistoryData] ()
+        }
+    }
+        
+    
+    func loadPlayedTalksData() -> [String: Bool]  {
+        
+        if let playedTalks = NSKeyedUnarchiver.unarchiveObject(withFile: PlayedTalks_ArchiveURL.path)
+            as? [String: Bool] {
+            
+            return playedTalks
+        } else {
+            
+            return [String: Bool] ()
+        }
+    }
+
+
+    func loadUserAlbumData() -> [UserAlbumData]  {
+        
+        if let userAlbumData = NSKeyedUnarchiver.unarchiveObject(withFile: UserAlbumData.ArchiveURL.path) as? [UserAlbumData] {
+            
+            return userAlbumData
+        } else {
+            
+            return [UserAlbumData] ()
+        }
+    }
+
+    func loadUserNoteData() -> [String: UserNoteData]  {
+        
+        if let userNotes = NSKeyedUnarchiver.unarchiveObject(withFile: UserNoteData.ArchiveURL.path)
+            as? [String: UserNoteData] {
+            
+            return userNotes
+        } else {
+            
+            return [String: UserNoteData] ()
+        }
+    }
+
+    func loadUserFavoriteData() -> [String: UserFavoriteData]  {
+        
+        if let userFavorites = NSKeyedUnarchiver.unarchiveObject(withFile: UserFavoriteData.ArchiveURL.path)
+            as? [String: UserFavoriteData] {
+            
+            return userFavorites
+        } else {
+            
+            return [String: UserFavoriteData] ()
+        }
+    }
+
+    func loadUserDownloadData() -> [String: UserDownloadData]  {
+        
+        if let userDownloads = NSKeyedUnarchiver.unarchiveObject(withFile: UserDownloadData.ArchiveURL.path)
+            as? [String: UserDownloadData] {
+            
+            return userDownloads
+        } else {
+            
+            return [String: UserDownloadData] ()
+        }
+    }
+
+
+    
+    //
+    // MARK: Save Persistent Data
+    //
+    func saveUserAlbumData() {
+        
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserAlbums, toFile: UserAlbumData.ArchiveURL.path)
+    }
+    
+    func saveUserNoteData() {
+        print("saveUserNoteData", TheDataModel.UserNotes)
+        
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserNotes, toFile: UserNoteData.ArchiveURL.path)
+    }
+    
+    func saveUserFavoritesData() {
+        
+        print("saveUserFavoritesData", TheDataModel.UserFavorites)
+
+        
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserFavorites, toFile: UserFavoriteData.ArchiveURL.path)
+    }
+    
+    func saveUserDownloadData() {
+        
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserDownloads, toFile: UserDownloadData.ArchiveURL.path)
+    }
+
+    
+    func saveTalkHistoryData() {
+        
+
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserTalkHistoryList, toFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
+    }
+    
+    func saveShareHistoryData() {
+        
+        NSKeyedArchiver.archiveRootObject(TheDataModel.UserShareHistoryAlbum, toFile: TalkHistoryData.ArchiveShareHistoryURL.path)
+    }
+    
+
+    func savePlayedTalksData() {
+         
+         NSKeyedArchiver.archiveRootObject(PlayedTalks, toFile: PlayedTalks_ArchiveURL.path)
+     }
+    
+    
+    //
     // MARK: Support Functions
+    //
     func isInternetAvailable() -> Bool
     {
         var zeroAddress = sockaddr_in()
@@ -1112,491 +1604,6 @@ class Model {
     }
     
 
-    
-    
-    //
-    // MARK: talk and album functions
-    //
-    func toggleTalkAsFavorite(talk: TalkData) -> Bool {
-
-        if TheDataModel.isFavoriteTalk(talk: talk) {
-            TheDataModel.UserFavorites[talk.FileName] = nil
-            if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: talk) {
-                print("toggleTalkAsFavorite removing: ", talk.Title)
-                TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
-            }
-        } else {
-            TheDataModel.UserFavorites[talk.FileName] = UserFavoriteData(fileName: talk.FileName)
-            print("toggleTalkAsFavorite adding: ", talk.Title)
-            TheDataModel.UserFavoritesAlbum.talkList.insert(talk, at: 0)
-            //CJM Append?
-        }
-
-        TheDataModel.saveUserFavoritesData()
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
-        
-        let isFavorite = TheDataModel.UserFavorites[talk.FileName] != nil
-        print("ToggleTalkAsFavorite New Value: ", isFavorite)
-        return isFavorite
-    }
-    
-    
-    func isFavoriteTalk(talk: TalkData) -> Bool {
-        
-        return TheDataModel.UserFavorites[talk.FileName] != nil
-    }
-    
- 
-    
-    func isDownloadInProgress(talk: TalkData) -> Bool {
-        
-        var downloadInProgress = false
-        if let userDownload = TheDataModel.UserDownloads[talk.FileName]  {
-            downloadInProgress = (userDownload.DownloadCompleted == "NO")
-        }
-        return downloadInProgress
-    }
-
-    
-    func setTalkAsDownloaded(talk: TalkData) {
-        
-        TheDataModel.UserDownloadAlbum.talkList.insert(talk, at: 0)
-        TheDataModel.UserDownloads[talk.FileName] = UserDownloadData(fileName: talk.FileName, downloadCompleted: "YES")
-        TheDataModel.saveUserDownloadData()
-
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-
-    }
-    
-    
-    func unsetTalkAsDownloaded(talk: TalkData) {
-        
-        if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: talk) {
-            print("download removing: ", talk.Title)
-            TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
-        }
-        
-        if let userDownload = TheDataModel.UserDownloads[talk.FileName] {
-            if userDownload.DownloadCompleted == "NO" {
-                TheDataModel.DownloadInProgress = false
-            }
-        }
-        TheDataModel.UserDownloads[talk.FileName] = nil
-        let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + talk.FileName
-        do {
-            try FileManager.default.removeItem(atPath: localPathMP3)
-        }
-        catch let error as NSError {
-        }
-        
-        TheDataModel.saveUserDownloadData()
-        TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-        
-    }
-    
-    
-    func hasBeenDownloaded(talk: TalkData) -> Bool {
-
-        return TheDataModel.UserDownloads[talk.FileName] != nil
-
-    }
-    
-    
-    func addNoteToTalk(talk: TalkData, noteText: String) {
-
-         //
-         // if there is a note text for this talk fileName, then save it in the note dictionary
-         // otherwise clear this note dictionary entry
-         let talkFileName = talk.FileName
-
-         if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
-             print("adding note on talk: ", talk.Title)
-             TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
-             TheDataModel.UserNoteAlbum.talkList.append(talk)
-         } else {
-             print("remove note on talk: ", talk.Title)
-             TheDataModel.UserNotes[talkFileName] = nil
-             if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: talk) {
-                 TheDataModel.UserNoteAlbum.talkList.remove(at: index)
-             }
-
-         }
-         
-         // save the data, recompute stats, reload root view to display updated stats
-         TheDataModel.saveUserNoteData()
-         TheDataModel.computeAlbumStats(album: TheDataModel.UserNoteAlbum)
-     }
-     
-     
-    func getNoteForTalk(talk: TalkData) -> String {
-
-         var noteText = ""
-
-         if let userNoteData = TheDataModel.UserNotes[talk.FileName]   {
-             noteText = userNoteData.Notes
-         }
-         return noteText
-     }
-
-
-    func isNotatedTalk(talk: TalkData) -> Bool {
-         
-         if let _ = TheDataModel.UserNotes[talk.FileName] {
-             return true
-         }
-         return false
-     }
-     
-     
-    func hasTalkBeenPlayed(talk: TalkData) -> Bool {
-     
-         return TheDataModel.PlayedTalks[talk.FileName] != nil
-
-     }
-
-     
-     func isMostRecentTalk(talk: TalkData) -> Bool {
-     
-         if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
-             return talk.FileName == lastTalk.FileName
-         }
-         return false
-     }
-      
-
-   
-
-
-    func loadTalkHistoryData() -> [TalkHistoryData]  {
-        
-        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
-            as? [TalkHistoryData] {
-            
-            return talkHistory
-        } else {
-            
-            return [TalkHistoryData] ()
-        }
-        
-    }
-    
-    func loadShareHistoryData() -> [TalkHistoryData]  {
-        
-        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveShareHistoryURL.path)
-            as? [TalkHistoryData] {
-            
-            return talkHistory
-        } else {
-            
-            return [TalkHistoryData] ()
-        }
-    }
-        
-    
-      
-    //
-    // invoked in background by TalkPlayerView
-    //
-    func addToTalkHistory(talk: TalkData) {
-        
-        self.PlayedTalks[talk.FileName] = true
-
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        let datePlayed = formatter.string(from: date)
-        formatter.dateFormat = "HH:mm:ss"
-        let timePlayed = formatter.string(from: date)
-
-        talk.DatePlayed = datePlayed
-        talk.TimePlayed = timePlayed
-
-        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
-
-        self.UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
-        self.UserTalkHistoryList.insert(talkHistory, at: 0)
-        let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
-        if excessTalkCount > 0 {
-            for _ in 0 ... excessTalkCount {
-                UserTalkHistoryList.remove(at: 0)
-            }
-        }
- 
-
-        
-        savePlayedTalksData()
-        saveTalkHistoryData()
-        self.computeAlbumStats(album: self.UserTalkHistoryAlbum)
-    }
-    
-    func addToShareHistory(talk: TalkData) {
-        
-        
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        let datePlayed = formatter.string(from: date)
-        formatter.dateFormat = "HH:mm:ss"
-        let timePlayed = formatter.string(from: date)
-        
-        self.PlayedTalks[talk.FileName] = true
-        talk.DatePlayed = datePlayed
-        talk.TimePlayed = timePlayed
-        UserShareHistoryAlbum.talkList.append(talk)
-        
-        let excessTalkCount = UserShareHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
-        if excessTalkCount > 0 {
-            for _ in 0 ... excessTalkCount {
-                UserShareHistoryAlbum.talkList.remove(at: 0)
-            }
-        }
-        
-        // save the data, recompute stats, reload root view to display updated stats
-        saveShareHistoryData()
-    }
-    
-    
-       
-  
-    
-    //
-    // MARK: User Album functions
-    //
-    func saveCustomUserAlbums() {
-    
-        let image = UIImage(named: "tri_right_x")
-        UserAlbums = []
-        for album in self.CustomUserAlbums.albumList {
-            
-            let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
-            
-            var talkFileNameList: [String] = []
-            for talk in album.talkList {
-                
-                if let _ = self.getTalkForName(name: talk.FileName) {
-                    talkFileNameList.append(talk.FileName)
-                }
-            }
-            userAlbum.TalkFileNames = talkFileNameList
-            UserAlbums.append(userAlbum)
-        }
-        self.saveUserAlbumData()
-        self.computeAlbumStats(album: self.CustomUserAlbums)
-        
-    }
-    
-    
-    func getUserAlbums() -> [UserAlbumData] {
-        
-        return UserAlbums
-    }
-    
-    func updateUserAlbum(updatedAlbum: UserAlbumData) {
-        
-        for (index, album) in UserAlbums.enumerated() {
-            
-            if album.Content == updatedAlbum.Content {
-                
-                UserAlbums[index] = updatedAlbum
-                break
-            }
-        }
-    }
-    
-    
-    func addUserAlbum(album: AlbumData) {
-        
-        let image = UIImage(named: "tri_right_x")
-        let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
-        UserAlbums.append(userAlbum)
-        
-        CustomUserAlbums.albumList.append(album)
-        computeAlbumStats(album: CustomUserAlbums)
-        
-        saveUserAlbumData()
-    }
-    
-    func removeUserAlbum(at: Int) {
-        
-        UserAlbums.remove(at: at)
-        
-        saveUserAlbumData()
-        //computeUserAlbumStats()
-    }
-    
-    func removeUserAlbum(userAlbum: UserAlbumData) {
-        
-        for (index, album) in UserAlbums.enumerated() {
-            
-            if album.Content == userAlbum.Content {
-                
-                UserAlbums.remove(at: index)
-                break
-            }
-        }
-    }
-    
-    func getUserAlbumTalks(userAlbum: UserAlbumData) -> [TalkData]{
-        
-        var userAlbumTalks = [TalkData] ()
-        
-        for talkFileName in userAlbum.TalkFileNames {
-            if let talk = getTalkForName(name: talkFileName) {
-                userAlbumTalks.append(talk)
-            }
-        }
-        
-        return userAlbumTalks
-    }
-    
-    func saveUserAlbumTalks(userAlbum: UserAlbumData, talks: [TalkData]) {
-        
-        var userAlbumIndex = 0
-        for album in UserAlbums {
-            
-            if album.Content == userAlbum.Content {
-                break
-            }
-            userAlbumIndex += 1
-        }
-        
-        if userAlbumIndex == UserAlbums.count {
-            return
-        }
-        
-        var talkFileNames = [String]()
-        for talk in talks {
-            talkFileNames.append(talk.FileName)
-        }
-        
-        // save the resulting array into the userlist and then persist into storage
-        UserAlbums[userAlbumIndex].TalkFileNames = talkFileNames
-        
-        saveUserAlbumData()
-        //computeUserAlbumStats()
-    }
-    
-    
-    func randomKey() -> String {
-        
-        let KEY_LENGTH = 10
-        let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-        
-        return String((0...KEY_LENGTH ).map{ _ in letters.randomElement()! })
-    }
-    
-    
-    
-    
-    //
-    // MARK: Load Persistent Data
-    //
-    func loadPlayedTalksData() -> [String: Bool]  {
-        
-        if let playedTalks = NSKeyedUnarchiver.unarchiveObject(withFile: PlayedTalks_ArchiveURL.path)
-            as? [String: Bool] {
-            
-            return playedTalks
-        } else {
-            
-            return [String: Bool] ()
-        }
-    }
-
-
-    func loadUserAlbumData() -> [UserAlbumData]  {
-        
-        if let userAlbumData = NSKeyedUnarchiver.unarchiveObject(withFile: UserAlbumData.ArchiveURL.path) as? [UserAlbumData] {
-            
-            return userAlbumData
-        } else {
-            
-            return [UserAlbumData] ()
-        }
-    }
-
-    func loadUserNoteData() -> [String: UserNoteData]  {
-        
-        if let userNotes = NSKeyedUnarchiver.unarchiveObject(withFile: UserNoteData.ArchiveURL.path)
-            as? [String: UserNoteData] {
-            
-            return userNotes
-        } else {
-            
-            return [String: UserNoteData] ()
-        }
-    }
-
-    func loadUserFavoriteData() -> [String: UserFavoriteData]  {
-        
-        if let userFavorites = NSKeyedUnarchiver.unarchiveObject(withFile: UserFavoriteData.ArchiveURL.path)
-            as? [String: UserFavoriteData] {
-            
-            return userFavorites
-        } else {
-            
-            return [String: UserFavoriteData] ()
-        }
-    }
-
-    func loadUserDownloadData() -> [String: UserDownloadData]  {
-        
-        if let userDownloads = NSKeyedUnarchiver.unarchiveObject(withFile: UserDownloadData.ArchiveURL.path)
-            as? [String: UserDownloadData] {
-            
-            return userDownloads
-        } else {
-            
-            return [String: UserDownloadData] ()
-        }
-    }
-
-
-    
-    //
-    // MARK: Save Persistent Data
-    //
-    func saveUserAlbumData() {
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserAlbums, toFile: UserAlbumData.ArchiveURL.path)
-    }
-    
-    func saveUserNoteData() {
-        print("saveUserNoteData", TheDataModel.UserNotes)
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserNotes, toFile: UserNoteData.ArchiveURL.path)
-    }
-    
-    func saveUserFavoritesData() {
-        
-        print("saveUserFavoritesData", TheDataModel.UserFavorites)
-
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserFavorites, toFile: UserFavoriteData.ArchiveURL.path)
-    }
-    
-    func saveUserDownloadData() {
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserDownloads, toFile: UserDownloadData.ArchiveURL.path)
-    }
-
-    
-    func saveTalkHistoryData() {
-        
-
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserTalkHistoryList, toFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
-    }
-    
-    func saveShareHistoryData() {
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserShareHistoryAlbum, toFile: TalkHistoryData.ArchiveShareHistoryURL.path)
-    }
-    
-
-    func savePlayedTalksData() {
-         
-         NSKeyedArchiver.archiveRootObject(PlayedTalks, toFile: PlayedTalks_ArchiveURL.path)
-     }
     
 
     

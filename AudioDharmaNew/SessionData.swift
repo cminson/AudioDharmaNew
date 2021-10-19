@@ -102,22 +102,22 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredTalks(filter: String) -> [TalkData] {
 
-        if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
-            GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
-        }
-        var filteredTalkList = self.talkList
-        if !filter.isEmpty {
-            filteredTalkList = []
-            for talk in self.talkList {
-                let searchedData = talk.Title.lowercased()
-                if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
+            if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
+                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
-        }
-        if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
-            GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
-        }
-        
-        return filteredTalkList
+            var filteredTalkList = self.talkList
+            if !filter.isEmpty {
+                filteredTalkList = []
+                for talk in self.talkList {
+                    let searchedData = talk.Title.lowercased()
+                    if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
+                }
+            }
+            if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
+                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+            }
+            
+            return filteredTalkList
     }
 
     

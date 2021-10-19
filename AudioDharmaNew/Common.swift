@@ -34,6 +34,8 @@ let COLOR_BACKGROUND_SECTION = "555555"
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 
+let MAX_SEARCH_RESULTS = 500    // Max results returned on album or talk search
+
 //
 // Thes globals indicate whats playing now (or last played)
 //
@@ -230,7 +232,6 @@ struct TextView: UIViewRepresentable {
         textView.isUserInteractionEnabled = true
         textView.delegate = context.coordinator
 
- 
         return textView
     }
  
@@ -263,6 +264,7 @@ struct ShareSheet: UIViewControllerRepresentable {
     }
 }
 
+
 struct TranscriptView: View {
     var talk: TalkData
     
@@ -286,36 +288,29 @@ struct TranscriptView: View {
 struct BiographyView: View {
     var talk: TalkData
 
-    var templateText: String
-    var contentText: String
-
     @State var stateBiographyText: String
     
     init(talk: TalkData)
     {
+        var text : String
+        
         self.talk = talk
-        if let templateFilePath = Bundle.main.path(forResource: "Template", ofType: "txt") {
-            do {
-                templateText = try String(contentsOfFile: templateFilePath)
-            } catch {
-                templateText = ""
-            }
-        } else {
-            templateText = ""
-        }
-
+        
         if let filepath = Bundle.main.path(forResource: self.talk.Speaker, ofType: "txt") {
             do {
-                contentText = try String(contentsOfFile: filepath)
+                text = try String(contentsOfFile: filepath)
             } catch {
-                contentText = ""
+                text = ""
             }
         } else {
-            contentText = ""
+            text = ""
         }
-        let text  = templateText.replacingOccurrences(of: "$SPEAKER", with: talk.Speaker)
-        stateBiographyText = text.replacingOccurrences(of: "$TEXT", with: contentText)
+        
+        text = text.replacingOccurrences(of: "<p>", with: "\n")
+        text = text.replacingOccurrences(of: "<br>", with: "\n")
+        
         stateBiographyText = text
+
     }
 
     
@@ -333,9 +328,12 @@ struct BiographyView: View {
             }
             Spacer()
                 .frame(height: 20)
-            HTMLView(text: $stateBiographyText)
-                .padding(.leading, 30)
-                .padding(.trailing, 30)
+            ScrollView {
+            Text(stateBiographyText)
+                .font(.system(size: 16, weight: .regular))
+                .padding(.leading, 20)
+                .padding(.trailing, 20)
+            }
         }
     }
 }
@@ -357,9 +355,20 @@ struct HelpPageView: View {
             text = "Temporarily Unavailable"
         }
     }
+    
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
+            /*
+            Text("Audio Dharma Help")
+                .font(.system(size: 30, weight: .heavy))
+            Spacer()
+                .frame(height:20)
+            Text("- All talks Are organized into albums\n- Touch an album and dsdfsdf dsfsdfsd dsfsdfsd fdsfsdf\ndfjkfdjkfd dsjjsdfjdfs")
+                .font(.system(size: 20, weight: .regular))
+            Spacer()
+             */
+            
             HTMLView(text: $text)
                   .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
 
@@ -391,12 +400,7 @@ struct DonationPageView: View {
 
             HTMLView(text: $text)
                     .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-
-
-
         }
-
-
     }
 }
 

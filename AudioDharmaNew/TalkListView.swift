@@ -54,11 +54,18 @@ struct TalkRow: View {
         stateTalkTitle = self.talk.Title
     }
     
+    func debug() -> Bool {
+        
+        print("ROW DISPLAY")
+        return true
+    }
+     
     
     var body: some View {
                 
         VStack(alignment: .leading) {
             HStack() {
+                //Text(self.debug() ? stateTalkTitle : stateTalkTitle)
                 talk.Speaker.toImage()
                     .resizable()
                     //.aspectRatio(contentMode: .fit)
@@ -201,7 +208,7 @@ struct TalkListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(album.getFilteredTalks(filter: searchText)) { talk in
+        List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
@@ -210,8 +217,8 @@ struct TalkListView: View {
                     selectedTalkTime = 0
                     selection = "PLAY_TALK"
                 }
-
         }
+        .id(UUID())
         .navigationBarTitle(album.Title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())

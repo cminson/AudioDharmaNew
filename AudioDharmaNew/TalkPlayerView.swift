@@ -18,12 +18,9 @@ enum TalkStates {                   // all possible states of the talk player
     case LOADING
     case PLAYING
     case PAUSED
-    case STOPPED
     case FINISHED
-    case ALBUMFINISHED
 }
 
-var TalkPlayerStatus: TalkStates = TalkStates.INITIAL
 
 var TheTalkPlayer: TalkPlayer!
 var PlayEntireAlbum: Bool = false
@@ -55,7 +52,6 @@ struct TalkPlayerView: View {
 
     @State var selection: String?  = nil
 
-    @State private var isTalkActive = false
     @State private var displayedElapsedTime: String
     @State private var sliderUpdating = false
     @State private var silderElapsedTime: Double = 0
@@ -63,9 +59,11 @@ struct TalkPlayerView: View {
     @State var displayBiographyView: Bool = false
     @State var playTalksInSequence: Bool = false
     @State private var playerTitle: String = "Play Talk"
+    @State private var displayNoInternet = false
+    @State private var stateTalkPlayer = TalkStates.INITIAL
 
-    
-    
+
+
     init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
         self.album = album
@@ -81,22 +79,25 @@ struct TalkPlayerView: View {
     
     func playTalk() {
         
+        if TheDataModel.isInternetAvailable() == false {
+            
+            self.displayNoInternet = true
+            return
+        }
         
-        print("Play TalkPlayerView: ", talk.Title)
-
-        if TalkPlayerStatus == .PAUSED {
+        if stateTalkPlayer == .PAUSED {
             
             TheTalkPlayer.play()
             return
-        
+    
         }
-        TalkPlayerStatus = .LOADING
+        stateTalkPlayer = .LOADING
         playerTitle = "Loading Talk"
         
 
         var talkURL : URL
         if TheDataModel.hasBeenDownloaded(talk: talk) {
-            print("pyaling download talk")
+            print("playing download edtalk")
             talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
         else {
@@ -106,15 +107,14 @@ struct TalkPlayerView: View {
         TheTalkPlayer = TalkPlayer()
         TheTalkPlayer.talkPlayerView = self
         TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
-
+        stateTalkPlayer = .PLAYING
       
     }
     
     
     func pauseTalk () {
         
-        TalkPlayerStatus = .PAUSED
-
+        stateTalkPlayer = .PAUSED
         TheTalkPlayer.pause()
     }
     
@@ -123,7 +123,7 @@ struct TalkPlayerView: View {
     
         print("TalkPlayerView finishTalk")
         TheTalkPlayer?.stop()
-        TalkPlayerStatus = .FINISHED
+        stateTalkPlayer = .FINISHED
 
     }
     
@@ -144,7 +144,7 @@ struct TalkPlayerView: View {
     mutating func talkHasCompleted () {
         print("talkHasCompleted")
         
-        TalkPlayerStatus = .FINISHED
+        stateTalkPlayer = .FINISHED
         TheTalkPlayer.stop()
         self.resetTalkDisplay()
 
@@ -174,7 +174,7 @@ struct TalkPlayerView: View {
     mutating func updateView(){
 
         //print("Update View Elapsed Time", self.elapsedTime)
-        TalkPlayerStatus = .PLAYING
+        stateTalkPlayer = .PLAYING
 
 
         if self.sliderUpdating == true {
@@ -185,13 +185,13 @@ struct TalkPlayerView: View {
             self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
             self.silderElapsedTime = self.elapsedTime
             self.displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
-            TalkPlayerStatus = .PLAYING
+            stateTalkPlayer = .PLAYING
         }
 
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
         if self.elapsedTime > 0 {
 
-            TalkPlayerStatus = .PLAYING
+            stateTalkPlayer = .PLAYING
 
             // if play time exceeds reporting threshold and not previously reported, report it
             if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
@@ -252,28 +252,23 @@ struct TalkPlayerView: View {
                 {
                     Image("tri_left_x")
                         .resizable()
-                        //.frame(width: isTalkActive ? 30 : 0, height: isTalkActive ? 30 : 0)
                         .frame(width: 30, height:  30)
-
-                        //.disabled(!isTalkActive)
-
                 }
                 Spacer()
                     .frame(width: 20)
                 ZStack() {
                     ProgressView()
-                        .hidden(TalkPlayerStatus != .LOADING)
+                        .hidden(stateTalkPlayer != .LOADING)
                     Button(action: {
-                        isTalkActive = (isTalkActive ? false : true)
-                        if isTalkActive {playTalk()} else {pauseTalk()}
+                        stateTalkPlayer == .PLAYING ? pauseTalk() : playTalk()
                         })
                         {
-                        Image(isTalkActive ? "buttontalkpause" : "buttontalkplay")
+                            Image(stateTalkPlayer == .PLAYING ? "buttontalkpause" : "buttontalkplay")
                                 .resizable()
                                 .frame(width: 60, height: 60)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .hidden(TalkPlayerStatus == .LOADING)
+                        .hidden(stateTalkPlayer == .LOADING)
                 }  // end ZStack
                 Spacer()
                     .frame(width: 20)
@@ -284,7 +279,6 @@ struct TalkPlayerView: View {
                     Image("tri_right_x")
                         .resizable()
                         .frame(width: 30, height:  30)
-                        //.disabled(!isTalkActive)
                 }
             }  // end HStack
             
@@ -345,7 +339,6 @@ struct TalkPlayerView: View {
                         Image(playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
                             .resizable()
                             .frame(width: 30, height:  30)
-                            //.disabled(!isTalkActive)
                     }
                     Text("play talk sequence")
                         .font(.system(size: 12, weight: .regular))
@@ -387,8 +380,18 @@ struct TalkPlayerView: View {
             }
         }
         .navigationBarTitle(Text(playerTitle))
+        .alert(isPresented: $displayNoInternet) {
+            Alert(
+                title: Text("Can Not Connect to AudioDharma"),
+                message: Text("Please check your internet connection or try again in a few minutes"),
+                primaryButton: .destructive(Text("OK")) {
+                    
+                    displayNoInternet = false
 
-      
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
 }
 

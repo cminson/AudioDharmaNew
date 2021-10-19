@@ -32,16 +32,19 @@ struct SplashScreen : View {
             if self.appIsReady {
                 HomePageView(parentAlbum: TheDataModel.RootAlbum)
             } else {
+                GeometryReader { metrics in
                 VStack() {
                     Spacer()
                     HStack() {
                         Spacer()
                         Image("Earth")
-                            //.frame(minWidth: 100, maxWidth: 300, minHeight: 100, maxHeight: 300, alignment: .center)
+                            .resizable()
+                            .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
                         Spacer()
                     }
                     Spacer()
 
+                }
                 }
             }
         }
