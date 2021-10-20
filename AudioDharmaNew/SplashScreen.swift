@@ -18,7 +18,7 @@ struct SplashScreen : View {
     
     @State var appIsReady:Bool = false
     
-    // download and configure DataModel.  WAIT on te completion semaphore in the
+    // download and configure DataModel.  WAIT on the completion semaphore in the
     // DispatchQueue timer in the body before finishing initialization
     init() {
         
@@ -53,15 +53,18 @@ struct SplashScreen : View {
         .background(Color.black)
         .onAppear {
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
                     ModelReadySemaphore.wait()
-                    print("MODEL LOADED")
+                    
+                    // Model now loaded.  So now it's safe to get additional data (Sangha activity)
                     TheDataModel.downloadSanghaActivity()
                     ModelReadySemaphore.wait()
-                    print("SANGHA LOADED")
+                    
+                    // Lastly set up background data refresh threads
                     TheDataModel.startBackgroundTimers()
 
+                    // good to go
                     self.appIsReady = true
                 }
             }

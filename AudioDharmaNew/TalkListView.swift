@@ -187,7 +187,7 @@ struct TalkRow: View {
 
 
 struct TalkListView: View {
-    var album: AlbumData
+    @ObservedObject var album: AlbumData
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""

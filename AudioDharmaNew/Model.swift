@@ -87,11 +87,12 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 120     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_MODEL_INTERVAL =  240 * 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
 //var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 
-var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
-var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
+//var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
+//var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -152,6 +153,46 @@ class Model {
     
     
     // MARK:  Initialization and Configuration
+    func resetAllData() {
+    
+         KeyToAlbum = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
+         FileNameToTalk  = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
+        
+         RootAlbum = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         RecommendedAlbum = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         UserFavoritesAlbum = AlbumData(title: "USER FAVORITES", key: KEY_USER_FAVORITES, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         UserNoteAlbum = AlbumData(title: "USER NOTES", key: KEY_NOTES, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         UserDownloadAlbum = AlbumData(title: "USER DOWNLOADS", key: KEY_USER_DOWNLOADS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         SanghaTalkHistoryAlbum =  AlbumData(title: "Today's Talk History", key: KEY_SANGHA_TALKHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.HISTORICAL)
+         SanghaShareHistoryAlbum =  AlbumData(title: "Today's Shared Talks", key: KEY_SANGHA_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.HISTORICAL)
+         UserTalkHistoryAlbum =  AlbumData(title: "Played Talks", key: KEY_USER_TALKHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+         CustomUserAlbums =  AlbumData(title: "Custom Albums", key: KEY_USER_ALBUMS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+
+         UserTalkHistoryList = []
+
+         ListAllTalks  = []
+         ListSpeakerAlbums = []
+         ListSeriesAlbums = []
+         ListRecommenedAlbums = []
+         ListFavoriteTalls  = []
+
+         DownloadInProgress = false
+
+         UpdatedTalksJSON = [:]
+
+
+         UserAlbums = []      // all the custom user albums defined by this user.
+         UserNotes = [:]      // all the  user notes defined by this user, indexed by fileName
+         UserFavorites = [:]      // all the favorites defined by this user, indexed by fileName
+         UserDownloads = [:]      // all the downloads defined by this user, indexed by fileName
+         PlayedTalks  = [:]  // all the talks that have been played by this user, indexed by fileName
+        
+    }
+    
+    
+    
     func initialize() {
         
         FileNameToTalk = [String: TalkData] ()
@@ -176,12 +217,39 @@ class Model {
         self.PlayedTalks = self.loadPlayedTalksData()
         self.UserDownloads = TheDataModel.loadUserDownloadData()
         self.validateUserDownloadData()
-     }
+    }
+    
     
     func startBackgroundTimers() {
         
-        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(getSanghaActivity), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
+        //Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+
     }
+    
+    
+    @objc func updateSanghaActivity() {
+    
+        if isInternetAvailable() == false {
+            return
+        }
+
+        downloadSanghaActivity()
+    }
+    
+    
+    @objc func updateDataModel() {
+    
+        if isInternetAvailable() == false {
+            return
+        }
+        print("updateDataModel")
+
+        downloadAndConfigure()
+    }
+
+    
+
     
  
     func currentTalkExists() -> Bool {
@@ -465,9 +533,7 @@ class Model {
                 case KEY_NOTES:
                     self.UserNoteAlbum = album
                     self.UserNotes = TheDataModel.loadUserNoteData()
-                    print("KEY_NOTES")
                     for (fileName, _ ) in self.UserNotes {
-                        print("testing if legal")
                         if let talk = FileNameToTalk[fileName] {
                             talkList.append(talk)
                         }
@@ -475,7 +541,6 @@ class Model {
                 case KEY_USER_DOWNLOADS:
                     self.UserDownloadAlbum = album
                     for (fileName, _ ) in self.UserDownloads {
-                        print("Downloaded: ", fileName)
                         if let talk = FileNameToTalk[fileName] {
                             talkList.append(talk)
                         }
@@ -489,7 +554,6 @@ class Model {
                         for fileName in userAlbumData.TalkFileNames {
                             if let talk = FileNameToTalk[fileName] {
                                 customAlbum.talkList.append(talk)
-                                print("adding talk", talk.Title)
                             }
                         }
                         
@@ -814,16 +878,6 @@ class Model {
     }
 
     
-    @objc func getSanghaActivity() {
-    
-        if isInternetAvailable() == false {
-            return
-        }
-
-        downloadSanghaActivity()
-    }
-    
-    
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
         
         var operation : String
@@ -878,6 +932,7 @@ class Model {
         // album.totalTalks is an observed published var
         // therefore need to update it via a dispatch to the main thread
         DispatchQueue.main.async {
+            print("updating TotalATalks for album", album.Title, totalTalks)
                 album.totalTalks = totalTalks
         }
         album.totalSeconds = totalSeconds
@@ -962,6 +1017,7 @@ class Model {
             try FileManager.default.removeItem(atPath: localPathMP3)
         }
         catch let error as NSError {
+            errorLog(error: error)
         }
         
         TheDataModel.saveUserDownloadData()
