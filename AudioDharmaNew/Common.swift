@@ -274,6 +274,13 @@ struct TranscriptView: View {
             }
           
         }
+        .onAppear() {
+            DisplayingBiographyOrTranscript = true
+        }
+        .onDisappear() {
+            DisplayingBiographyOrTranscript = false
+        }
+
     }
 }
 
@@ -328,6 +335,13 @@ struct BiographyView: View {
                 .padding(.trailing, 20)
             }
         }
+        .onAppear() {
+            DisplayingBiographyOrTranscript = true
+        }
+        .onDisappear() {
+            DisplayingBiographyOrTranscript = false
+        }
+
     }
 }
 

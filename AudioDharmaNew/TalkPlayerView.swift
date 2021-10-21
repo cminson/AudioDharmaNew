@@ -56,6 +56,8 @@ struct VolumeSlider: UIViewRepresentable {
 
 struct TalkPlayerView: View {
     var album: AlbumData
+    
+    //DEV NEED OBWE
     @State var talk: TalkData
     var elapsedTime: Double
 
@@ -175,10 +177,11 @@ struct TalkPlayerView: View {
     }
     
     
-    // invoked from background timer in TheTalkPlayer
+    // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
 
         stateTalkPlayer = .PLAYING
+
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -220,13 +223,10 @@ struct TalkPlayerView: View {
 
             }
         }
+
     }
     
-    func debug() -> Text {
-        print("RENDERING:", self.talk.Title)
-            return Text(self.talk.Title)
-    }
-    
+       
     var body: some View {
 
         VStack(alignment: .center, spacing: 0) {
@@ -243,10 +243,14 @@ struct TalkPlayerView: View {
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            Text(self.talk.Speaker)
+            Text("About " + self.talk.Speaker)
+                .underline()
                 .background(Color.white)
                 .padding(.trailing, 0)
                 .font(.system(size: 20, weight: .regular, design: .default))
+                .onTapGesture {
+                    selection = "BIOGRAPHY"
+                }
             Spacer()
                 .frame(height: 20)
                 
@@ -323,72 +327,53 @@ struct TalkPlayerView: View {
                 .padding(.leading, 20)
                 .frame(height: 30)
                 
-            // optional biograph and transcript buttons
+            // optional biography and transcript buttons
             Spacer()
-                .frame(height: 20)
-            HStack() {
-                 Button("About This Speaker") {
-                     DisplayingBiographyOrTranscript = true
-                     selection = "BIOGRAPHY"
-                }
-                .font(.system(size: 12, weight: .regular))
-                .padding(.leading, 15)
-                .hidden(!self.talk.hasBiography())
-
-                Spacer()
-                
-                VStack(spacing: 5) {
-                    Button(action: {
-                        self.playTalksInSequence = self.playTalksInSequence ? false : true
-                    })
-                    {
-                        Image(self.playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
-                            .resizable()
-                            .frame(width: 30, height:  30)
-                    }
-                    Text("play talk sequence")
-                        .font(.system(size: 12, weight: .regular))
-
-                }
-                
-                Spacer()
-                Button("transcript") {
-                    DisplayingBiographyOrTranscript = true
-                    selection = "TRANSCRIPT"
-                }
-                .font(.system(size: 12, weight: .regular))
-                .padding(.trailing, 15)
-                .hidden(!self.talk.hasTranscript())
+                .frame(height: 25)
+            Button("transcript") {
+                selection = "TRANSCRIPT"
             }
+            .font(.system(size: 12, weight: .regular))
+            .hidden(!self.talk.hasTranscript())
                 
             // Standard volume and output device control
             Spacer()
-            VolumeSlider()
-               .frame(height: 40)
-               .padding(.horizontal)
+            VStack (spacing: 0) {
+                Spacer()
+                Button(action: {
+                    self.playTalksInSequence = self.playTalksInSequence ? false : true
+                })
+                {
+                    Image(self.playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
+                        .resizable()
+                        .frame(width: 30, height:  30)
+                }
+                Text("play talks in sequence")
+                    .font(.system(size: 12, weight: .regular))
+                Spacer()
+                    .frame(height: 30)
+                VolumeSlider()
+                    .frame(height: 40)
+                    .padding(.horizontal)
+            }
             } // end group 2
   
         }  // end VStack
-        .onAppear {
-            TalkIsCurrentlyPlaying = true
-        }
-        .onDisappear {
-            TalkIsCurrentlyPlaying = false
-        }
-
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
+        NavigationLink(destination: EmptyView()) {EmptyView()}
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onAppear {
-            print("TalkPlayerView appeared")
+            TalkIsCurrentlyPlaying = true
             DisplayingBiographyOrTranscript = false
         }
         .onDisappear {
-            print("TalkPlayerView disappearing")
-            if DisplayingBiographyOrTranscript == false {
+            if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view
                 finishTalk()
             }
+            TalkIsCurrentlyPlaying = false
+
         }
         .navigationBarTitle(Text(playerTitle))
         .alert(isPresented: $displayNoInternet) {
@@ -398,7 +383,6 @@ struct TalkPlayerView: View {
                 primaryButton: .destructive(Text("OK")) {
                     
                     displayNoInternet = false
-
                 },
                 secondaryButton: .cancel()
             )
