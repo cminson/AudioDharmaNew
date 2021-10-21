@@ -18,7 +18,7 @@ import UIKit
  * UI for the top-level display of albums.  Invoked by SplashScreen after data model is loaded.
  */
 struct HomePageView: View {
-    var parentAlbum: AlbumData
+    @ObservedObject  var parentAlbum: AlbumData
     
     @State var selectedAlbum: AlbumData
     @State var selectedTalk: TalkData
@@ -26,6 +26,8 @@ struct HomePageView: View {
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = true
+    @State var isActive: Bool = false
+
     
     init(parentAlbum: AlbumData) {
         
@@ -34,11 +36,8 @@ struct HomePageView: View {
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
-        
-        let seconds = TheDataModel.RootAlbum.totalSeconds
-        print("ROOT SECONDS: ", seconds)
     }
-
+    
     
     var body: some View {
 
@@ -96,9 +95,3 @@ struct HomePageView: View {
         
 }
 
-/*
- .alert(isPresented: $noCurrentTalk) { () -> Alert in
-             Alert(title: Text("You haven't played a talk yet, so there is no talk to re-start"))
-  
-  }
- */

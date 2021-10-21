@@ -18,7 +18,8 @@ struct TalkRow: View {
   
     //let id = UUID()
     var album: AlbumData
-    @ObservedObject var talk: TalkData
+    var talk: TalkData
+    //@ObservedObject var talk: TalkData
     
     @State private var display = false
     @State private var displayNoteDialog = false

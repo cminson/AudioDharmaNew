@@ -66,6 +66,7 @@ struct AlbumRow: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
+                if UpdateInProgress == false {
                 if KEYS_TO_ALBUMS.contains(album.Key) {
                     selection = "ALBUMS"
                 }
@@ -73,6 +74,7 @@ struct AlbumRow: View {
                     selection = "USERALBUMS"
                 } else {
                     selection = "TALKS"
+                }
                 }
             }
         }
@@ -93,10 +95,12 @@ struct AlbumListView: View {
     
     var album: AlbumData
     
+    
     @State var selectedAlbum: AlbumData
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
+
     
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double

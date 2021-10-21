@@ -105,6 +105,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
+
             var filteredTalkList = self.talkList
             if !filter.isEmpty {
                 filteredTalkList = []

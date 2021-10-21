@@ -23,7 +23,7 @@ struct SplashScreen : View {
     init() {
         
         TheDataModel.initialize()
-        TheDataModel.downloadAndConfigure()
+        TheDataModel.downloadAndConfigure(startingApp: true)
     }
     
 
