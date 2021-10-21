@@ -13,7 +13,6 @@ import UIKit
 
 struct UserTalkRow: View {
   
-    //let id = UUID()
     var album: AlbumData
     @ObservedObject var talk: TalkData
     var talkSet: Set<TalkData>

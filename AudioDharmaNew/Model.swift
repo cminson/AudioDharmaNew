@@ -87,8 +87,8 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_MODEL_INTERVAL =  2 * 60     // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_MODEL_INTERVAL =  60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
 //var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 
 //var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
@@ -178,9 +178,9 @@ class Model {
             errorLog(error: error)
         }
 
-        self.PlayedTalks = self.loadPlayedTalksData()
-        self.UserDownloads = TheDataModel.loadUserDownloadData()
-        self.validateUserDownloadData()
+        PlayedTalks = loadPlayedTalksData()
+        UserDownloads = loadUserDownloadData()
+        validateUserDownloadData()
     }
     
     
@@ -210,9 +210,7 @@ class Model {
         }
         print("updateDataModel")
 
-        DispatchQueue.main.async {
-            self.downloadAndConfigure(startingApp: false)
-        }
+        downloadAndConfigure(startingApp: false)
     }
 
  
@@ -332,13 +330,16 @@ class Model {
                 if startingApp == true {
                     self.loadTalks(jsonDict: jsonDict)
                     self.loadAlbums(jsonDict: jsonDict)
+                    
                 }
                 else {
                     self.updateWithNewTalks(jsonDict: jsonDict)
+
                 }
                 for album in self.RootAlbum.albumList {
                     self.computeAlbumStats(album: album)
                 }
+                
             }
             catch {
             }
@@ -501,9 +502,7 @@ class Model {
         }
         
         ListAllTalks = self.ListAllTalks.sorted(by: { $0.Date > $1.Date })
-        
         AllTalksAlbum.talkList = ListAllTalks
-        computeAlbumStats(album: AllTalksAlbum)
     }
 
 
@@ -897,7 +896,9 @@ class Model {
 
     
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
-        
+       
+        //CJM DEV
+        /*
         var operation : String
         switch (type) {
         
@@ -926,6 +927,7 @@ class Model {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in }
         
         task.resume()
+         */
     }
     
     
@@ -950,7 +952,10 @@ class Model {
         // album.totalTalks is an observed published var
         // therefore need to update it via a dispatch to the main thread
         DispatchQueue.main.async {
+            
+            if TalkIsCurrentlyPlaying == false {
                 album.totalTalks = totalTalks
+            }
         }
         album.totalSeconds = totalSeconds
         
@@ -1504,7 +1509,7 @@ class Model {
                 try FileManager.default.removeItem(atPath: localPathMP3)
             }
             catch let error as NSError {
-                self.errorLog(error: error)
+                errorLog(error: error)
             }
         }
         
@@ -1522,7 +1527,7 @@ class Model {
                             try FileManager.default.removeItem(atPath: mp3FileURL.path)
                         }
                         catch let error as NSError {
-                            self.errorLog(error: error)
+                            errorLog(error: error)
                         }
 
                     }
@@ -1553,7 +1558,7 @@ class Model {
                 try FileManager.default.removeItem(atPath: localPathMP3)
             }
             catch let error as NSError {
-                self.errorLog(error: error)
+                errorLog(error: error)
             }
         }
     }

@@ -11,7 +11,7 @@ import SwiftUI
 import MediaPlayer
 import UIKit
 
-
+//(https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
 
 enum TalkStates {                   // all possible states of the talk player
     case INITIAL
@@ -22,11 +22,20 @@ enum TalkStates {                   // all possible states of the talk player
 }
 
 
+var TalkIsCurrentlyPlaying = false
 var TheTalkPlayer: TalkPlayer!
 var PlayEntireAlbum: Bool = false
 var PlayingDownloadedTalk: Bool = false
-
 var DisplayingBiographyOrTranscript = false
+
+
+//
+// Thes globals indicate whats playing now (or last played)
+//
+var CurrentTalk : TalkData = TalkData.empty()  // the last talk played or being played
+var CurrentTalkElapsedTime : Double = 0                // elapsed time in this talk
+var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk being played
+
 
 
 /*
@@ -47,7 +56,7 @@ struct VolumeSlider: UIViewRepresentable {
 
 struct TalkPlayerView: View {
     var album: AlbumData
-    var talk: TalkData
+    @State var talk: TalkData
     var elapsedTime: Double
 
     @State var selection: String?  = nil
@@ -73,7 +82,6 @@ struct TalkPlayerView: View {
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
         
-    
     }
 
     
@@ -94,16 +102,16 @@ struct TalkPlayerView: View {
         stateTalkPlayer = .LOADING
         playerTitle = "Loading Talk"
         
+        print("Will play talk: ", talk.Title)
 
         var talkURL : URL
-        if TheDataModel.hasBeenDownloaded(talk: talk) {
+        if TheDataModel.hasBeenDownloaded(talk: self.talk) {
             print("playing download edtalk")
             talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
         else {
             talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
         }
-        print(talkURL)
         TheTalkPlayer = TalkPlayer()
         TheTalkPlayer.talkPlayerView = self
         TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
@@ -142,18 +150,17 @@ struct TalkPlayerView: View {
     
     // invoked upon TheTalkPlayer completion
     mutating func talkHasCompleted () {
-        print("talkHasCompleted")
         
         stateTalkPlayer = .FINISHED
         TheTalkPlayer.stop()
-        self.resetTalkDisplay()
+        resetTalkDisplay()
 
         // if option is enabled, play the next talk in the current series
         if self.playTalksInSequence == true {
 
+
             if var index = self.album.talkList.firstIndex(of: self.talk) {
             
-                print("Old sequence talk: ", index, self.talk.Title)
                 index += 1
                 if index >= self.album.talkList.count { index = 0}
                 
@@ -161,21 +168,17 @@ struct TalkPlayerView: View {
                 self.talk = self.album.talkList[index]
                 self.elapsedTime = 0
                 TheDataModel.saveLastTalkState(talk: self.talk, elapsedTime: self.elapsedTime)
-
-                print("New sequence talk: ", index, self.talk.Title)
             }
-            self.playTalk()
+            playTalk()
         }
-        self.updateTitleDisplay()
+        updateTitleDisplay()
     }
     
     
     // invoked from background timer in TheTalkPlayer
     mutating func updateView(){
 
-        //print("Update View Elapsed Time", self.elapsedTime)
         stateTalkPlayer = .PLAYING
-
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -219,6 +222,10 @@ struct TalkPlayerView: View {
         }
     }
     
+    func debug() -> Text {
+        print("RENDERING:", self.talk.Title)
+            return Text(self.talk.Title)
+    }
     
     var body: some View {
 
@@ -228,7 +235,6 @@ struct TalkPlayerView: View {
             Spacer()
                 .frame(height: 15)
                 
-           // title, speaker
            Text(self.talk.Title)
                 .background(Color.white)
                 .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
@@ -260,10 +266,10 @@ struct TalkPlayerView: View {
                     ProgressView()
                         .hidden(stateTalkPlayer != .LOADING)
                     Button(action: {
-                        stateTalkPlayer == .PLAYING ? pauseTalk() : playTalk()
+                        self.stateTalkPlayer == .PLAYING ? pauseTalk() : playTalk()
                         })
                         {
-                            Image(stateTalkPlayer == .PLAYING ? "buttontalkpause" : "buttontalkplay")
+                            Image(self.stateTalkPlayer == .PLAYING ? "buttontalkpause" : "buttontalkplay")
                                 .resizable()
                                 .frame(width: 60, height: 60)
                         }
@@ -333,10 +339,10 @@ struct TalkPlayerView: View {
                 
                 VStack(spacing: 5) {
                     Button(action: {
-                        self.playTalksInSequence = playTalksInSequence ? false : true
+                        self.playTalksInSequence = self.playTalksInSequence ? false : true
                     })
                     {
-                        Image(playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
+                        Image(self.playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
                             .resizable()
                             .frame(width: 30, height:  30)
                     }
@@ -363,10 +369,15 @@ struct TalkPlayerView: View {
             } // end group 2
   
         }  // end VStack
+        .onAppear {
+            TalkIsCurrentlyPlaying = true
+        }
+        .onDisappear {
+            TalkIsCurrentlyPlaying = false
+        }
+
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
-        // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
-        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onAppear {

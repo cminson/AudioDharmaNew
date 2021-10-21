@@ -28,7 +28,7 @@ class TalkPlayer : NSObject {
     
     func startTalk(talkURL: URL, startAtTime: Double){
         
-        print("talkplayer startTalk")
+        print("talkplayer startTalk: ", talkURL)
 
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)

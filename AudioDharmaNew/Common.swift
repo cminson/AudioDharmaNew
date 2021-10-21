@@ -36,13 +36,6 @@ let SECONDARY_FONT_COLOR = UIColor.gray
 
 let MAX_SEARCH_RESULTS = 500    // Max results returned on album or talk search
 
-//
-// Thes globals indicate whats playing now (or last played)
-//
-var CurrentTalk : TalkData = TalkData.empty()  // the last talk played or being played
-var CurrentTalkElapsedTime : Double = 0                // elapsed time in this talk
-var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk being played
-
 
 
 /*

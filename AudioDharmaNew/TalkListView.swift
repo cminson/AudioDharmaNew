@@ -16,10 +16,8 @@ let ICON_TALK_NOTATED = Image("notebar")
 
 struct TalkRow: View {
   
-    //let id = UUID()
     var album: AlbumData
     var talk: TalkData
-    //@ObservedObject var talk: TalkData
     
     @State private var display = false
     @State private var displayNoteDialog = false
@@ -35,7 +33,6 @@ struct TalkRow: View {
     
     init(album: AlbumData, talk: TalkData) {
         
-        //self.id = UUID()
         self.album = album
         self.talk = talk
                 
@@ -180,15 +177,14 @@ struct TalkRow: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         }
         .frame(height: LIST_ROW_SIZE_STANDARD)
-
     }
-    
-
 }
 
 
 struct TalkListView: View {
     @ObservedObject var album: AlbumData
+    //var album: AlbumData
+
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
@@ -196,7 +192,6 @@ struct TalkListView: View {
     @State var selectedTalk: TalkData
     @State var selectedAlbum: AlbumData
 
-    
     init(album: AlbumData) {
         
         self.album = album
