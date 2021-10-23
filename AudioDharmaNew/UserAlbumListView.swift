@@ -174,10 +174,14 @@ struct UserAlbumListView: View {
             UserAlbumRow(album: album)
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
+        Button("New Album") {
+           Image(systemName: "plus.circle")
+        }
+        /*
         .toolbar {
             Button(action: {
                 displayNewCustomAlbum = true
@@ -185,6 +189,7 @@ struct UserAlbumListView: View {
                Image(systemName: "plus.circle")
             }
         }
+         */
         
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view

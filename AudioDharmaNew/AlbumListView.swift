@@ -54,14 +54,12 @@ struct AlbumRow: View {
                     .padding(.leading, 0)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
+                    Spacer()
                     Text(album.totalTalks.displayInCommaFormat())
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Text(album.totalSeconds.displayInClockFormat())
-                        .background(Color.white)
-                        .padding(.trailing, -10)
-                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
+                    Spacer()
                 }
             }
             .contentShape(Rectangle())
@@ -125,7 +123,7 @@ struct AlbumListView: View {
            AlbumRow(album: album)
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)

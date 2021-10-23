@@ -37,7 +37,6 @@ var CurrentTalkElapsedTime : Double = 0                // elapsed time in this t
 var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk being played
 
 
-
 /*
  ******************************************************************************
  * TalkPlayer
@@ -48,12 +47,11 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
 
 struct TalkPlayerView: View {
     var album: AlbumData
-    
     @State var talk: TalkData
     var elapsedTime: Double
+    var resumeLastTalk: Bool
 
     @State var selection: String?  = nil
-
     @State private var displayedElapsedTime: String
     @State private var sliderUpdating = false
     @State private var silderElapsedTime: Double = 0
@@ -64,15 +62,17 @@ struct TalkPlayerView: View {
     @State private var displayNoInternet = false
     @State private var stateTalkPlayer = TalkStates.INITIAL
 
-
-    init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
+    
+    init(album: AlbumData, talk: TalkData, elapsedTime: Double,  resumeLastTalk: Bool) {
         
         self.album = album
         self.talk = talk
         self.elapsedTime = elapsedTime
+        self.resumeLastTalk = resumeLastTalk
         
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
+        
     }
 
     
@@ -152,7 +152,8 @@ struct TalkPlayerView: View {
     // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
 
-        stateTalkPlayer = .PLAYING
+        self.stateTalkPlayer = .PLAYING
+        print(self.stateTalkPlayer)
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -211,7 +212,6 @@ struct TalkPlayerView: View {
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            //Text("About " + self.talk.Speaker)
             Text(self.talk.Speaker)
                 .underline()
                 .background(Color.white)
@@ -328,6 +328,7 @@ struct TalkPlayerView: View {
         .onAppear {
             TalkIsCurrentlyPlaying = true
             DisplayingBiographyOrTranscript = false
+            
         }
         .onDisappear {
             if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view

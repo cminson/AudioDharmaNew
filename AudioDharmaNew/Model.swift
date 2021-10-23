@@ -189,10 +189,8 @@ class Model {
     func startBackgroundTimers() {
         
         // CJM DEV
-        /*
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
-         */
 
     }
     
@@ -1203,10 +1201,11 @@ class Model {
     //
     func saveCustomUserAlbums() {
     
-        let image = UIImage(named: "tri_right_x")
+        let image = UIImage(named: "notebar")
         UserAlbums = []
         for album in self.CustomUserAlbums.albumList {
             
+            print(album.Title)
             let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
             
             var talkFileNameList: [String] = []

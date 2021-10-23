@@ -63,11 +63,8 @@ struct TalkRow: View {
                 
         VStack(alignment: .leading) {
             HStack() {
-                //Text(self.debug() ? stateTalkTitle : stateTalkTitle)
                 talk.Speaker.toImage()
                     .resizable()
-                    //.aspectRatio(contentMode: .fit)
-                    //.frame(width: LIST_IMAGE_HEIGHT)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .background(Color.white)
@@ -79,7 +76,7 @@ struct TalkRow: View {
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                     .background(Color.white)
                 Spacer()
-                VStack(alignment: .trailing, spacing: 8) {
+                VStack(alignment: .trailing, spacing: 5) {
                     Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
                         .background(Color.white)
                         .padding(.trailing, -5)
@@ -218,9 +215,9 @@ struct TalkListView: View {
         .listStyle(PlainListStyle())  // ensures fills parent view
         //.id(UUID())
         .navigationBarTitle(album.Title, displayMode: .inline)
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: false), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
