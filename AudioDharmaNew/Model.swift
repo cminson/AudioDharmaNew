@@ -80,6 +80,7 @@ let KEY_USEREDIT_ALBUMS = "KEY_USEREDIT_ALBUMS"
 let KEY_USER_TALKS = "KEY_USER_TALKS"
 let KEY_USEREDIT_TALKS = "KEY_USEREDIT_TALKS"
 let KEY_PLAY_TALK = "KEY_PLAY_TALK"
+let KEY_TRANCRIPT_TALKS = "KEY_TRANSCRIPT_TALKS"
 
 let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes per second of MP3.  Used to estimate size of download files
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
@@ -131,6 +132,7 @@ class Model {
     var UserShareHistoryAlbum =  AlbumData(title: "Shared Talks", key: KEY_USER_SHAREHISTORY, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     var SimilarTalksAlbum =  AlbumData(title: "Similar Talks", key: KEY_SIMILAR_TALKS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     var CustomUserAlbums =  AlbumData(title: "Custom Albums", key: KEY_USER_ALBUMS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+    var TranscriptsAlbum =  AlbumData(title: "Talks With Transcripts", key: KEY_TRANCRIPT_TALKS, section: "", imageName: "defaultPhoto", date: "", albumType: AlbumType.ACTIVE)
 
     var UserTalkHistoryList: [TalkHistoryData] = []
 
@@ -186,8 +188,11 @@ class Model {
     
     func startBackgroundTimers() {
         
+        // CJM DEV
+        /*
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+         */
 
     }
     
@@ -401,8 +406,10 @@ class Model {
                                          totalSeconds: seconds,
                                          pdf: pdf)
                     
+           
                 if talk.hasTranscript() {
-                    talk.Title = talk.Title + " [transcript]"
+                    //talk.Title = talk.Title + " [transcript]"
+                    TranscriptsAlbum.talkList.append(talk)
                 }
             
                 self.FileNameToTalk[fileName] = talk
@@ -441,10 +448,14 @@ class Model {
                 talkCount += 1
         }
         
+
+        
         // sort the albums
-        self.ListSpeakerAlbums = self.ListSpeakerAlbums.sorted(by: { $0.Key < $1.Key })
-        self.ListSeriesAlbums = self.ListSeriesAlbums.sorted(by: { $1.Date < $0.Date })
-        self.ListAllTalks = self.ListAllTalks.sorted(by: { $0.Date > $1.Date })
+        ListSpeakerAlbums = ListSpeakerAlbums.sorted(by: { $0.Key < $1.Key })
+        ListSeriesAlbums = ListSeriesAlbums.sorted(by: { $1.Date < $0.Date })
+        ListAllTalks = ListAllTalks.sorted(by: { $0.Date > $1.Date })
+        
+
         
         //  sort all talks in series albums
         for seriesAlbum in ListSeriesAlbums {
@@ -457,6 +468,10 @@ class Model {
             seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
         
+        TranscriptsAlbum.talkList = TranscriptsAlbum.talkList.sorted(by: { $0.Date > $1.Date })
+        ListSeriesAlbums.insert(TranscriptsAlbum, at: 0)
+        computeAlbumStats(album: TranscriptsAlbum)
+
         self.loadLastTalkState()
 
     }
@@ -489,9 +504,12 @@ class Model {
                                      pdf: pdf)
             FileNameToTalk[fileName] = talk
 
+            // CJM DEV
+            /*
             if talk.hasTranscript() {
                 talk.Title = talk.Title + " [transcript]"
             }
+             */
         
             ListAllTalks.append(talk)
             if let speakerAlbum = self.KeyToAlbum[speaker] {
@@ -1104,13 +1122,13 @@ class Model {
     func hasTalkBeenPlayed(talk: TalkData) -> Bool {
      
          return TheDataModel.PlayedTalks[talk.FileName] != nil
-
      }
 
      
      func isMostRecentTalk(talk: TalkData) -> Bool {
      
-         if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.last {
+         
+         if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.first {
              return talk.FileName == lastTalk.FileName
          }
          return false
@@ -1145,8 +1163,6 @@ class Model {
             }
         }
  
-
-        
         savePlayedTalksData()
         saveTalkHistoryData()
         self.computeAlbumStats(album: self.UserTalkHistoryAlbum)

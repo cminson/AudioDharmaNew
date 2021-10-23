@@ -79,6 +79,8 @@ struct AlbumRow: View {
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        //.background(NavigationLink(destination: TestView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: UserAlbumListView(album: album), tag: "USERALBUMS", selection: $selection) { EmptyView() } .hidden())
 

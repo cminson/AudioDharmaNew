@@ -45,19 +45,10 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
  ******************************************************************************
  */
 
-struct VolumeSlider: UIViewRepresentable {
-    
-   func makeUIView(context: Context) -> MPVolumeView {
-      MPVolumeView(frame: .zero)
-   }
-
-   func updateUIView(_ view: MPVolumeView, context: Context) {}
-}
 
 struct TalkPlayerView: View {
     var album: AlbumData
     
-    //DEV NEED OBWE
     @State var talk: TalkData
     var elapsedTime: Double
 
@@ -74,7 +65,6 @@ struct TalkPlayerView: View {
     @State private var stateTalkPlayer = TalkStates.INITIAL
 
 
-
     init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
         self.album = album
@@ -83,7 +73,6 @@ struct TalkPlayerView: View {
         
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
-        
     }
 
     
@@ -94,12 +83,10 @@ struct TalkPlayerView: View {
             self.displayNoInternet = true
             return
         }
-        
         if stateTalkPlayer == .PAUSED {
             
             TheTalkPlayer.play()
             return
-    
         }
         stateTalkPlayer = .LOADING
         playerTitle = "Loading Talk"
@@ -108,7 +95,7 @@ struct TalkPlayerView: View {
 
         var talkURL : URL
         if TheDataModel.hasBeenDownloaded(talk: self.talk) {
-            print("playing download edtalk")
+            print("playing download talk")
             talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
         }
         else {
@@ -117,7 +104,6 @@ struct TalkPlayerView: View {
         TheTalkPlayer = TalkPlayer()
         TheTalkPlayer.talkPlayerView = self
         TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
-        stateTalkPlayer = .PLAYING
       
     }
     
@@ -138,24 +124,11 @@ struct TalkPlayerView: View {
     }
     
     
-    func resetTalkDisplay() {
-        
-        print("resetTalkDisplay")
-    }
-    
-      
-    func updateTitleDisplay() {
-        print("updateTitleDisplay")
-        
-    }
-    
-    
     // invoked upon TheTalkPlayer completion
     mutating func talkHasCompleted () {
         
         stateTalkPlayer = .FINISHED
         TheTalkPlayer.stop()
-        resetTalkDisplay()
 
         // if option is enabled, play the next talk in the current series
         if self.playTalksInSequence == true {
@@ -173,7 +146,6 @@ struct TalkPlayerView: View {
             }
             playTalk()
         }
-        updateTitleDisplay()
     }
     
     
@@ -181,7 +153,6 @@ struct TalkPlayerView: View {
     mutating func updateView(){
 
         stateTalkPlayer = .PLAYING
-
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -191,17 +162,16 @@ struct TalkPlayerView: View {
             self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
             self.silderElapsedTime = self.elapsedTime
             self.displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
-            stateTalkPlayer = .PLAYING
         }
 
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
         if self.elapsedTime > 0 {
 
-            stateTalkPlayer = .PLAYING
 
             // if play time exceeds reporting threshold and not previously reported, report it
             if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
 
+                print("Adding to Talk History: ", talk.Title)
                 TheDataModel.addToTalkHistory(talk: self.talk)
                 TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
@@ -219,21 +189,19 @@ struct TalkPlayerView: View {
                     playerTitle = position + Int(self.elapsedTime).displayInClockFormat()
                 }
             } else {
+                //playerTitle = Int(self.elapsedTime).displayInClockFormat() + " | " + Int(self.talk.TotalSeconds).displayInClockFormat()
                 playerTitle = Int(self.elapsedTime).displayInClockFormat()
-
             }
         }
-
     }
     
        
     var body: some View {
 
         VStack(alignment: .center, spacing: 0) {
-
             Group {
             Spacer()
-                .frame(height: 15)
+                .frame(height: 30)
                 
            Text(self.talk.Title)
                 .background(Color.white)
@@ -243,7 +211,8 @@ struct TalkPlayerView: View {
                 .font(.system(size: 20, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            Text("About " + self.talk.Speaker)
+            //Text("About " + self.talk.Speaker)
+            Text(self.talk.Speaker)
                 .underline()
                 .background(Color.white)
                 .padding(.trailing, 0)
@@ -252,7 +221,7 @@ struct TalkPlayerView: View {
                     selection = "BIOGRAPHY"
                 }
             Spacer()
-                .frame(height: 20)
+                .frame(height: 30)
                 
             // play, pause, fast-forward,  fast-backward buttons
             HStack() {
@@ -260,25 +229,29 @@ struct TalkPlayerView: View {
                     TheTalkPlayer.seekFastBackward()
                 })
                 {
-                    Image("tri_left_x")
+                    Image(systemName: "backward.fill")
                         .resizable()
-                        .frame(width: 30, height:  30)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height:  20)
+                        .foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
                 }
                 Spacer()
                     .frame(width: 20)
                 ZStack() {
                     ProgressView()
-                        .hidden(stateTalkPlayer != .LOADING)
+                        .hidden(self.stateTalkPlayer != .LOADING)
                     Button(action: {
                         self.stateTalkPlayer == .PLAYING ? pauseTalk() : playTalk()
                         })
                         {
-                            Image(self.stateTalkPlayer == .PLAYING ? "buttontalkpause" : "buttontalkplay")
+                            Image(systemName: self.stateTalkPlayer == .PLAYING ? "pause.fill" : "play.fill")
                                 .resizable()
-                                .frame(width: 60, height: 60)
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 60)
                         }
                         .buttonStyle(PlainButtonStyle())
-                        .hidden(stateTalkPlayer == .LOADING)
+                        .hidden(self.stateTalkPlayer == .LOADING)
+
                 }  // end ZStack
                 Spacer()
                     .frame(width: 20)
@@ -286,9 +259,12 @@ struct TalkPlayerView: View {
                     TheTalkPlayer.seekFastForward()
                 })
                 {
-                    Image("tri_right_x")
+                    Image(systemName: "forward.fill")
                         .resizable()
-                        .frame(width: 30, height:  30)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height:  20)
+                        .foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
+
                 }
             }  // end HStack
             
@@ -299,21 +275,7 @@ struct TalkPlayerView: View {
             // current time and total time display
             Spacer()
                 .frame(height: 30)
-            HStack() {
-                Spacer()
-                Text(self.displayedElapsedTime)
-                    .font(.system(size: 12, weight: .regular))
-                Spacer()
-                    .frame(width: 20)
-                Text("|")
-                    .font(.system(size: 12, weight: .regular))
-                Spacer()
-                    .frame(width: 20)
-                Text(self.talk.TotalSeconds.displayInClockFormat())
-                    .font(.system(size: 12, weight: .regular))
-                Spacer()
-            }
-           
+                      
             // talk current position control
             Slider(value: $silderElapsedTime,
                    in: 0...Double(self.talk.TotalSeconds),
@@ -323,45 +285,44 @@ struct TalkPlayerView: View {
                         TheTalkPlayer.seekToTime(seconds: Int64(silderElapsedTime))
                     }
             })
-                .padding(.trailing, 20)
-                .padding(.leading, 20)
-                .frame(height: 30)
+            .padding(.trailing, 20)
+            .padding(.leading, 20)
+            .frame(height: 30)
+            .accentColor(Color.black)
                 
-            // optional biography and transcript buttons
             Spacer()
                 .frame(height: 25)
-            Button("transcript") {
-                selection = "TRANSCRIPT"
+            Button(action: {
+                self.playTalksInSequence = self.playTalksInSequence ? false : true
+            })
+            {
+                Image(systemName: "equal.circle.fill")
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(height:  30)
+                    .foregroundColor(self.playTalksInSequence == true ? Color.black : Color.gray)
+
             }
-            .font(.system(size: 12, weight: .regular))
-            .hidden(!self.talk.hasTranscript())
-                
-            // Standard volume and output device control
             Spacer()
-            VStack (spacing: 0) {
-                Spacer()
-                Button(action: {
-                    self.playTalksInSequence = self.playTalksInSequence ? false : true
-                })
-                {
-                    Image(self.playTalksInSequence ? "playTalkSequenceOn" : "playTalkSequenceOff")
-                        .resizable()
-                        .frame(width: 30, height:  30)
-                }
-                Text("play talks in sequence")
-                    .font(.system(size: 12, weight: .regular))
-                Spacer()
-                    .frame(height: 30)
-                VolumeSlider()
-                    .frame(height: 40)
-                    .padding(.horizontal)
-            }
+                .frame(height:  5)
+            Text("play talks in sequence")
+                .font(.system(size: 12, weight: .regular))
+
+                
+            Spacer()
+            VolumeSlider()
+                .frame(height: 50)
+                .padding(.horizontal)
+                .accentColor(Color.black)
+
+          
             } // end group 2
-  
+ 
         }  // end VStack
+      
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
-        NavigationLink(destination: EmptyView()) {EmptyView()}
+        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
         .foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onAppear {
@@ -376,6 +337,13 @@ struct TalkPlayerView: View {
 
         }
         .navigationBarTitle(Text(playerTitle))
+        .navigationBarTitle(album.Title, displayMode: .inline)
+        .toolbar {
+            Button(self.talk.hasTranscript() ? "Transcript" : "") {
+                selection = "TRANSCRIPT"
+            }
+            .hidden(!self.talk.hasTranscript())
+        }
         .alert(isPresented: $displayNoInternet) {
             Alert(
                 title: Text("Can Not Connect to AudioDharma"),
@@ -391,39 +359,17 @@ struct TalkPlayerView: View {
 }
 
 
+struct VolumeSlider: UIViewRepresentable {
+    
+    init() {
+        
+        //self.showsRouteButton = true
 
-/*
- let volumeView = MPVolumeView(frame: MPVolumeParentView.bounds)
+    }
+    
+   func makeUIView(context: Context) -> MPVolumeView {
+      MPVolumeView(frame: .zero)
+   }
 
- volumeView.showsRouteButton = true
-
- let iconBlack = UIImage(named: "routebuttonblack")
- let iconGreen = UIImage(named: "routebuttongreen")
- 
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.normal)
- volumeView.setRouteButtonImage(iconBlack, for: UIControl.State.disabled)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.highlighted)
- volumeView.setRouteButtonImage(iconGreen, for: UIControl.State.selected)
-
- volumeView.tintColor = MAIN_FONT_COLOR
- 
- 
- 
- let point = CGPoint(x: MPVolumeParentView.frame.size.width  / 2,y : (MPVolumeParentView.frame.size.height / 2) + 5)
- volumeView.center = point
- MPVolumeParentView.addSubview(volumeView)
- */
-
-    /*
-     
-     .navigationBarBackButtonHidden(true)
-    .toolbar(content: {
-          ToolbarItem (placement: .navigation)  {
-             Image(systemName: "arrow.left")
-             .foregroundColor(.white)
-             .onTapGesture {
-                 //self.presentation.wrappedValue.dismiss()
-             }
-          }
-    })
-     */
+   func updateUIView(_ view: MPVolumeView, context: Context) {}
+}

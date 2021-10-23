@@ -110,7 +110,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             if !filter.isEmpty {
                 filteredTalkList = []
                 for talk in self.talkList {
-                    let searchedData = talk.Title.lowercased()
+                    let transcript = talk.hasTranscript() ? "transcript" : ""
+                    let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript
                     if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
                 }
             }
@@ -124,10 +125,13 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredUserTalks(filter: String) -> [TalkData] {
 
+        /*
         let talkSet = Set(self.talkList)
         var listAllTalks = TheDataModel.ListAllTalks
         listAllTalks.removeAll(where: { talkSet.contains($0) })
         var allTalks = self.talkList + listAllTalks
+         */
+        var allTalks = self.talkList
 
         if !filter.isEmpty {
             var filteredTalkList: [TalkData] = []

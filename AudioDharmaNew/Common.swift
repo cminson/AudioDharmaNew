@@ -341,6 +341,8 @@ struct BiographyView: View {
         .onDisappear() {
             DisplayingBiographyOrTranscript = false
         }
+        .navigationBarTitle(talk.Speaker)
+
 
     }
 }
@@ -379,8 +381,8 @@ struct HelpPageView: View {
             HTMLView(text: $text)
                   .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
 
-
         }
+
     }
 }
 

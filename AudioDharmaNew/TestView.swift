@@ -1,20 +1,13 @@
 //
-//  TalkListView.swift
+//  TestView.swift
+//  AudioDharmaNew
 //
-//  General talks view.
-//
-//  Created by Christopher Minson on 9/9/21.
-//  Copyright © 2022 Christopher Minson. All rights reserved.
+//  Created by Christopher on 10/22/21.
 //
 
 import SwiftUI
-import UIKit
 
-let ICON_TALK_FAVORITE = Image("favoritebar")
-let ICON_TALK_NOTATED = Image("notebar")
-
-
-struct TalkRow: View {
+struct TestRow: View {
   
     var album: AlbumData
     var talk: TalkData
@@ -181,10 +174,8 @@ struct TalkRow: View {
 }
 
 
-struct TalkListView: View {
+struct TestView: View {
     @ObservedObject var album: AlbumData
-    //var album: AlbumData
-
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
@@ -198,36 +189,43 @@ struct TalkListView: View {
         selectedTalk = TalkData.empty()
         selectedAlbum = AlbumData.empty()
     }
+
     
-
+    
     var body: some View {
+        VStack(alignment: .center, spacing: 0) {
 
-        
-        SearchBar(text: $searchText)
-           .padding(.top, 0)
-        List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
-            
-            TalkRow(album: album, talk: talk)
-                .onTapGesture {
-                    print("talk selected: ", talk.Title)
-                    selectedTalk = talk
-                    selectedTalkTime = 0
-                    selection = "PLAY_TALK"
-                }
-        }
+            SearchBar(text: $searchText)
+               .padding(.top, 0)
+            List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
+                
+                TestRow(album: album, talk: talk)
+                    .onTapGesture {
+                        print("talk selected: ", talk.Title)
+                        selectedTalk = talk
+                        selectedTalkTime = 0
+                        selection = "PLAY_TALK"
+                    }
+            }
+ 
+        }  // end VStack
+        /*
         .listStyle(PlainListStyle())  // ensures fills parent view
+         */
         //.id(UUID())
+
         .navigationBarTitle(album.Title, displayMode: .inline)
+
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
+        /*
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
+         */
 
         .navigationBarHidden(false)
-        //.listStyle(PlainListStyle())  // ensures fills parent view
+        //.background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
 
-
-        .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {
@@ -236,18 +234,8 @@ struct TalkListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)
-               Spacer()
-               Button(action: {
-                   selection = "RESUME_TALK"
-                   selectedTalk = CurrentTalk
-                   selectedTalkTime = CurrentTalkElapsedTime
-               }) {
-                   Text("Resume Talk")
-                      
-               }
-               .foregroundColor(.black)
-               .hidden(!TheDataModel.currentTalkExists())
+               .foregroundColor(.black)  // ensure icons don't turn blue
+
                Spacer()
                Button(action: {
                    selection = "DONATE"
@@ -255,15 +243,11 @@ struct TalkListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black) // to ensure the toolbar icons don't turn blue
+              .foregroundColor(.black)
 
            }
-
        }
+      
     }
-
-
 }
-
-
 

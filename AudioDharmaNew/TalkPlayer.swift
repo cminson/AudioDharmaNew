@@ -8,7 +8,6 @@
 //
 
 import Foundation
-
 import UIKit
 import AVFoundation
 import CoreMedia
@@ -28,8 +27,6 @@ class TalkPlayer : NSObject {
     
     func startTalk(talkURL: URL, startAtTime: Double){
         
-        print("talkplayer startTalk: ", talkURL)
-
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
@@ -46,6 +43,7 @@ class TalkPlayer : NSObject {
         
     
     func verifyURL (urlString: String?) -> Bool {
+        
         if let urlString = urlString {
             if let url = URL(string: urlString) {
                 return UIApplication.shared.canOpenURL(url as URL)
@@ -54,35 +52,24 @@ class TalkPlayer : NSObject {
         return false
     }
     
-    @objc private func onAppWillResignActive() {
-           print("onAppWillResignActive")
-       }
-
     
     func play() {
         
-        print("talkplayer play")
-
         Player.play()
         startTalkTimer()
-
     }
         
     
     func stop() {
         
-        print("talkplayer stop")
         Player.pause()
         Player.seek(to: CMTime.zero)
-        
-        //CJM DEV
         stopTalkTimer()
     }
     
     
     func pause() {
-        print("talkplayer pause")
-
+        
         Player.pause()
         stopTalkTimer()
     }
@@ -100,8 +87,6 @@ class TalkPlayer : NSObject {
     
     func stopTalkTimer(){
 
-        print("talkplayer stopTalkTimer")
-
         if let timer = TalkTimer {
 
             timer.invalidate()
@@ -112,14 +97,13 @@ class TalkPlayer : NSObject {
     
     @objc func timerUpdate() {
         
+        // invoked every second.  inform parent view
         talkPlayerView.updateView()
     }
     
     
     @objc func talkHasCompleted() {
         
-        print("talkplayer talkHasCompleted")
-
         stopTalkTimer()
         talkPlayerView.talkHasCompleted()
     }
@@ -145,7 +129,6 @@ class TalkPlayer : NSObject {
             }
         }
         
-        //CJM DEV
         if getCurrentTimeInSeconds() >= getDurationInSeconds() {
             talkHasCompleted()
         }

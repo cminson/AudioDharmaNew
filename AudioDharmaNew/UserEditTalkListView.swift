@@ -36,18 +36,14 @@ struct UserTalkRow: View {
             HStack() {
                  talk.Speaker.toImage()
                     .resizable()
-                    //.aspectRatio(contentMode: .fit)
-                    //.frame(width: LIST_IMAGE_HEIGHT)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    //.background(self.inCustomList ? Color.orange : Color.white)
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + talk.Title : talk.Title)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
-                    //.background(self.inCustomList ? Color.orange : Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
                     Text(talk.TotalSeconds.displayInClockFormat())
@@ -125,7 +121,6 @@ struct UserEditTalkListView: View {
         SearchBar(text: $searchText)
            .padding(.top, 0)
         List(album.getFilteredUserTalks(filter: searchText)) { talk in
-           // List(album.talkList) { talk in
             
             UserTalkRow(album: album, talk: talk, talkSet: talkSet)
         }
@@ -167,7 +162,7 @@ struct UserEditTalkListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black) // to ensure the toolbar icons don't turn blue
+              .foregroundColor(.black) // to ensure  toolbar icons don't turn blue
 
            }
        }
