@@ -19,6 +19,8 @@ enum AlbumType {
     case HISTORICAL
 }
 
+var CachedCustomUserTalks : [TalkData]! = []
+
 
 //
 // AlbumData describes an album.  Containes either a list of talks
@@ -123,16 +125,22 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     }
 
     
-    func getFilteredUserTalks(filter: String) -> [TalkData] {
+    func getFilteredUserTalks(filter: String, editing: Bool) -> [TalkData] {
 
-        /*
-        let talkSet = Set(self.talkList)
-        var listAllTalks = TheDataModel.ListAllTalks
-        listAllTalks.removeAll(where: { talkSet.contains($0) })
-        var allTalks = self.talkList + listAllTalks
-         */
-        var allTalks = self.talkList
-
+        var allTalks : [TalkData] = []
+        
+        if editing == true {
+            allTalks =  CachedCustomUserTalks
+        }
+        else {
+            
+            let talkSet = Set(self.talkList)
+            var listAllTalks = TheDataModel.ListAllTalks
+            listAllTalks.removeAll(where: { talkSet.contains($0) })
+            allTalks = self.talkList + listAllTalks
+            CachedCustomUserTalks = allTalks
+        }
+     
         if !filter.isEmpty {
             var filteredTalkList: [TalkData] = []
             for talk in allTalks {
@@ -141,7 +149,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             }
             allTalks = filteredTalkList
         }
-        
         return allTalks
     }
 }

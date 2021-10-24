@@ -209,14 +209,14 @@ struct TalkPlayerView: View {
                 .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
-                .font(.system(size: 20, weight: .regular, design: .default))
+                .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
             Text(self.talk.Speaker)
                 .underline()
                 .background(Color.white)
                 .padding(.trailing, 0)
-                .font(.system(size: 20, weight: .regular, design: .default))
+                .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
                 .onTapGesture {
                     selection = "BIOGRAPHY"
                 }
@@ -272,7 +272,6 @@ struct TalkPlayerView: View {
             
             Group {
                 
-            // current time and total time display
             Spacer()
                 .frame(height: 30)
                       
@@ -301,14 +300,11 @@ struct TalkPlayerView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(height:  30)
                     .foregroundColor(self.playTalksInSequence == true ? Color.black : Color.gray)
-
             }
             Spacer()
                 .frame(height:  5)
             Text("play talks in sequence")
-                .font(.system(size: 12, weight: .regular))
-
-                
+                .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
             Spacer()
             VolumeSlider()
                 .frame(height: 50)

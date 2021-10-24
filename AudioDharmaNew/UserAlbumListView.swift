@@ -28,7 +28,6 @@ struct UserAlbumRow: View {
         for talk in album.talkList {
             print("Talk: ", talk.Title)
         }
-
     }
 
     var body: some View {
@@ -51,10 +50,6 @@ struct UserAlbumRow: View {
                         .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Text(album.totalSeconds.displayInClockFormat())
-                        .background(Color.white)
-                        .padding(.trailing, -10)
-                        .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
             }
             .contextMenu {
@@ -68,12 +63,10 @@ struct UserAlbumRow: View {
                     print("delete ablum")
                     displayDeleteAlbum = true
                 }
-
             }
             .contentShape(Rectangle())
             .onTapGesture {
                 selection = "TALKS"
-                
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
@@ -94,38 +87,39 @@ struct UserAlbumRow: View {
                         TheDataModel.CustomUserAlbums.albumList.remove(at: index)
                         TheDataModel.saveCustomUserAlbums()
                     }
-
                 },
                 secondaryButton: .cancel()
             )
         }
-
         .popover(isPresented: $displayEditCustomAlbum) {
             VStack() {
-                Text("Edit Album Title")
-                    .padding()
                 Spacer()
-                    .frame(height:30)
+                    .frame(height:20)
+                Text("Edit Album Title")
+                Spacer()
+                    .frame(height:5)
                 TextField("", text: $albumTitle)
                     .padding(.horizontal)
                     .frame(height: 40)
                     .border(Color.gray)
                 Spacer()
-                    .frame(height:30)
+                    .frame(height:20)
                 HStack() {
                     Button("Cancel") {
                         displayEditCustomAlbum = false
                     }
                     Spacer()
-                        .frame(width: 30)
-                    Button("Done") {
+                        .frame(width: 60)
+                    Button("OK") {
                         displayEditCustomAlbum = false
                         album.Title = albumTitle
                         TheDataModel.saveCustomUserAlbums()
                     }
                 }
+                Spacer()
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+            .frame(width: 300)
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         }
 
      }
@@ -146,7 +140,7 @@ struct UserAlbumListView: View {
     @State var displayNewCustomAlbum = false
     
     @State private var textStyle = UIFont.TextStyle.body
-    @State private var customAlbum = "Custom Album"
+    @State private var albumTitle = ""
 
     
     init(album: AlbumData) {
@@ -178,19 +172,11 @@ struct UserAlbumListView: View {
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
-        Button("New Album") {
-           Image(systemName: "plus.circle")
-        }
-        /*
         .toolbar {
-            Button(action: {
+            Button("New Album") {
                 displayNewCustomAlbum = true
-           }) {
-               Image(systemName: "plus.circle")
             }
         }
-         */
-        
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
@@ -228,25 +214,36 @@ struct UserAlbumListView: View {
        }
         .popover(isPresented: $displayNewCustomAlbum) {
             VStack() {
-                Text("New Custom Album")
-                    .padding()
                 Spacer()
-                    .frame(height:30)
-                TextField("", text: $customAlbum)
+                    .frame(height:20)
+                Text("New Album Title")
+                Spacer()
+                    .frame(height:5)
+                TextField("", text: $albumTitle)
                     .padding(.horizontal)
                     .frame(height: 40)
                     .border(Color.gray)
                 Spacer()
-                    .frame(height:30)
-                Button("Done") {
-                    displayNewCustomAlbum = false
-                    let newAlbum = AlbumData(title: customAlbum, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
-                    TheDataModel.CustomUserAlbums.albumList.append(newAlbum)
-                    TheDataModel.saveCustomUserAlbums()
+                    .frame(height:20)
+                HStack() {
+                    Button("Cancel") {
+                        displayNewCustomAlbum = false
+                    }
+                    Spacer()
+                        .frame(width: 60)
+                    Button("OK") {
+                        displayNewCustomAlbum = false
+                        let newAlbum = AlbumData(title: albumTitle, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        TheDataModel.CustomUserAlbums.albumList.append(newAlbum)
+                        TheDataModel.saveCustomUserAlbums()
+                    }
                 }
+                Spacer()
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+            .frame(width: 300)
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         }
+        
 
     }
     

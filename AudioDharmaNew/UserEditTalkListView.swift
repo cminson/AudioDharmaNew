@@ -10,6 +10,7 @@
 import SwiftUI
 import UIKit
 
+var EditingCustomAlbumTalks = false
 
 struct UserTalkRow: View {
   
@@ -66,7 +67,7 @@ struct UserTalkRow: View {
                 .padding(.trailing, -10)
             }
             .onTapGesture {
-                print("tap")
+                EditingCustomAlbumTalks = true
                 stateIsInCustomAlbum.toggle()
                 
                 if stateIsInCustomAlbum == true {
@@ -86,13 +87,8 @@ struct UserTalkRow: View {
         .background(stateIsInCustomAlbum ? Color.orange : Color.white)
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .frame(height: LIST_ROW_SIZE_STANDARD)
-
     }
-    
-
 }
-
-
 
 
 struct UserEditTalkListView: View {
@@ -114,13 +110,13 @@ struct UserEditTalkListView: View {
  
         self.talkSet = Set(album.talkList)
     }
-    
 
     var body: some View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(album.getFilteredUserTalks(filter: searchText)) { talk in
+      
+        List(album.getFilteredUserTalks(filter: searchText, editing: EditingCustomAlbumTalks)) { talk in
             
             UserTalkRow(album: album, talk: talk, talkSet: talkSet)
         }
@@ -166,7 +162,11 @@ struct UserEditTalkListView: View {
 
            }
        }
+        .onAppear {
+            EditingCustomAlbumTalks = false
+        }
         .onDisappear {
+            EditingCustomAlbumTalks = false
             TheDataModel.computeAlbumStats(album: album)
             TheDataModel.saveCustomUserAlbums()
             print("OnDisappear")

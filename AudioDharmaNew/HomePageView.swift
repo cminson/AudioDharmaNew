@@ -31,7 +31,6 @@ struct HomePageView: View {
     
     init(parentAlbum: AlbumData) {
         
-        //UINavigationBar.appearance().titleTextAttributes = [.font : UIFont(name: "Georgia-Bold", size: 20)!]
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()

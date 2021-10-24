@@ -15,28 +15,26 @@ import WebKit
 //
 // Global Vars and Constants
 //
-
-var BusyIndicator =  UIActivityIndicatorView()
-
 let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]
 
 let LIST_IMAGE_HEIGHT : CGFloat = 40.0
 let LIST_IMAGE_WIDTH : CGFloat = 40.0
-let FONT_SIZE_SECTION : CGFloat = 14.0
 let LIST_ROW_SIZE_SECTION : CGFloat = 35.0
 let LIST_ROW_SIZE_STANDARD : CGFloat = 40.0
 
 let FONT_SIZE_ROW_TITLE : CGFloat = 16
 let FONT_SIZE_ROW_ATTRIBUTES : CGFloat = 10
- 
+let FONT_SIZE_SECTION : CGFloat = 14
+let FONT_SIZE_BIOGRAPHY_TEXT : CGFloat = 16
+let FONT_SIZE_HELP_TEXT : CGFloat = 16
+let FONT_SIZE_DONATION_TEXT : CGFloat = 16
+let FONT_SIZE_TALK_PLAYER : CGFloat = 20
+let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
+
 let COLOR_BACKGROUND_SECTION = "555555"
 
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
-
-let MAX_SEARCH_RESULTS = 500    // Max results returned on album or talk search
-
-
 
 /*
  *********************************************************************************
@@ -91,10 +89,10 @@ struct ToolBar: ToolbarContent {
                     .renderingMode(.original)
 
             }
-            
         }
     }
 }
+
 
 struct HTMLView: UIViewRepresentable {
   @Binding var text: String
@@ -137,8 +135,6 @@ struct PDFKitView: View {
         PDFKitRepresentedView(url)
     }
 }
-
-
 
 
 struct SearchBar: View {
@@ -330,7 +326,7 @@ struct BiographyView: View {
                 .frame(height: 20)
             ScrollView {
             Text(stateBiographyText)
-                .font(.system(size: 16, weight: .regular))
+                .font(.system(size: FONT_SIZE_BIOGRAPHY_TEXT, weight: .regular))
                 .padding(.leading, 20)
                 .padding(.trailing, 20)
             }
@@ -342,97 +338,77 @@ struct BiographyView: View {
             DisplayingBiographyOrTranscript = false
         }
         .navigationBarTitle(talk.Speaker)
-
-
     }
 }
 
 
 struct HelpPageView: View {
     
-    @State var text: String
-    
-    init()
-    {
-        if let filepath = Bundle.main.path(forResource: "help", ofType: "txt") {
-            do {
-                text = try String(contentsOfFile: filepath)
-            } catch {
-                text = "Temporarily Unavailable"
-            }
-        } else {
-            text = "Temporarily Unavailable"
-        }
-    }
-    
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
            
-   
+            ScrollView {
+
             Spacer()
                 .frame(height:30)
             Text("General")
-                .font(.system(size: 20, weight: .heavy))
+                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
-            Text("• All talks are organized into albums.\n• Touch an album and it will display all the talks it contains.\n •Touch-and-hold a talk to display its menu.  This allows you to do operations like downloading and sharing.\n• To resume playing your last talk at the point you left it, touch the Resume button at the bottom of the screen.")
-                .font(.system(size: 18, weight: .regular))
+            Text("• All talks are organized into albums.\n• Touch an album and it will display all the talks it contains.\n •Touch-and-hold a talk to display its menu.  This allows you to do operations like downloading and sharing.\n• To resume playing your last talk at the point you left it, touch the Resume button at the bottom of the screen.\n• To view a speaker's background, touch the underlined speaker name in the Play Talks window.")
+                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:20)
             Text("Custom Albums")
-                .font(.system(size: 20, weight: .heavy))
+                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
             Text("• To create a custom album, go to custom albums and touch New Albums.\n •Touch-and-hold a custom album to display its menu.  This menu allows you to to edit the custom album and add or delete talks.")
-                .font(.system(size: 18, weight: .regular))
+                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
-          // HTMLView(text: $text)
-                //.frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            }
 
         }
         .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         .navigationBarTitle("Help", displayMode: .inline)
-
-
     }
 }
 
+
 struct DonationPageView: View {
     
-    @State var text : String
-    
-    init()
-    {
-        if let filepath = Bundle.main.path(forResource: "donate", ofType: "txt") {
-            do {
-                text = try String(contentsOfFile: filepath)
-            } catch {
-                text = "Temporarily Unavailable"
-            }
-        } else {
-            text = "Temporarily Unavailable"
-        }
-    }
 
     var body: some View {
-        //VStack(alignment: .leading, spacing: 0) {
-            VStack(alignment: .leading, spacing: 0) {
-                Spacer()
-                    .frame(height:30)
-                Text("Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs. Our financial support comes from the generosity of people who value what we do.")
-                        .font(.system(size: 18, weight: .regular))
-                        .multilineTextAlignment(.leading)
-                Spacer()
-                    .frame(height:10)
-               Text("If you wish to donate please click the Donation link below.")
-                    .font(.system(size: 18, weight: .regular))
+        VStack(alignment: .leading, spacing: 0) {
+            Spacer()
+                .frame(height:30)
+            Text("Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs. Our financial support comes from the generosity of people who value what we do.")
+                    .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
                     .multilineTextAlignment(.leading)
+            Spacer()
+                .frame(height:10)
+           Text("If you wish to donate please click the link below.")
+                .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
+                .multilineTextAlignment(.leading)
+            Spacer()
+                .frame(height:30)
+            HStack() {
                 Spacer()
+                Link(destination: URL(string: URL_DONATE)!, label: {
+                    Text("Donate")
+                        .underline()
+                        .foregroundColor(.black)
+                        .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .heavy))
+
+                })
+                Spacer()
+            }
+            Spacer()
 
             
         }

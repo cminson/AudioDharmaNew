@@ -35,7 +35,6 @@ let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    /
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
 let CONFIG_GET_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/XGETACTIVITY.php?"           // where to get sangha activity (shares, listens)
 let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.php?KEY="           // where to get similar talks\
-let CONFIG_GET_HELP = "/AudioDharmaAppBackend/Access/XGETHELP.php?"           // where to get help page
 let DEFAULT_MP3_PATH = "http://www.audiodharma.org"     // where to get talks
 let DEFAULT_DONATE_PATH = "http://audiodharma.org/donate/"       // where to donate
 
@@ -342,7 +341,9 @@ class Model {
                 for album in self.RootAlbum.albumList {
                     self.computeAlbumStats(album: album)
                 }
-                
+                for album in self.CustomUserAlbums.albumList {
+                    self.computeAlbumStats(album: album)
+                }
             }
             catch {
             }
@@ -1152,8 +1153,8 @@ class Model {
 
         let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
 
-        self.UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
-        self.UserTalkHistoryList.insert(talkHistory, at: 0)
+        UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
+        UserTalkHistoryList.insert(talkHistory, at: 0)
         let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {
@@ -1163,7 +1164,7 @@ class Model {
  
         savePlayedTalksData()
         saveTalkHistoryData()
-        self.computeAlbumStats(album: self.UserTalkHistoryAlbum)
+        computeAlbumStats(album: self.UserTalkHistoryAlbum)
     }
     
     func addToShareHistory(talk: TalkData) {
@@ -1176,7 +1177,7 @@ class Model {
         formatter.dateFormat = "HH:mm:ss"
         let timePlayed = formatter.string(from: date)
         
-        self.PlayedTalks[talk.FileName] = true
+        PlayedTalks[talk.FileName] = true
         talk.DatePlayed = datePlayed
         talk.TimePlayed = timePlayed
         UserShareHistoryAlbum.talkList.append(talk)
@@ -1211,15 +1212,15 @@ class Model {
             var talkFileNameList: [String] = []
             for talk in album.talkList {
                 
-                if let _ = self.getTalkForName(name: talk.FileName) {
+                if let _ = getTalkForName(name: talk.FileName) {
                     talkFileNameList.append(talk.FileName)
                 }
             }
             userAlbum.TalkFileNames = talkFileNameList
             UserAlbums.append(userAlbum)
         }
-        self.saveUserAlbumData()
-        self.computeAlbumStats(album: self.CustomUserAlbums)
+        saveUserAlbumData()
+        computeAlbumStats(album: CustomUserAlbums)
         
     }
     

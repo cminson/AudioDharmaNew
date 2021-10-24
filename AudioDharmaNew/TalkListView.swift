@@ -39,7 +39,13 @@ struct TalkRow: View {
         stateIsFavoriteTalk = TheDataModel.isFavoriteTalk(talk: talk)
         stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
 
-        stateTalkTitle = talk.Title
+        if album.Key == KEY_ALL_TALKS {
+            stateTalkTitle = talk.Title + " | " + talk.Speaker
+
+        } else {
+            stateTalkTitle = talk.Title
+
+        }
         if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
@@ -199,14 +205,12 @@ struct TalkListView: View {
 
     var body: some View {
 
-        
         SearchBar(text: $searchText)
            .padding(.top, 0)
         List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
-                    print("talk selected: ", talk.Title)
                     selectedTalk = talk
                     selectedTalkTime = 0
                     selection = "PLAY_TALK"
