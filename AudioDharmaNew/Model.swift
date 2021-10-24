@@ -232,22 +232,29 @@ class Model {
                     
                     CurrentTalk = talk
                     CurrentTalkElapsedTime = Double(elapsedTime) ?? 0
-                    print("LOADING NEW CURRENT TALK: ", CurrentTalk.Title)
+                    CurrentAlbum = AlbumData.empty()
+                    if let key = UserDefaults.standard.string(forKey: "AlbumKey") {
+                        if let album = KeyToAlbum[key] {
+                            CurrentAlbum = album
+                        }
+                    }
+                    print("LOADING NEW CURRENT TALK: ", CurrentAlbum.Title, CurrentTalk.Title)
                 }
             }
         }
     }
     
     
-    func saveLastTalkState(talk: TalkData, elapsedTime: Double) {
+    func saveLastTalkState(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
         //print("saveLastTalkState", talk.Title, elapsedTime)
 
         CurrentTalk = talk
+        CurrentAlbum = album
         CurrentTalkElapsedTime = elapsedTime
         UserDefaults.standard.set(CurrentTalkElapsedTime, forKey: "CurrentTalkTime")
         UserDefaults.standard.set(CurrentTalk.FileName, forKey: "TalkName")
-
+        UserDefaults.standard.set(CurrentAlbum.Key, forKey: "AlbumKey")
     }
  
     
@@ -583,7 +590,9 @@ class Model {
                     self.CustomUserAlbums = album
                     self.UserAlbums = TheDataModel.loadUserAlbumData()
                     for userAlbumData in self.UserAlbums {
+                        let albumKey = self.randomKey()
                         let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        KeyToAlbum[albumKey] = customAlbum
                         albumList.append(customAlbum)
                         for fileName in userAlbumData.TalkFileNames {
                             if let talk = FileNameToTalk[fileName] {
@@ -618,6 +627,7 @@ class Model {
                 album.albumList = albumList
                 album.talkList = talkList
                 self.RootAlbum.albumList.append(album)
+                KeyToAlbum[key] = album
 
                 // get the optional talk array for this Album
                 for jsonTalk in jsonTalkList {
@@ -1328,142 +1338,188 @@ class Model {
     
     
     //
-    // MARK: Load Persistent Data
+    // MARK:  Persistent Data Functions
     //
+    func saveTalkHistoryData() {
+        
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserTalkHistoryList, requiringSecureCoding: false) {
+                try data.write(to: TalkHistoryData.ArchiveTalkHistoryURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
+    }
+
+    
     func loadTalkHistoryData() -> [TalkHistoryData]  {
         
-        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
-            as? [TalkHistoryData] {
-            
-            return talkHistory
-        } else {
-            
-            return [TalkHistoryData] ()
+        if let data = try? Data(contentsOf: TalkHistoryData.ArchiveTalkHistoryURL) {
+            if let talkHistory = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [TalkHistoryData] {
+                return talkHistory
+            } else {
+                return [TalkHistoryData] ()
+            }
         }
+        return [TalkHistoryData] ()
+    }
+
+    
+    func saveShareHistoryData() {
         
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserShareHistoryAlbum, requiringSecureCoding: false) {
+                try data.write(to: TalkHistoryData.ArchiveShareHistoryURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
     }
 
     
     func loadShareHistoryData() -> [TalkHistoryData]  {
         
-        if let talkHistory = NSKeyedUnarchiver.unarchiveObject(withFile: TalkHistoryData.ArchiveShareHistoryURL.path)
-            as? [TalkHistoryData] {
-            
-            return talkHistory
-        } else {
-            
-            return [TalkHistoryData] ()
+        if let data = try? Data(contentsOf: TalkHistoryData.ArchiveShareHistoryURL) {
+            if let talkHistory = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [TalkHistoryData] {
+                return talkHistory
+            } else {
+                return [TalkHistoryData] ()
+            }
         }
+        return [TalkHistoryData] ()
     }
         
+    
+    func savePlayedTalksData() {
+         
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: PlayedTalks, requiringSecureCoding: false) {
+                try data.write(to: PlayedTalks_ArchiveURL)
+            }
+        } catch let error as NSError {
+            errorLog(error: error)
+        }
+     }
+
     
     func loadPlayedTalksData() -> [String: Bool]  {
         
-        if let playedTalks = NSKeyedUnarchiver.unarchiveObject(withFile: PlayedTalks_ArchiveURL.path)
-            as? [String: Bool] {
-            
-            return playedTalks
-        } else {
-            
-            return [String: Bool] ()
+        if let data = try? Data(contentsOf: PlayedTalks_ArchiveURL) {
+            if let playedTalks = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: Bool] {
+                return playedTalks
+            } else {
+                return [String: Bool] ()
+            }
         }
+        return [String: Bool] ()
     }
 
 
-    func loadUserAlbumData() -> [UserAlbumData]  {
-        
-        if let userAlbumData = NSKeyedUnarchiver.unarchiveObject(withFile: UserAlbumData.ArchiveURL.path) as? [UserAlbumData] {
-            
-            return userAlbumData
-        } else {
-            
-            return [UserAlbumData] ()
-        }
-    }
-
-    func loadUserNoteData() -> [String: UserNoteData]  {
-        
-        if let userNotes = NSKeyedUnarchiver.unarchiveObject(withFile: UserNoteData.ArchiveURL.path)
-            as? [String: UserNoteData] {
-            
-            return userNotes
-        } else {
-            
-            return [String: UserNoteData] ()
-        }
-    }
-
-    func loadUserFavoriteData() -> [String: UserFavoriteData]  {
-        
-        if let userFavorites = NSKeyedUnarchiver.unarchiveObject(withFile: UserFavoriteData.ArchiveURL.path)
-            as? [String: UserFavoriteData] {
-            
-            return userFavorites
-        } else {
-            
-            return [String: UserFavoriteData] ()
-        }
-    }
-
-    func loadUserDownloadData() -> [String: UserDownloadData]  {
-        
-        if let userDownloads = NSKeyedUnarchiver.unarchiveObject(withFile: UserDownloadData.ArchiveURL.path)
-            as? [String: UserDownloadData] {
-            
-            return userDownloads
-        } else {
-            
-            return [String: UserDownloadData] ()
-        }
-    }
-
-
-    
-    //
-    // MARK: Save Persistent Data
-    //
     func saveUserAlbumData() {
         
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserAlbums, toFile: UserAlbumData.ArchiveURL.path)
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserAlbums, requiringSecureCoding: false) {
+                try data.write(to: UserAlbumData.ArchiveURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
     }
+
+    
+    func loadUserAlbumData() -> [UserAlbumData]  {
+        
+        if let data = try? Data(contentsOf: UserAlbumData.ArchiveURL) {
+            if let userAlbumData = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [UserAlbumData] {
+                return userAlbumData
+            } else {
+                return [UserAlbumData] ()
+            }
+        }
+        return [UserAlbumData] ()
+    }
+
     
     func saveUserNoteData() {
-        print("saveUserNoteData", TheDataModel.UserNotes)
         
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserNotes, toFile: UserNoteData.ArchiveURL.path)
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserNotes, requiringSecureCoding: false) {
+                try data.write(to: UserNoteData.ArchiveURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
     }
+
+    
+    func loadUserNoteData() -> [String: UserNoteData]  {
+        
+        if let data = try? Data(contentsOf:  UserNoteData.ArchiveURL) {
+            if let userNotes = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: UserNoteData] {
+                return userNotes
+            } else {
+                return [String: UserNoteData] ()
+            }
+        }
+        return [String: UserNoteData] ()
+    }
+    
     
     func saveUserFavoritesData() {
         
-        print("saveUserFavoritesData", TheDataModel.UserFavorites)
-
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserFavorites, toFile: UserFavoriteData.ArchiveURL.path)
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserFavorites, requiringSecureCoding: false) {
+                try data.write(to: UserFavoriteData.ArchiveURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
     }
+
+
+    func loadUserFavoriteData() -> [String: UserFavoriteData]  {
+        
+        if let data = try? Data(contentsOf:  UserFavoriteData.ArchiveURL) {
+            if let userFavorites = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: UserFavoriteData] {
+                return userFavorites
+            } else {
+                return [String: UserFavoriteData] ()
+            }
+        }
+        return [String: UserFavoriteData] ()
+    }
+    
     
     func saveUserDownloadData() {
         
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserDownloads, toFile: UserDownloadData.ArchiveURL.path)
+        do {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserDownloads, requiringSecureCoding: false) {
+                try data.write(to: UserDownloadData.ArchiveURL)
+            }
+        }
+        catch let error as NSError {
+            errorLog(error: error)
+        }
     }
 
-    
-    func saveTalkHistoryData() {
+
+    func loadUserDownloadData() -> [String: UserDownloadData]  {
         
-
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserTalkHistoryList, toFile: TalkHistoryData.ArchiveTalkHistoryURL.path)
+        if let data = try? Data(contentsOf: UserDownloadData.ArchiveURL) {
+            if let userDownloads = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [String: UserDownloadData] {
+                return userDownloads
+            } else {
+                return [String: UserDownloadData] ()
+            }
+        }
+        return [String: UserDownloadData] ()
     }
-    
-    func saveShareHistoryData() {
-        
-        NSKeyedArchiver.archiveRootObject(TheDataModel.UserShareHistoryAlbum, toFile: TalkHistoryData.ArchiveShareHistoryURL.path)
-    }
-    
-
-    func savePlayedTalksData() {
-         
-         NSKeyedArchiver.archiveRootObject(PlayedTalks, toFile: PlayedTalks_ArchiveURL.path)
-     }
-    
+       
     
     //
     // MARK: Support Functions
@@ -1691,10 +1747,10 @@ class Model {
         return FileNameToTalk[name]
     }
 
-
     
     func errorLog(error: NSError) {
         
+        print("ERROR: ", error)
     }
     
 

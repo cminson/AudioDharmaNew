@@ -127,7 +127,6 @@ struct TalkPlayerView: View {
     // invoked upon TheTalkPlayer completion
     mutating func talkHasCompleted () {
         
-        stateTalkPlayer = .FINISHED
         TheTalkPlayer.stop()
 
         // if option is enabled, play the next talk in the current series
@@ -142,7 +141,7 @@ struct TalkPlayerView: View {
                 self.silderElapsedTime = 0
                 self.talk = self.album.talkList[index]
                 self.elapsedTime = 0
-                TheDataModel.saveLastTalkState(talk: self.talk, elapsedTime: self.elapsedTime)
+                TheDataModel.saveLastTalkState(album: self.album, talk: self.talk, elapsedTime: self.elapsedTime)
             }
             playTalk()
         }
@@ -178,7 +177,7 @@ struct TalkPlayerView: View {
             }
 
             // persistent store off the current talk and position in talk
-            TheDataModel.saveLastTalkState(talk: self.talk, elapsedTime: self.elapsedTime)
+            TheDataModel.saveLastTalkState(album: album, talk: self.talk, elapsedTime: self.elapsedTime)
 
             if playTalksInSequence {
                 

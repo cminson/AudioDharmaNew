@@ -242,6 +242,7 @@ struct TalkListView: View {
                Button(action: {
                    selection = "RESUME_TALK"
                    selectedTalk = CurrentTalk
+                   selectedAlbum = CurrentAlbum
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
