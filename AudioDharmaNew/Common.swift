@@ -377,7 +377,7 @@ struct HelpPageView: View {
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
-            Text("• All talks Are organized into albums.\n• Touch an album and it will display all the talks it contains.\n •Touch-and-hold a talk to display its menu.  This allows you to do operations like downloading and sharing.\n• To resume playing your last talk at the point you left it, touch the Resume button at the bottom of the screen.")
+            Text("• All talks are organized into albums.\n• Touch an album and it will display all the talks it contains.\n •Touch-and-hold a talk to display its menu.  This allows you to do operations like downloading and sharing.\n• To resume playing your last talk at the point you left it, touch the Resume button at the bottom of the screen.")
                 .font(.system(size: 18, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
@@ -387,7 +387,7 @@ struct HelpPageView: View {
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
-            Text("• To create a custom album, go to custom albums and touch New Albums.\n •Touch-and-hold a custom album to display its menu.  This menu allows to to edit the custom album and add or delete talks.")
+            Text("• To create a custom album, go to custom albums and touch New Albums.\n •Touch-and-hold a custom album to display its menu.  This menu allows you to to edit the custom album and add or delete talks.")
                 .font(.system(size: 18, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
@@ -422,10 +422,23 @@ struct DonationPageView: View {
     var body: some View {
         //VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 0) {
+                Spacer()
+                    .frame(height:30)
+                Text("Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs. Our financial support comes from the generosity of people who value what we do.")
+                        .font(.system(size: 18, weight: .regular))
+                        .multilineTextAlignment(.leading)
+                Spacer()
+                    .frame(height:10)
+               Text("If you wish to donate please click the Donation link below.")
+                    .font(.system(size: 18, weight: .regular))
+                    .multilineTextAlignment(.leading)
+                Spacer()
 
-            HTMLView(text: $text)
-                    .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            
         }
+        .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+        .navigationBarTitle("Donations", displayMode: .inline)
+
     }
 }
 
