@@ -1,0 +1,11 @@
+convert -size 240x240 xc:transparent -fill transparent -draw 'rectangle 0,0, 240,240' rect.png
+convert -size 60x60 xc:transparent  -stroke '#555555'  -fill '#555555' -draw 'circle 30,30 30,59' circle.png
+composite -gravity center circle.png rect.png personal.png
+composite -gravity center circle.png rect.png sequence.png
+composite -gravity east circle.png sequence.png sequence.png
+composite -gravity west circle.png sequence.png  sequence.png
+composite -gravity west -geometry +30+0  circle.png rect.png  community.png
+composite -gravity east -geometry +30+60  circle.png community.png  community.png
+composite -gravity east -geometry +30-60  circle.png community.png  community.png
+convert community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,190' community.png
+convert community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,50' community.png

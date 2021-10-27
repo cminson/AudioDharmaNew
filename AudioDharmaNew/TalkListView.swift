@@ -29,7 +29,8 @@ struct TalkRow: View {
     @State private var stateIsNotatedTalk : Bool
     @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
-    
+    @State private var displayDownloadInProgress = false
+
     
     init(album: AlbumData, talk: TalkData) {
         
@@ -93,6 +94,14 @@ struct TalkRow: View {
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
+                .alert(isPresented: $displayDownloadInProgress) {
+                    Alert(
+                        title: Text("Download  in Progress"),
+                        message: Text("Please wait until the other download completes"),
+                        dismissButton: .default(Text("OK")) {
+                        }
+                    )
+                }
                 VStack() {
                     ICON_TALK_FAVORITE
                         .resizable()
@@ -103,6 +112,24 @@ struct TalkRow: View {
                         .frame(width: 12, height: 12)
                         .hidden(!stateIsNotatedTalk)
                  }
+                .alert(isPresented: $displayDownloadDialog) {
+                    Alert(
+                        title: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
+                        message: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
+                        primaryButton: .destructive(Text("OK")) {
+                            if TheDataModel.hasBeenDownloaded(talk: talk) {
+                                TheDataModel.unsetTalkAsDownloaded(talk:talk)
+                            } else {
+                                if TheDataModel.DownloadInProgress == false {
+                                    displayDownloadInProgress = false
+                                    stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
+                                    TheDataModel.startDownload(talk: talk, success: downloadCompleted)
+                                }                         }
+                        },
+                        secondaryButton: .cancel()
+                    )
+                }
+
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
@@ -124,28 +151,16 @@ struct TalkRow: View {
                     .frame(width: 300)
                     Button("Download | Remove Download") {
                         if TheDataModel.DownloadInProgress == false {
+                            print("launching download")
+
                             self.displayDownloadDialog = true
+                        } else {
+                            print("Setting Progress")
+                            self.displayDownloadInProgress = true
                         }
                     }
+
                 }
-            }
-        
-            .alert(isPresented: $displayDownloadDialog) {
-                Alert(
-                    title: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
-                    message: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
-                    primaryButton: .destructive(Text("OK")) {
-                        if TheDataModel.hasBeenDownloaded(talk: talk) {
-                            TheDataModel.unsetTalkAsDownloaded(talk:talk)
-                        } else {
-                            if TheDataModel.DownloadInProgress == false {
-                                stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                                TheDataModel.startDownload(talk: talk, success: downloadCompleted)
-                            }
-                        }
-                    },
-                    secondaryButton: .cancel()
-                )
             }
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
@@ -161,23 +176,37 @@ struct TalkRow: View {
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
-                Text(talk.Title)
-                    .padding()
                 Spacer()
-                    .frame(height:30)
+                    .frame(height:20)
+                Text("Edit Notes:  " + talk.Title)
+                Spacer()
+                    .frame(height:5)
                 TextView(text: $noteText, textStyle: $textStyle)
                     .padding(.horizontal)
                     .frame(height: 100)
                     .border(Color.gray)
                 Spacer()
-                    .frame(height:30)
-                Button("Done") {
-                    TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
-                    self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
-                    displayNoteDialog = false
+                    .frame(height:20)
+   
+                HStack() {
+                    Button("Delete") {
+                        noteText = ""
+                        TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
+                        self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
+                        displayNoteDialog = false
+                    }
+                    Spacer()
+                        .frame(width: 60)
+                    Button("OK") {
+                        TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
+                        self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
+                        displayNoteDialog = false
+                    }
                 }
+                Spacer()
             }
-            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
+            .frame(width: 300)
+            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         }
         .frame(height: LIST_ROW_SIZE_STANDARD)
     }
@@ -194,12 +223,15 @@ struct TalkListView: View {
     @State var selectedTalkTime: Double = 0
     @State var selectedTalk: TalkData
     @State var selectedAlbum: AlbumData
+    @State var resumeButtonHidden: Bool
+
 
     init(album: AlbumData) {
         
         self.album = album
-        selectedTalk = TalkData.empty()
-        selectedAlbum = AlbumData.empty()
+        self.selectedTalk = TalkData.empty()
+        self.selectedAlbum = AlbumData.empty()
+        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
     }
     
 
@@ -246,10 +278,10 @@ struct TalkListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                      
+                       .foregroundColor(.black)
+                       .hidden(resumeButtonHidden)
                }
                .foregroundColor(.black)
-               .hidden(!TheDataModel.currentTalkExists())
                Spacer()
                Button(action: {
                    selection = "DONATE"

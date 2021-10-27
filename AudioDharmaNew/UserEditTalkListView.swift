@@ -150,7 +150,7 @@ struct UserEditTalkListView: View {
                       
                }
                .foregroundColor(.black)
-               .hidden(!TheDataModel.currentTalkExists())
+               .hidden(TheDataModel.currentTalkIsEmpty())
                Spacer()
                Button(action: {
                    selection = "DONATE"

@@ -100,6 +100,8 @@ struct AlbumListView: View {
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
+    @State var resumeButtonHidden: Bool
+
 
     
     @State var selectedTalk: TalkData
@@ -111,6 +113,7 @@ struct AlbumListView: View {
         
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
 
     }
     
@@ -147,10 +150,10 @@ struct AlbumListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                      
+                       .foregroundColor(.black)
+                       .hidden(resumeButtonHidden)
                }
-               .foregroundColor(.black)
-               .hidden(!TheDataModel.currentTalkExists())
+
                Spacer()
                Button(action: {
                    selection = "DONATE"

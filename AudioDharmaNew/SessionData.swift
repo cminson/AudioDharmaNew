@@ -89,8 +89,10 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var filteredAlbumList = [AlbumData] ()
 
+        ModelUpdatedSemaphore.wait()
         print("getFilteredAlbums:", self.Title)
         if filter.isEmpty {
+            ModelUpdatedSemaphore.signal()
             return self.albumList
         } else {
             for album in self.albumList {
@@ -98,6 +100,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                 if searchedData.contains(filter.lowercased()) {filteredAlbumList.append(album)}
             }
         }
+        ModelUpdatedSemaphore.signal()
+
         return filteredAlbumList
     }
     
@@ -108,6 +112,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
 
+            ModelUpdatedSemaphore.wait()
+
             var filteredTalkList = self.talkList
             if !filter.isEmpty {
                 filteredTalkList = []
@@ -117,6 +123,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                     if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
                 }
             }
+            ModelUpdatedSemaphore.signal()
+
             if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
             }
@@ -129,6 +137,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var allTalks : [TalkData] = []
         
+        ModelUpdatedSemaphore.wait()
+
         if editing == true {
             allTalks =  CachedCustomUserTalks
         }
@@ -149,6 +159,9 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             }
             allTalks = filteredTalkList
         }
+        
+        ModelUpdatedSemaphore.signal()
+
         return allTalks
     }
 }

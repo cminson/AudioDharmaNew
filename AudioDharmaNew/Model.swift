@@ -80,6 +80,8 @@ let KEY_USER_TALKS = "KEY_USER_TALKS"
 let KEY_USEREDIT_TALKS = "KEY_USEREDIT_TALKS"
 let KEY_PLAY_TALK = "KEY_PLAY_TALK"
 let KEY_TRANCRIPT_TALKS = "KEY_TRANSCRIPT_TALKS"
+let KEY_SHORT_TALKS = "KEY_SHORT_TALKS"
+
 
 let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes per second of MP3.  Used to estimate size of download files
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
@@ -88,7 +90,7 @@ var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
 var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_MODEL_INTERVAL =  60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_MODEL_INTERVAL =  20    // amount of time (in seconds) between each poll of the cloud for updated model info
 //var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
 
 //var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
@@ -109,6 +111,7 @@ enum INIT_CODES {          // all possible startup results
 }
 
 let ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
+let ModelUpdatedSemaphore = DispatchSemaphore(value: 1)  // signals when data updating is finished
 let GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
 let UpdateInProgress = false
@@ -154,6 +157,7 @@ class Model {
     var PlayedTalks: [String: Bool]   = [:]  // all the talks that have been played by this user, indexed by fileName
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
+    var SystemIsConfigured = false  // set to true if a config file was found and configured
     
     
     // MARK:  Initialization and Configuration
@@ -216,16 +220,14 @@ class Model {
     }
 
  
-    func currentTalkExists() -> Bool {
+    func currentTalkIsEmpty() -> Bool {
         
-        //print("currentTalkExists: ", CurrentTalk.Title)
-        return !CurrentTalk.Title.isEmpty
+        return CurrentTalk.TotalSeconds == 0 || CurrentTalk.FileName.isEmpty
     }
     
     
-    func loadLastTalkState() {
+    func loadLastAlbumTalkState() {
         
-        print("loadLastTalkState")
         if let talkName = UserDefaults.standard.string(forKey: "TalkName") {
             if let elapsedTime = UserDefaults.standard.string(forKey: "CurrentTalkTime") {
                 if let talk = TheDataModel.getTalkForName(name: talkName) {
@@ -234,20 +236,23 @@ class Model {
                     CurrentTalkElapsedTime = Double(elapsedTime) ?? 0
                     CurrentAlbum = AlbumData.empty()
                     if let key = UserDefaults.standard.string(forKey: "AlbumKey") {
+
                         if let album = KeyToAlbum[key] {
+                            print("LOADING NEW CURRENT ALBUM: ", album.Title)
+
                             CurrentAlbum = album
                         }
                     }
-                    print("LOADING NEW CURRENT TALK: ", CurrentAlbum.Title, CurrentTalk.Title)
+                    print("LOADING NEW CURRENT TALK: ", CurrentTalk.Title)
                 }
             }
         }
     }
     
     
-    func saveLastTalkState(album: AlbumData, talk: TalkData, elapsedTime: Double) {
+    func saveLastAlbumTalkState(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
-        //print("saveLastTalkState", talk.Title, elapsedTime)
+        print("saveLastTalkState", talk.Title, album.Key)
 
         CurrentTalk = talk
         CurrentAlbum = album
@@ -342,7 +347,9 @@ class Model {
                     
                 }
                 else {
+                    ModelUpdatedSemaphore.wait()
                     self.updateWithNewTalks(jsonDict: jsonDict)
+                    ModelUpdatedSemaphore.signal()
 
                 }
                 for album in self.RootAlbum.albumList {
@@ -354,6 +361,8 @@ class Model {
             }
             catch {
             }
+            
+            self.SystemIsConfigured = true
             
             // END CRITICAL SECTION
             ModelReadySemaphore.signal()
@@ -478,7 +487,6 @@ class Model {
         ListSeriesAlbums.insert(TranscriptsAlbum, at: 0)
         computeAlbumStats(album: TranscriptsAlbum)
 
-        self.loadLastTalkState()
 
     }
     
@@ -628,6 +636,9 @@ class Model {
                 album.talkList = talkList
                 self.RootAlbum.albumList.append(album)
                 KeyToAlbum[key] = album
+            if key == KEY_SHORT_TALKS {
+                print("KEY SHORT TALKS LOADED")
+            }
 
                 // get the optional talk array for this Album
                 for jsonTalk in jsonTalkList {
@@ -657,6 +668,9 @@ class Model {
                     }
                 } // end talk loop
         } // end Album loop
+        
+        self.loadLastAlbumTalkState()
+
     }
     
     
@@ -718,7 +732,7 @@ class Model {
     
     func downloadSanghaActivity() {
         
-        print("downloadSanghaActivity")
+        //print("downloadSanghaActivity")
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil

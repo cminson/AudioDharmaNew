@@ -141,6 +141,7 @@ struct UserAlbumListView: View {
     
     @State private var textStyle = UIFont.TextStyle.body
     @State private var albumTitle = ""
+    @State private var resumeButtonHidden : Bool
 
     
     init(album: AlbumData) {
@@ -149,6 +150,8 @@ struct UserAlbumListView: View {
         
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
+
         
         /*
         print("LIsting custome albums")
@@ -198,10 +201,10 @@ struct UserAlbumListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                      
+                       .foregroundColor(.black)
+                       .hidden(resumeButtonHidden)
                }
                .foregroundColor(.black)
-               .hidden(!TheDataModel.currentTalkExists())
                Spacer()
                Button(action: {
                    selection = "DONATE"

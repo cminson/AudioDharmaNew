@@ -74,37 +74,62 @@ struct TalkPlayerView: View {
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
         
     }
-
+    
     
     func playTalk() {
+    
+        if TheDataModel.hasBeenDownloaded(talk: self.talk) {
+            playDownloadedTalk()
+        } else {
+            playWebTalk()
+        }
+    }
+    
+    
+    func playDownloadedTalk() {
+  
+        if stateTalkPlayer == .PAUSED  {
+            TheTalkPlayer.play()
+        } else {
+            
+            let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
+            
+            print("Will play talk: ", talk.Title)
+            stateTalkPlayer = .LOADING
+            playerTitle = "Loading Talk"
+
+            TheTalkPlayer = TalkPlayer()
+            TheTalkPlayer.talkPlayerView = self
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
+        }
+        
+        stateTalkPlayer = .PLAYING
+
+    }
+
+    
+    func playWebTalk() {
         
         if TheDataModel.isInternetAvailable() == false {
-            
             self.displayNoInternet = true
             return
         }
-        if stateTalkPlayer == .PAUSED {
-            
-            TheTalkPlayer.play()
-            return
-        }
-        stateTalkPlayer = .LOADING
-        playerTitle = "Loading Talk"
-        
-        print("Will play talk: ", talk.Title)
 
-        var talkURL : URL
-        if TheDataModel.hasBeenDownloaded(talk: self.talk) {
-            print("playing download talk")
-            talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
+        if stateTalkPlayer == .PAUSED {
+            TheTalkPlayer.play()
+        } else {
+        
+            let talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
+            print("Will play talk: ", talk.Title)
+            stateTalkPlayer = .LOADING
+            playerTitle = "Loading Talk"
+
+            TheTalkPlayer = TalkPlayer()
+            TheTalkPlayer.talkPlayerView = self
+            TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
         }
-        else {
-            talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
-        }
-        TheTalkPlayer = TalkPlayer()
-        TheTalkPlayer.talkPlayerView = self
-        TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
-      
+    
+        stateTalkPlayer = .PLAYING
     }
     
     
@@ -141,7 +166,7 @@ struct TalkPlayerView: View {
                 self.silderElapsedTime = 0
                 self.talk = self.album.talkList[index]
                 self.elapsedTime = 0
-                TheDataModel.saveLastTalkState(album: self.album, talk: self.talk, elapsedTime: self.elapsedTime)
+                TheDataModel.saveLastAlbumTalkState(album: self.album, talk: self.talk, elapsedTime: self.elapsedTime)
             }
             playTalk()
         }
@@ -150,9 +175,6 @@ struct TalkPlayerView: View {
     
     // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
-
-        self.stateTalkPlayer = .PLAYING
-        print(self.stateTalkPlayer)
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -171,13 +193,12 @@ struct TalkPlayerView: View {
             // if play time exceeds reporting threshold and not previously reported, report it
             if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
 
-                print("Adding to Talk History: ", talk.Title)
                 TheDataModel.addToTalkHistory(talk: self.talk)
                 TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
 
             // persistent store off the current talk and position in talk
-            TheDataModel.saveLastTalkState(album: album, talk: self.talk, elapsedTime: self.elapsedTime)
+            TheDataModel.saveLastAlbumTalkState(album: album, talk: self.talk, elapsedTime: self.elapsedTime)
 
             if playTalksInSequence {
                 
@@ -344,11 +365,10 @@ struct TalkPlayerView: View {
             Alert(
                 title: Text("Can Not Connect to AudioDharma"),
                 message: Text("Please check your internet connection or try again in a few minutes"),
-                primaryButton: .destructive(Text("OK")) {
+                dismissButton: .default(Text("OK")) {
                     
                     displayNoInternet = false
-                },
-                secondaryButton: .cancel()
+                }
             )
         }
     }
@@ -358,9 +378,6 @@ struct TalkPlayerView: View {
 struct VolumeSlider: UIViewRepresentable {
     
     init() {
-        
-        //self.showsRouteButton = true
-
     }
     
    func makeUIView(context: Context) -> MPVolumeView {

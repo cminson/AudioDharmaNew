@@ -17,8 +17,9 @@ import AVFoundation
 struct SplashScreen : View {
     
     @State var appIsReady:Bool = false
-    
-    // download and configure DataModel.  WAIT on the completion semaphore in the
+    @State var configurationFailed:Bool = false
+
+        // download and configure DataModel.  WAIT on the completion semaphore in the
     // DispatchQueue timer in the body before finishing initialization
     init() {
         
@@ -57,20 +58,32 @@ struct SplashScreen : View {
                 withAnimation {
                     ModelReadySemaphore.wait()
                     
-                    // Model now loaded.  So now it's safe to get additional data (Sangha activity)
-                    TheDataModel.downloadSanghaActivity()
-                    ModelReadySemaphore.wait()
-                    
-                    // Lastly set up background data refresh threads
-                    TheDataModel.startBackgroundTimers()
+                    if TheDataModel.SystemIsConfigured {
+                        // Model now loaded.  So now it's safe to get additional data (Sangha activity)
+                        TheDataModel.downloadSanghaActivity()
+                        ModelReadySemaphore.wait()
+                        
+                        // Lastly set up background data refresh threads
+                        TheDataModel.startBackgroundTimers()
 
-                    // good to go
-                    self.appIsReady = true
+                        // good to go
+                        self.appIsReady = true
+                    } else {
+                        self.configurationFailed = true
+                    }
                 }
             }
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .topLeading)
         .edgesIgnoringSafeArea(.all)
         .background(Color.black)
+        .alert(isPresented: $configurationFailed) {   
+            Alert(
+                title: Text("Can Not Connect to AudioDharma"),
+                message: Text("Please enable your internet connection and restart the app"),
+                dismissButton: .default(Text("OK")) {
+                }
+            )
+        }
     }
 }

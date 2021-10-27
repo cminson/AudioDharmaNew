@@ -26,15 +26,16 @@ struct HomePageView: View {
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = true
-    @State var isActive: Bool = false
+    @State var resumeButtonHidden: Bool
 
-    
+
     init(parentAlbum: AlbumData) {
         
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
     }
     
     
@@ -71,12 +72,12 @@ struct HomePageView: View {
                         selectedTalk = CurrentTalk
                         selectedAlbum = CurrentAlbum
                         selectedTalkTime = CurrentTalkElapsedTime
-                    }) {
+                    })
+                    {
                         Text("Resume Talk")
-                           
+                            .foregroundColor(.black)
+                            .hidden(resumeButtonHidden)
                     }
-                    .foregroundColor(.black)
-                    .hidden(!TheDataModel.currentTalkExists())
                     Spacer()
                     Button(action: {
                         selection = "DONATE"

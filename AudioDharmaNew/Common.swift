@@ -312,24 +312,24 @@ struct BiographyView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Spacer()
-                .frame(height: 20)
-            HStack() {
+          
+           ScrollView {
                 Spacer()
-                talk.Speaker.toImage()
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 200)
+                    .frame(height: 20)
+                HStack() {
+                    Spacer()
+                    talk.Speaker.toImage()
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 200)
+                    Spacer()
+                }
                 Spacer()
-            }
-            Spacer()
-                .frame(height: 20)
-            ScrollView {
-            Text(stateBiographyText)
-                .font(.system(size: FONT_SIZE_BIOGRAPHY_TEXT, weight: .regular))
-                .padding(.leading, 20)
-                .padding(.trailing, 20)
-            }
+                    .frame(height: 15)
+                Text(stateBiographyText)
+                    .font(.system(size: FONT_SIZE_BIOGRAPHY_TEXT, weight: .regular))
+                    .padding(.leading, 20)
+                    .padding(.trailing, 20)
         }
         .onAppear() {
             DisplayingBiographyOrTranscript = true
@@ -338,6 +338,7 @@ struct BiographyView: View {
             DisplayingBiographyOrTranscript = false
         }
         .navigationBarTitle(talk.Speaker)
+    }
     }
 }
 
