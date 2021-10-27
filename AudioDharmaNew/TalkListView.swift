@@ -15,7 +15,8 @@ let ICON_TALK_NOTATED = Image("notebar")
 
 
 struct TalkRow: View {
-  
+   // @Environment(\.colorScheme) var colorScheme
+
     var album: AlbumData
     var talk: TalkData
     
@@ -74,23 +75,19 @@ struct TalkRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .background(Color.white)
                     .padding(.leading, -15)
                 Spacer()
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
-                    .background(Color.white)
+                //CJM DEV
+                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : colorScheme == .light ? Color.black : Color.white)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 5) {
                     Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
-                        .background(Color.white)
                         .padding(.trailing, -5)
-                    
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Text(String(album.albumType == AlbumType.ACTIVE ?  talk.Date : talk.Country))
-                        .background(Color.white)
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
@@ -269,7 +266,6 @@ struct TalkListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)
                Spacer()
                Button(action: {
                    selection = "RESUME_TALK"
@@ -278,10 +274,8 @@ struct TalkListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                       .foregroundColor(.black)
                        .hidden(resumeButtonHidden)
                }
-               .foregroundColor(.black)
                Spacer()
                Button(action: {
                    selection = "DONATE"
@@ -289,7 +283,6 @@ struct TalkListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black) // to ensure the toolbar icons don't turn blue
 
            }
 

@@ -225,7 +225,6 @@ struct TalkPlayerView: View {
                 .frame(height: 30)
                 
            Text(self.talk.Title)
-                .background(Color.white)
                 .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
@@ -234,7 +233,6 @@ struct TalkPlayerView: View {
                 .frame(height: 20)
             Text(self.talk.Speaker)
                 .underline()
-                .background(Color.white)
                 .padding(.trailing, 0)
                 .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
                 .onTapGesture {
@@ -307,7 +305,7 @@ struct TalkPlayerView: View {
             .padding(.trailing, 20)
             .padding(.leading, 20)
             .frame(height: 30)
-            .accentColor(Color.black)
+            //.accentColor(Color.black)
                 
             Spacer()
                 .frame(height: 25)
@@ -329,8 +327,6 @@ struct TalkPlayerView: View {
             VolumeSlider()
                 .frame(height: 50)
                 .padding(.horizontal)
-                .accentColor(Color.black)
-
           
             } // end group 2
  
@@ -339,7 +335,7 @@ struct TalkPlayerView: View {
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
-        .foregroundColor(Color.black.opacity(0.7))
+        //.foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onAppear {
             TalkIsCurrentlyPlaying = true

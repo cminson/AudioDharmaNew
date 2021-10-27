@@ -46,17 +46,14 @@ struct AlbumRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .background(Color.white)
                     .padding(.leading, 0)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
                     Spacer()
                     Text(album.totalTalks.displayInCommaFormat())
-                        .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Spacer()
@@ -77,14 +74,10 @@ struct AlbumRow: View {
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        //.background(NavigationLink(destination: TestView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: UserAlbumListView(album: album), tag: "USERALBUMS", selection: $selection) { EmptyView() } .hidden())
-
-        // The Following line is NECESSARY.  There can not be just 2 Navigation links (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
-        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
-        .background(Color.white)
+        // Ref for the following line.  Keep for now: (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
+        .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
         .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)
      }
@@ -124,6 +117,7 @@ struct AlbumListView: View {
            .padding(.top, 0)
         List(album.getFilteredAlbums(filter: searchText)) { album in
            AlbumRow(album: album)
+                //.listRowInsets(EdgeInsets())
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
@@ -141,7 +135,6 @@ struct AlbumListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)  // ensure icons don't turn blue
                Spacer()
                Button(action: {
                    selection = "RESUME_TALK"
@@ -150,7 +143,6 @@ struct AlbumListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                       .foregroundColor(.black)
                        .hidden(resumeButtonHidden)
                }
 
@@ -161,8 +153,6 @@ struct AlbumListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black)
-
            }
        }
     }

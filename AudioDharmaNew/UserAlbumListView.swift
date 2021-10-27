@@ -38,16 +38,13 @@ struct UserAlbumRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .background(Color.white)
                     .padding(.leading, -15)
                 Text("\(album.Title)")
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .background(Color.white)
                     .padding(.leading, 0)
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
                     Text(album.totalTalks.displayInCommaFormat())
-                        .background(Color.white)
                         .padding(.trailing, -10)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
@@ -74,7 +71,6 @@ struct UserAlbumRow: View {
         .background(NavigationLink(destination: UserEditTalkListView(album: album), tag: "EDIT_TALKS_IN__ALBUM", selection: $selection) { EmptyView() } .hidden())
         // The Following line is NECESSARY.   (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
-        .background(Color.white)
         .frame(height: LIST_ROW_SIZE_STANDARD)
         .frame(maxWidth: .infinity)
         .alert(isPresented: $displayDeleteAlbum) {
@@ -192,7 +188,6 @@ struct UserAlbumListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)  // ensure icons don't turn blue
                Spacer()
                Button(action: {
                    selection = "RESUME_TALK"
@@ -201,10 +196,8 @@ struct UserAlbumListView: View {
                    selectedTalkTime = CurrentTalkElapsedTime
                }) {
                    Text("Resume Talk")
-                       .foregroundColor(.black)
                        .hidden(resumeButtonHidden)
                }
-               .foregroundColor(.black)
                Spacer()
                Button(action: {
                    selection = "DONATE"
@@ -212,7 +205,6 @@ struct UserAlbumListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black)
 
            }
        }

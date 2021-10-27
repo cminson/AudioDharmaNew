@@ -139,7 +139,6 @@ struct UserEditTalkListView: View {
                } label: {
                    Image(systemName: "questionmark.circle")
                }
-               .foregroundColor(.black)
                Spacer()
                Button(action: {
                    selection = "RESUME_TALK"
@@ -149,7 +148,6 @@ struct UserEditTalkListView: View {
                    Text("Resume Talk")
                       
                }
-               .foregroundColor(.black)
                .hidden(TheDataModel.currentTalkIsEmpty())
                Spacer()
                Button(action: {
@@ -158,7 +156,6 @@ struct UserEditTalkListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-              .foregroundColor(.black) // to ensure  toolbar icons don't turn blue
 
            }
        }

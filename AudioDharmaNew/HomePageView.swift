@@ -65,7 +65,6 @@ struct HomePageView: View {
                     } label: {
                         Image(systemName: "questionmark.circle")
                     }
-                    .foregroundColor(.black)
                     Spacer()
                     Button(action: {
                         selection = "RESUME_TALK"
@@ -75,7 +74,6 @@ struct HomePageView: View {
                     })
                     {
                         Text("Resume Talk")
-                            .foregroundColor(.black)
                             .hidden(resumeButtonHidden)
                     }
                     Spacer()
@@ -85,7 +83,6 @@ struct HomePageView: View {
                    }) {
                         Image(systemName: "heart.circle")
                     }
-                   .foregroundColor(.black)
 
                 }
             }

@@ -9,3 +9,5 @@ composite -gravity east -geometry +30+60  circle.png community.png  community.pn
 composite -gravity east -geometry +30-60  circle.png community.png  community.png
 convert community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,190' community.png
 convert community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,50' community.png
+#
+convert -size 240x240 xc:transparent -strokewidth 25 -stroke orange -fill transparent -draw 'circle 120,120 40,120' albumdefault.png
