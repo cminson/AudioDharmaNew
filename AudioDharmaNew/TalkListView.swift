@@ -14,8 +14,9 @@ let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
 
 
+
 struct TalkRow: View {
-   // @Environment(\.colorScheme) var colorScheme
+
 
     var album: AlbumData
     var talk: TalkData
@@ -32,7 +33,7 @@ struct TalkRow: View {
     @State private var textStyle = UIFont.TextStyle.body
     @State private var displayDownloadInProgress = false
 
-    
+
     init(album: AlbumData, talk: TalkData) {
         
         self.album = album
@@ -80,8 +81,7 @@ struct TalkRow: View {
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                //CJM DEV
-                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : colorScheme == .light ? Color.black : Color.white)
+                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
                 VStack(alignment: .trailing, spacing: 5) {
                     Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)

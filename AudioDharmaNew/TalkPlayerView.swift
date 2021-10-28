@@ -225,7 +225,7 @@ struct TalkPlayerView: View {
                 .frame(height: 30)
                 
            Text(self.talk.Title)
-                .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
+                .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
@@ -251,7 +251,7 @@ struct TalkPlayerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
-                        .foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
+                        .foregroundColor(Color(UIColor.label))
                 }
                 Spacer()
                     .frame(width: 20)
@@ -266,6 +266,7 @@ struct TalkPlayerView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(height: 60)
+                                .foregroundColor(Color(UIColor.label))
                         }
                         .buttonStyle(PlainButtonStyle())
                         .hidden(self.stateTalkPlayer == .LOADING)
@@ -281,8 +282,8 @@ struct TalkPlayerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
-                        .foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
-
+                        //.foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
+                        .foregroundColor(Color(UIColor.label))
                 }
             }  // end HStack
             
@@ -305,8 +306,6 @@ struct TalkPlayerView: View {
             .padding(.trailing, 20)
             .padding(.leading, 20)
             .frame(height: 30)
-            //.accentColor(Color.black)
-                
             Spacer()
                 .frame(height: 25)
             Button(action: {
@@ -317,7 +316,7 @@ struct TalkPlayerView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(height:  30)
-                    .foregroundColor(self.playTalksInSequence == true ? Color.black : Color.gray)
+                    .foregroundColor(self.playTalksInSequence == true ? Color(UIColor.label) : Color.gray)
             }
             Spacer()
                 .frame(height:  5)
@@ -335,7 +334,6 @@ struct TalkPlayerView: View {
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
-        //.foregroundColor(Color.black.opacity(0.7))
         .padding(.trailing, 0)
         .onAppear {
             TalkIsCurrentlyPlaying = true

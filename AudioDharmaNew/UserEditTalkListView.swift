@@ -44,7 +44,7 @@ struct UserTalkRow: View {
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + talk.Title : talk.Title)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
-                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? Color.red : Color.black)
+                    .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
                     Text(talk.TotalSeconds.displayInClockFormat())
@@ -84,7 +84,7 @@ struct UserTalkRow: View {
             }
         }
         .contentShape(Rectangle())
-        .background(stateIsInCustomAlbum ? Color.orange : Color.white)
+        .background(stateIsInCustomAlbum ? COLOR_HIGHLIGHTED_TALK : Color(UIColor.systemBackground))
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .frame(height: LIST_ROW_SIZE_STANDARD)
     }

@@ -13,11 +13,15 @@ import SwiftUI
 import UIKit
 
 
+
+
+
 /*
  * HomePageView
  * UI for the top-level display of albums.  Invoked by SplashScreen after data model is loaded.
  */
 struct HomePageView: View {
+    
     @ObservedObject  var parentAlbum: AlbumData
     
     @State var selectedAlbum: AlbumData
@@ -27,15 +31,26 @@ struct HomePageView: View {
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = true
     @State var resumeButtonHidden: Bool
-
-
+    
     init(parentAlbum: AlbumData) {
+        
         
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
         self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
+        
+    }
+    
+    func isLightScheme() -> Bool {
+        
+        @Environment(\.colorScheme) var colorScheme: ColorScheme
+        
+        let result = colorScheme == .light
+        print("LIGHT: ", result)
+
+        return result
     }
     
     
@@ -53,7 +68,6 @@ struct HomePageView: View {
             .listStyle(PlainListStyle())  // ensures fills parent view
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime,  resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)

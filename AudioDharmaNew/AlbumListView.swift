@@ -26,7 +26,7 @@ struct SectionRow: View {
             }
             .frame(height: LIST_ROW_SIZE_SECTION)
         }
-        .background(Color(hex: COLOR_BACKGROUND_SECTION))
+        .background(Color(hex: COLOR_HEX_BACKGROUND_SECTION))
         .frame(maxWidth: .infinity)
         .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
      }

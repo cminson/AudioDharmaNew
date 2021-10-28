@@ -31,10 +31,14 @@ let FONT_SIZE_DONATION_TEXT : CGFloat = 16
 let FONT_SIZE_TALK_PLAYER : CGFloat = 20
 let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
 
-let COLOR_BACKGROUND_SECTION = "555555"
+let COLOR_HEX_BACKGROUND_SECTION = "555555"
+let COLOR_DOWNLOADED_TALK = Color.orange
+let COLOR_HIGHLIGHTED_TALK = Color.gray
 
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
+
+var AppColorScheme: ColorScheme = .light
 
 /*
  *********************************************************************************
@@ -495,7 +499,20 @@ extension String {
     
     
     func toImage() -> Image {
-       let uiImage =  (UIImage(named: self) ?? UIImage(named: "defaultPhoto"))!
+    
+        var imageName : String
+        
+        switch self {
+        case "personal":
+            imageName = AppColorScheme == .light ? "light_personal" : "dark_personal"
+        case "community":
+            imageName = AppColorScheme == .light ? "light_community" : "dark_community"
+        case "sequence":
+            imageName = AppColorScheme == .light ? "light_sequence"  :  "dark_sequence"
+        default:
+            imageName = self
+        }
+       let uiImage =  (UIImage(named: imageName) ?? UIImage(named: "defaultPhoto"))!
        return Image(uiImage: uiImage)
     }
 }

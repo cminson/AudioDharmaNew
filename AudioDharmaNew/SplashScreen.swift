@@ -15,16 +15,19 @@ import AVFoundation
 
 
 struct SplashScreen : View {
-    
+
     @State var appIsReady:Bool = false
     @State var configurationFailed:Bool = false
+    
+    @Environment(\.colorScheme) var colorScheme: ColorScheme
 
-        // download and configure DataModel.  WAIT on the completion semaphore in the
+    // download and configure DataModel.  WAIT on the completion semaphore in the
     // DispatchQueue timer in the body before finishing initialization
     init() {
         
         TheDataModel.initialize()
         TheDataModel.downloadAndConfigure(startingApp: true)
+        
     }
     
 
@@ -54,6 +57,7 @@ struct SplashScreen : View {
         .background(Color.black)
         .onAppear {
             
+            AppColorScheme = colorScheme
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
                     ModelReadySemaphore.wait()
@@ -87,3 +91,4 @@ struct SplashScreen : View {
         }
     }
 }
+

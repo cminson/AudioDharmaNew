@@ -89,9 +89,8 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_MODEL_INTERVAL =  20    // amount of time (in seconds) between each poll of the cloud for updated model info
-//var UPDATE_SANGHA_INTERVAL = 3     // CJM DEV
+var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_MODEL_INTERVAL =  120 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
 
 //var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 //var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
@@ -486,8 +485,6 @@ class Model {
         TranscriptsAlbum.talkList = TranscriptsAlbum.talkList.sorted(by: { $0.Date > $1.Date })
         ListSeriesAlbums.insert(TranscriptsAlbum, at: 0)
         computeAlbumStats(album: TranscriptsAlbum)
-
-
     }
     
     
@@ -538,7 +535,6 @@ class Model {
     }
 
 
-    
     func loadAlbums(jsonDict: [String: AnyObject]) {
 
         print("load albums")
@@ -938,8 +934,6 @@ class Model {
     
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
        
-        //CJM DEV
-        /*
         var operation : String
         switch (type) {
         
@@ -968,7 +962,6 @@ class Model {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in }
         
         task.resume()
-         */
     }
     
     
