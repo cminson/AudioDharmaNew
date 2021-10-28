@@ -145,7 +145,6 @@ struct TalkPlayerView: View {
         print("TalkPlayerView finishTalk")
         TheTalkPlayer?.stop()
         stateTalkPlayer = .FINISHED
-
     }
     
     

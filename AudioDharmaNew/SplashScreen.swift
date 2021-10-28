@@ -27,7 +27,6 @@ struct SplashScreen : View {
         
         TheDataModel.initialize()
         TheDataModel.downloadAndConfigure(startingApp: true)
-        
     }
     
 

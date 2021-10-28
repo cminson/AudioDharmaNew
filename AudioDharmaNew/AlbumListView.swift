@@ -88,17 +88,14 @@ struct AlbumListView: View {
     
     var album: AlbumData
     
-    
     @State var selectedAlbum: AlbumData
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
     @State var resumeButtonHidden: Bool
-
-
-    
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double
+    
     
     init(album: AlbumData) {
         self.album = album
@@ -107,7 +104,6 @@ struct AlbumListView: View {
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
         self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
-
     }
     
     
@@ -154,11 +150,8 @@ struct AlbumListView: View {
                    Image(systemName: "heart.circle")
                }
            }
-       }
-    }
-       
-
-    
+       } // end toolbar
+    } // end view
 }
 
 

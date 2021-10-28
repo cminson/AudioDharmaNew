@@ -162,7 +162,6 @@ class TalkPlayer : NSObject {
         let minutes = (Int(timeInSeconds) / 60) % 60
         let hours = (Int(timeInSeconds) / 3600) % 3600
 
-
         return String(format: "%0.2d:%0.2d:%0.2d",hours,minutes,seconds)
     }
     

@@ -196,6 +196,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
         return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", totalSeconds: 0,  pdf: "")
     }
     
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(FileName)
     }
@@ -217,10 +218,8 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
         self.TotalSeconds = totalSeconds
         self.PDF = pdf
         
-
         self.SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
             
-        
         self.DatePlayed = ""
         self.TimePlayed = ""
         self.City = ""

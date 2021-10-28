@@ -32,6 +32,7 @@ struct HomePageView: View {
     @State var noCurrentTalk: Bool = true
     @State var resumeButtonHidden: Bool
     
+    
     init(parentAlbum: AlbumData) {
         
         
@@ -40,17 +41,6 @@ struct HomePageView: View {
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
         self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
-        
-    }
-    
-    func isLightScheme() -> Bool {
-        
-        @Environment(\.colorScheme) var colorScheme: ColorScheme
-        
-        let result = colorScheme == .light
-        print("LIGHT: ", result)
-
-        return result
     }
     
     
@@ -71,7 +61,7 @@ struct HomePageView: View {
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime,  resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)
-             .toolbar {
+            .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
                         selection = "HELP"
@@ -102,7 +92,6 @@ struct HomePageView: View {
             }
            // end toolbar
        }  // end NavigationView
-
        .navigationViewStyle(.stack)
     }
         

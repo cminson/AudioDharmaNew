@@ -47,8 +47,8 @@ class UserNoteData: NSObject, NSCoding {
         
         self.init(notes: notes)
     }
-    
 }
+
 
 class UserDownloadData: NSObject, NSCoding {
     
@@ -93,8 +93,8 @@ class UserDownloadData: NSObject, NSCoding {
 
         self.init(fileName: fileName, downloadCompleted: downloadCompleted)
     }
-    
 }
+
 
 class UserFavoriteData: NSObject, NSCoding {
     
@@ -131,8 +131,8 @@ class UserFavoriteData: NSObject, NSCoding {
         
         self.init(fileName: fileName)
     }
-    
 }
+
 
 class UserAlbumData: NSObject, NSCoding {
     
@@ -205,8 +205,6 @@ class UserAlbumData: NSObject, NSCoding {
 }
     
     
-
-
 class TalkHistoryData: NSObject, NSCoding {
     
     // MARK: Persistance
@@ -275,7 +273,6 @@ class TalkHistoryData: NSObject, NSCoding {
             return nil
         }
        
-        
         self.init(fileName: fileName,
                   datePlayed: datePlayed,
                   timePlayed: timePlayed,

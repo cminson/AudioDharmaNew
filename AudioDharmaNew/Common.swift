@@ -280,7 +280,6 @@ struct TranscriptView: View {
         .onDisappear() {
             DisplayingBiographyOrTranscript = false
         }
-
     }
 }
 
@@ -310,7 +309,6 @@ struct BiographyView: View {
         text = text.replacingOccurrences(of: "<br>", with: "\n")
         
         stateBiographyText = text
-
     }
 
     
@@ -349,7 +347,6 @@ struct BiographyView: View {
 
 struct HelpPageView: View {
     
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
            
@@ -414,17 +411,12 @@ struct DonationPageView: View {
                 Spacer()
             }
             Spacer()
-
-            
         }
         .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         .navigationBarTitle("Donations", displayMode: .inline)
 
     }
 }
-
-
-
 
 
 /*

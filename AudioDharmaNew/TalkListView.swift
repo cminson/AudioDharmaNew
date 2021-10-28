@@ -14,9 +14,7 @@ let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
 
 
-
 struct TalkRow: View {
-
 
     var album: AlbumData
     var talk: TalkData
@@ -52,7 +50,6 @@ struct TalkRow: View {
         if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
-     
     }
     
     
@@ -61,12 +58,6 @@ struct TalkRow: View {
         stateTalkTitle = self.talk.Title
     }
     
-    func debug() -> Bool {
-        
-        print("ROW DISPLAY")
-        return true
-    }
-     
     
     var body: some View {
                 

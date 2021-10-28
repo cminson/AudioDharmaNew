@@ -4,7 +4,6 @@
 //  The data model for the app.  Here are all the functions to download and configure the app,
 //  as well as all functions necessary for updating app state.
 //
-//
 //  Created by Christopher on 6/22/17.
 //  Copyright © 2017 Christopher Minson. All rights reserved.
 //            self.UserFavorites = TheDataModel.loadUserFavoriteData()
@@ -997,8 +996,6 @@ class Model {
 
     }
     
-
-
         
     //
     // MARK: talk and album functions
@@ -1184,6 +1181,7 @@ class Model {
         computeAlbumStats(album: self.UserTalkHistoryAlbum)
     }
     
+    
     func addToShareHistory(talk: TalkData) {
         
         
@@ -1210,9 +1208,6 @@ class Model {
         saveShareHistoryData()
     }
     
-    
-       
-  
     
     //
     // MARK: User Album functions
@@ -1247,6 +1242,7 @@ class Model {
         return UserAlbums
     }
     
+    
     func updateUserAlbum(updatedAlbum: UserAlbumData) {
         
         for (index, album) in UserAlbums.enumerated() {
@@ -1272,6 +1268,7 @@ class Model {
         saveUserAlbumData()
     }
     
+    
     func removeUserAlbum(at: Int) {
         
         UserAlbums.remove(at: at)
@@ -1292,6 +1289,7 @@ class Model {
         }
     }
     
+    
     func getUserAlbumTalks(userAlbum: UserAlbumData) -> [TalkData]{
         
         var userAlbumTalks = [TalkData] ()
@@ -1304,6 +1302,7 @@ class Model {
         
         return userAlbumTalks
     }
+    
     
     func saveUserAlbumTalks(userAlbum: UserAlbumData, talks: [TalkData]) {
         
@@ -1552,9 +1551,6 @@ class Model {
         return (isReachable && !needsConnection)
     }
     
-   
-   
-  
         
     // ensure that no download records get persisted that are incomplete in any way
     // I do this because asynchronous downloads might not complete, leaving systen in inconsistent state
@@ -1656,7 +1652,6 @@ class Model {
     }
     
    
-    
     func isFullURL(url: String) -> Bool {
         
         if url.lowercased().range(of:"http:") != nil {
@@ -1669,6 +1664,7 @@ class Model {
         }
         
     }
+    
     
     func remoteTalkExists(talk: TalkData, completion:@escaping (Bool, TalkData)->()){
         
