@@ -32,6 +32,7 @@ struct TalkRow: View {
     @State private var displayDownloadInProgress = false
 
 
+
     init(album: AlbumData, talk: TalkData) {
         
         self.album = album
@@ -54,7 +55,7 @@ struct TalkRow: View {
     
     
     func downloadCompleted() {
-        print("downloadCompleted")
+
         stateTalkTitle = self.talk.Title
     }
     
@@ -117,7 +118,6 @@ struct TalkRow: View {
                         secondaryButton: .cancel()
                     )
                 }
-
                 .padding(.trailing, -10)
                 .contextMenu {
                     Button("Get Similar Talks") {
@@ -139,15 +139,11 @@ struct TalkRow: View {
                     .frame(width: 300)
                     Button("Download | Remove Download") {
                         if TheDataModel.DownloadInProgress == false {
-                            print("launching download")
-
                             self.displayDownloadDialog = true
                         } else {
-                            print("Setting Progress")
                             self.displayDownloadInProgress = true
                         }
                     }
-
                 }
             }
              .sheet(isPresented: $displayShareSheet) {
@@ -211,7 +207,8 @@ struct TalkListView: View {
     @State var selectedTalkTime: Double = 0
     @State var selectedTalk: TalkData
     @State var selectedAlbum: AlbumData
-    @State var resumeButtonHidden: Bool
+    @State private var displayNoCurrentTalk = false
+    @State var sharedURL: String = ""
 
 
     init(album: AlbumData) {
@@ -219,7 +216,6 @@ struct TalkListView: View {
         self.album = album
         self.selectedTalk = TalkData.empty()
         self.selectedAlbum = AlbumData.empty()
-        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
     }
     
 
@@ -236,18 +232,24 @@ struct TalkListView: View {
                     selection = "PLAY_TALK"
                 }
         }
+        VStack() {}
+        .alert(isPresented: $displayNoCurrentTalk) {
+            Alert(
+                title: Text("No talk available"),
+                message: Text("No talk has been played yet"),
+                dismissButton: .default(Text("OK")) {
+                    displayNoCurrentTalk = false
+                }
+            )
+        }
         .listStyle(PlainListStyle())  // ensures fills parent view
-        //.id(UUID())
         .navigationBarTitle(album.Title, displayMode: .inline)
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: false), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
-        //.listStyle(PlainListStyle())  // ensures fills parent view
-
-
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
@@ -259,13 +261,17 @@ struct TalkListView: View {
                }
                Spacer()
                Button(action: {
-                   selection = "RESUME_TALK"
-                   selectedTalk = CurrentTalk
-                   selectedAlbum = CurrentAlbum
-                   selectedTalkTime = CurrentTalkElapsedTime
+                   if TheDataModel.currentTalkExists() {
+                       selection = "RESUME_TALK"
+                       selectedTalk = CurrentTalk
+                       selectedAlbum = CurrentAlbum
+                       selectedTalkTime = CurrentTalkElapsedTime
+                   } else {
+                       self.displayNoCurrentTalk = true
+                   }
                }) {
                    Text("Resume Talk")
-                       .hidden(resumeButtonHidden)
+                       //.hidden(resumeButtonHidden)
                }
                Spacer()
                Button(action: {
@@ -276,10 +282,8 @@ struct TalkListView: View {
                }
 
            }
-
        }
     }
-
 
 }
 

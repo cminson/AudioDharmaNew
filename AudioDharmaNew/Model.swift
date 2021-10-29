@@ -212,15 +212,14 @@ class Model {
         if isInternetAvailable() == false {
             return
         }
-        print("updateDataModel")
 
         downloadAndConfigure(startingApp: false)
     }
 
  
-    func currentTalkIsEmpty() -> Bool {
+    func currentTalkExists() -> Bool {
         
-        return CurrentTalk.TotalSeconds == 0 || CurrentTalk.FileName.isEmpty
+        return CurrentTalk.TotalSeconds > 0  
     }
     
     
@@ -236,12 +235,10 @@ class Model {
                     if let key = UserDefaults.standard.string(forKey: "AlbumKey") {
 
                         if let album = KeyToAlbum[key] {
-                            print("LOADING NEW CURRENT ALBUM: ", album.Title)
 
                             CurrentAlbum = album
                         }
                     }
-                    print("LOADING NEW CURRENT TALK: ", CurrentTalk.Title)
                 }
             }
         }
@@ -250,8 +247,6 @@ class Model {
     
     func saveLastAlbumTalkState(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
-        print("saveLastTalkState", talk.Title, album.Key)
-
         CurrentTalk = talk
         CurrentAlbum = album
         CurrentTalkElapsedTime = elapsedTime
@@ -536,7 +531,6 @@ class Model {
 
     func loadAlbums(jsonDict: [String: AnyObject]) {
 
-        print("load albums")
         var albumList : [AlbumData] = []
         var talkList : [TalkData] = []
         
@@ -556,7 +550,6 @@ class Model {
                 case KEY_ALL_TALKS:
                     self.AllTalksAlbum = album
                     talkList = self.ListAllTalks
-                    print("ALL TALK COUNT: ", self.ListAllTalks.count)
                 case KEY_ALL_SPEAKERS:
                     albumList = self.ListSpeakerAlbums
                 case KEY_ALL_SERIES:
@@ -569,7 +562,6 @@ class Model {
                     self.UserFavoritesAlbum = album
                     self.UserFavorites = TheDataModel.loadUserFavoriteData()
                     for (fileName, _ ) in self.UserFavorites {
-                        print(fileName)
                         if let talk = FileNameToTalk[fileName] {
                             talkList.append(talk)
                         }
@@ -605,7 +597,6 @@ class Model {
                         
                     }
                 case KEY_USER_TALKHISTORY:
-                    print("talk History")
                     self.UserTalkHistoryAlbum = album
                     self.UserTalkHistoryList = TheDataModel.loadTalkHistoryData()
 
@@ -631,9 +622,6 @@ class Model {
                 album.talkList = talkList
                 self.RootAlbum.albumList.append(album)
                 KeyToAlbum[key] = album
-            if key == KEY_SHORT_TALKS {
-                print("KEY SHORT TALKS LOADED")
-            }
 
                 // get the optional talk array for this Album
                 for jsonTalk in jsonTalkList {
@@ -727,7 +715,6 @@ class Model {
     
     func downloadSanghaActivity() {
         
-        //print("downloadSanghaActivity")
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -920,7 +907,6 @@ class Model {
                     TheDataModel.DownloadInProgress = false
                     return
                 }
-                print("Download background done")
                 TheDataModel.DownloadInProgress = false
                 TheDataModel.setTalkAsDownloaded(talk: talk)
                 success()
@@ -966,7 +952,6 @@ class Model {
     
     func computeAlbumStats(album: AlbumData) {
         
-        //print("computeAlbumStats: ", album.Title)
         var totalSeconds = 0
         var totalTalks = 0
         
@@ -991,9 +976,6 @@ class Model {
             }
         }
         album.totalSeconds = totalSeconds
-        
-        //print("ComputeAlbumStates: ", album.Title, album.totalTalks, album.totalSeconds)
-
     }
     
         
@@ -1005,12 +987,10 @@ class Model {
         if TheDataModel.isFavoriteTalk(talk: talk) {
             TheDataModel.UserFavorites[talk.FileName] = nil
             if let index = TheDataModel.UserFavoritesAlbum.talkList.firstIndex(of: talk) {
-                print("toggleTalkAsFavorite removing: ", talk.Title)
                 TheDataModel.UserFavoritesAlbum.talkList.remove(at: index)
             }
         } else {
             TheDataModel.UserFavorites[talk.FileName] = UserFavoriteData(fileName: talk.FileName)
-            print("toggleTalkAsFavorite adding: ", talk.Title)
             TheDataModel.UserFavoritesAlbum.talkList.insert(talk, at: 0)
             //CJM Append?
         }
@@ -1019,7 +999,6 @@ class Model {
         TheDataModel.computeAlbumStats(album: TheDataModel.UserFavoritesAlbum)
         
         let isFavorite = TheDataModel.UserFavorites[talk.FileName] != nil
-        print("ToggleTalkAsFavorite New Value: ", isFavorite)
         return isFavorite
     }
     
@@ -1055,7 +1034,6 @@ class Model {
     func unsetTalkAsDownloaded(talk: TalkData) {
         
         if let index = TheDataModel.UserDownloadAlbum.talkList.firstIndex(of: talk) {
-            print("download removing: ", talk.Title)
             TheDataModel.UserDownloadAlbum.talkList.remove(at: index)
         }
         
@@ -1094,11 +1072,9 @@ class Model {
          let talkFileName = talk.FileName
 
          if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
-             print("adding note on talk: ", talk.Title)
              TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
              TheDataModel.UserNoteAlbum.talkList.append(talk)
          } else {
-             print("remove note on talk: ", talk.Title)
              TheDataModel.UserNotes[talkFileName] = nil
              if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: talk) {
                  TheDataModel.UserNoteAlbum.talkList.remove(at: index)
@@ -1218,7 +1194,6 @@ class Model {
         UserAlbums = []
         for album in self.CustomUserAlbums.albumList {
             
-            print(album.Title)
             let userAlbum = UserAlbumData(title: album.Title, image: image!, content: "", talkFileNames: [])
             
             var talkFileNameList: [String] = []
@@ -1576,7 +1551,6 @@ class Model {
         
         for userDownload in badDownloads {
             
-            print("Reomving bad donwload: ", userDownload.FileName)
             UserDownloads[userDownload.FileName] = nil
             let localPathMP3 = MP3_DOWNLOADS_PATH + "/" + userDownload.FileName
 

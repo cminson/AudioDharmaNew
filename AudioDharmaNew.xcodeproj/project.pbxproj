@@ -378,6 +378,7 @@
 		83A2E4C526E0415900F8B531 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		83A2E4C726E0415900F8B531 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		83B9A5232710C39E00667F2B /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
+		83C416A3272C513800191872 /* AudioDharmaNew.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AudioDharmaNew.entitlements; sourceTree = "<group>"; };
 		83D65D5426E2D18200751527 /* SessionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionData.swift; sourceTree = "<group>"; };
 		83EB0CC626F6A4E200570A48 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		83EB42DA26EACE6C00AD069B /* Common.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Common.swift; sourceTree = "<group>"; };
@@ -581,6 +582,7 @@
 		83A2E4BD26E0415700F8B531 /* AudioDharmaNew */ = {
 			isa = PBXGroup;
 			children = (
+				83C416A3272C513800191872 /* AudioDharmaNew.entitlements */,
 				83EB0CC626F6A4E200570A48 /* SplashScreen.swift */,
 				83A2E4C026E0415700F8B531 /* HomePageView.swift */,
 				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
@@ -1013,6 +1015,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AudioDharmaNew/AudioDharmaNew.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"AudioDharmaNew/Preview Content\"";
 				DEVELOPMENT_TEAM = V25Y65GL8V;
@@ -1046,6 +1049,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AudioDharmaNew/AudioDharmaNew.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"AudioDharmaNew/Preview Content\"";
 				DEVELOPMENT_TEAM = V25Y65GL8V;

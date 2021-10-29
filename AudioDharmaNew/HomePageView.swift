@@ -29,18 +29,16 @@ struct HomePageView: View {
     @State var selectedTalkTime: Double
     @State var selection: String?  = ""
     @State var searchText: String  = ""
-    @State var noCurrentTalk: Bool = true
-    @State var resumeButtonHidden: Bool
+    @State var displayNoCurrentTalk: Bool = false
+    @State var sharedURL: String = ""
     
     
     init(parentAlbum: AlbumData) {
-        
         
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
-        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
     }
     
     
@@ -55,10 +53,30 @@ struct HomePageView: View {
                    }
                }
             }
+           .alert(isPresented: $displayNoCurrentTalk) {
+               Alert(
+                   title: Text("No talk available"),
+                   message: Text("No talk has been played yet"),
+                   dismissButton: .default(Text("OK")) {
+                       displayNoCurrentTalk = false
+                   }
+               )
+            }
+            .onOpenURL { url in
+               sharedURL = url.absoluteString
+               if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
+                   if let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                       selection = "RESUME_TALK"
+                       selectedTalk = talk
+                       selectedAlbum = TheDataModel.AllTalksAlbum
+                       selectedTalkTime = 0
+                    }
+               }
+            }
             .listStyle(PlainListStyle())  // ensures fills parent view
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-            .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime,  resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
+            .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)
             .toolbar {
@@ -71,23 +89,26 @@ struct HomePageView: View {
                     }
                     Spacer()
                     Button(action: {
-                        selection = "RESUME_TALK"
-                        selectedTalk = CurrentTalk
-                        selectedAlbum = CurrentAlbum
-                        selectedTalkTime = CurrentTalkElapsedTime
+                        if TheDataModel.currentTalkExists() {
+                            selection = "RESUME_TALK"
+                            selectedTalk = CurrentTalk
+                            selectedAlbum = CurrentAlbum
+                            selectedTalkTime = CurrentTalkElapsedTime
+                        } else {
+                            displayNoCurrentTalk = true
+                        }
                     })
                     {
                         Text("Resume Talk")
-                            .hidden(resumeButtonHidden)
+                            //.hidden(resumeButtonHidden)
                     }
-                    Spacer()
+                     Spacer()
                     Button(action: {
                         selection = "DONATE"
 
                    }) {
                         Image(systemName: "heart.circle")
                     }
-
                 }
             }
            // end toolbar

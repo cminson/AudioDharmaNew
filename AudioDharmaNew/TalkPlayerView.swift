@@ -49,7 +49,6 @@ struct TalkPlayerView: View {
     var album: AlbumData
     @State var talk: TalkData
     var elapsedTime: Double
-    var resumeLastTalk: Bool
 
     @State var selection: String?  = nil
     @State private var displayedElapsedTime: String
@@ -61,14 +60,15 @@ struct TalkPlayerView: View {
     @State private var playerTitle: String = "Play Talk"
     @State private var displayNoInternet = false
     @State private var stateTalkPlayer = TalkStates.INITIAL
+    @State var tappedUrl: String = ""
 
     
-    init(album: AlbumData, talk: TalkData, elapsedTime: Double,  resumeLastTalk: Bool) {
+    init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
         
         self.album = album
         self.talk = talk
         self.elapsedTime = elapsedTime
-        self.resumeLastTalk = resumeLastTalk
+       
         
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
@@ -221,8 +221,7 @@ struct TalkPlayerView: View {
         VStack(alignment: .center, spacing: 0) {
             Group {
             Spacer()
-                .frame(height: 30)
-                
+                .frame(height: 40)
            Text(self.talk.Title)
                 .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 .padding(.trailing, 15)
@@ -329,6 +328,10 @@ struct TalkPlayerView: View {
             } // end group 2
  
         }  // end VStack
+        .onOpenURL { url in
+          tappedUrl = url.absoluteString
+        }
+
       
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())

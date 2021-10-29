@@ -121,9 +121,9 @@ struct UserEditTalkListView: View {
             UserTalkRow(album: album, talk: talk, talkSet: talkSet)
         }
         .navigationBarTitle(album.Title, displayMode: .inline)
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: false), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
@@ -148,7 +148,6 @@ struct UserEditTalkListView: View {
                    Text("Resume Talk")
                       
                }
-               .hidden(TheDataModel.currentTalkIsEmpty())
                Spacer()
                Button(action: {
                    selection = "DONATE"

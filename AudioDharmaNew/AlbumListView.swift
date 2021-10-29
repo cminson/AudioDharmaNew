@@ -92,18 +92,17 @@ struct AlbumListView: View {
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
-    @State var resumeButtonHidden: Bool
     @State var selectedTalk: TalkData
     @State var selectedTalkTime: Double
-    
+    @State var displayNoCurrentTalk: Bool = false
+    @State var sharedURL: String = ""
+
     
     init(album: AlbumData) {
         self.album = album
         self.selectedAlbum = AlbumData.empty()
-        
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
-        self.resumeButtonHidden = TheDataModel.currentTalkIsEmpty()
     }
     
     
@@ -115,8 +114,17 @@ struct AlbumListView: View {
            AlbumRow(album: album)
                 //.listRowInsets(EdgeInsets())
         }
+        .alert(isPresented: $displayNoCurrentTalk) {
+            Alert(
+                title: Text("No talk available"),
+                message: Text("No talk has been played yet"),
+                dismissButton: .default(Text("OK")) {
+                    displayNoCurrentTalk = false
+                }
+            )
+        }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime, resumeLastTalk: true), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
@@ -133,13 +141,16 @@ struct AlbumListView: View {
                }
                Spacer()
                Button(action: {
-                   selection = "RESUME_TALK"
-                   selectedTalk = CurrentTalk
-                   selectedAlbum = CurrentAlbum
-                   selectedTalkTime = CurrentTalkElapsedTime
+                   if TheDataModel.currentTalkExists() {
+                       selection = "RESUME_TALK"
+                       selectedTalk = CurrentTalk
+                       selectedAlbum = CurrentAlbum
+                       selectedTalkTime = CurrentTalkElapsedTime
+                   } else {
+                       displayNoCurrentTalk = true
+                   }
                }) {
                    Text("Resume Talk")
-                       .hidden(resumeButtonHidden)
                }
 
                Spacer()

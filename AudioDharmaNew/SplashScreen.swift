@@ -13,11 +13,14 @@ import SwiftUI
 import UIKit
 import AVFoundation
 
+var SharedRTalkActive = false
 
 struct SplashScreen : View {
 
     @State var appIsReady:Bool = false
     @State var configurationFailed:Bool = false
+    @State var sharedURL: String = ""
+
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
@@ -33,7 +36,16 @@ struct SplashScreen : View {
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if self.appIsReady {
-                HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                
+                if SharedRTalkActive == true {
+                    if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
+                        if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                            TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: talk, elapsedTime: 0)
+                        }
+                    }
+                } else {
+                    HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                }
             } else {
                 GeometryReader { metrics in
                 VStack() {
@@ -50,6 +62,10 @@ struct SplashScreen : View {
                 }
                 }
             }
+        }
+        .onOpenURL { url in
+            sharedURL = url.absoluteString
+            SharedRTalkActive = true
         }
         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
         .edgesIgnoringSafeArea(.all)
