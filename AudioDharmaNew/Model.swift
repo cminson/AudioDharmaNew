@@ -100,7 +100,7 @@ var UPDATE_MODEL_INTERVAL =  120 * 60   // amount of time (in seconds) between e
 //var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 //var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
-let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH]
+let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
 
 let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
@@ -710,6 +710,7 @@ class Model {
                 talkList = []
                 albumList = []
             
+                print(key)
                 switch (key) {
                 case KEY_ALL_TALKS_SPANISH:
                     AllTalksAlbumSpanish = album
@@ -719,6 +720,7 @@ class Model {
                 case KEY_ALL_SERIES_SPANISH:
                     albumList = ListSeriesAlbumsSpanish
                 case KEY_RECOMMENDED_TALKS_SPANISH:
+                    print("SEE KEY_RECOMMENDED_TALKS_SPANISH")
                     RecommendedAlbumSpanish = album
               default:
                     albumList = []
@@ -736,15 +738,18 @@ class Model {
                     let URL = jsonTalk["url"] as? String ?? ""
                     let series = jsonTalk["series"] as? String ?? ""
                     let fileName = URL.components(separatedBy: "/").last ?? ""
-                                       
+                     
                     if let talk = self.FileNameToTalk[fileName] {
+
                         // if series specified, these always go into RecommendedAlbum
                         var seriesAlbum : AlbumData
                         if !series.isEmpty {
-                             let seriesKey = "RECOMMENDED" + series
-                            if self.KeyToAlbum[seriesKey] == nil {
+                            let seriesKey = "RECOMMENDED_SPANISH" + series
+                            if KeyToAlbum[seriesKey] == nil {
+                                
                                 seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date, albumType: AlbumType.ACTIVE)
                                 KeyToAlbum[seriesKey] = seriesAlbum
+                                print("Adding album:", seriesAlbum)
                                 RecommendedAlbumSpanish.albumList.append(seriesAlbum)
                             }
                             seriesAlbum = KeyToAlbum[seriesKey]!

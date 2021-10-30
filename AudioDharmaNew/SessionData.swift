@@ -87,6 +87,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredAlbums(filter: String) -> [AlbumData] {
 
+        //print("getfilteredalbums")
+
         var filteredAlbumList = [AlbumData] ()
 
         ModelUpdatedSemaphore.wait()
@@ -107,6 +109,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredTalks(filter: String) -> [TalkData] {
 
+            //print("getfilteredtalks")
             if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
