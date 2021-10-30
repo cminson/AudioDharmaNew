@@ -90,7 +90,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
         var filteredAlbumList = [AlbumData] ()
 
         ModelUpdatedSemaphore.wait()
-        print("getFilteredAlbums:", self.Title)
         if filter.isEmpty {
             ModelUpdatedSemaphore.signal()
             return self.albumList
@@ -178,6 +177,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     var FileName: String
     var Date: String
     var Speaker: String
+    var ln: String
     var PDF: String
     var TotalSeconds: Int
     var SpeakerPhoto: UIImage
@@ -193,7 +193,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     
     
     static func empty () -> TalkData {
-        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", totalSeconds: 0,  pdf: "")
+        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 0,  pdf: "")
     }
     
     
@@ -207,6 +207,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
          fileName: String,
          date: String,
          speaker: String,
+         ln: String,
          totalSeconds: Int,
          pdf: String)
     {
@@ -215,6 +216,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
         self.FileName = fileName
         self.Date = date
         self.Speaker = speaker
+        self.ln = ln
         self.TotalSeconds = totalSeconds
         self.PDF = pdf
         
@@ -233,6 +235,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
                             fileName: FileName,
                             date: Date,
                             speaker: Speaker,
+                            ln: ln,
                             totalSeconds: TotalSeconds,
                             pdf: PDF)
         
