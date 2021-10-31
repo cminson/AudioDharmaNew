@@ -44,7 +44,6 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
  ******************************************************************************
  */
 
-
 struct TalkPlayerView: View {
     var album: AlbumData
     @State var talk: TalkData
@@ -248,8 +247,8 @@ struct TalkPlayerView: View {
                     Image(systemName: "backward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  20)
-                        .foregroundColor(Color(UIColor.label))
+                        .frame(height:  15)
+                        .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
                 Spacer()
                     .frame(width: 20)
@@ -263,15 +262,17 @@ struct TalkPlayerView: View {
                             Image(systemName: self.stateTalkPlayer == .PLAYING ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 60)
-                                .foregroundColor(Color(UIColor.label))
+                                .frame(height: 45)
+                                //.foregroundColor(Color(UIColor.label))
+                                .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+
                         }
                         .buttonStyle(PlainButtonStyle())
                         .hidden(self.stateTalkPlayer == .LOADING)
 
                 }  // end ZStack
                 Spacer()
-                    .frame(width: 20)
+                    .frame(width: 15)
                 Button(action: {
                     TheTalkPlayer.seekFastForward()
                 })
@@ -280,8 +281,7 @@ struct TalkPlayerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
-                        //.foregroundColor(self.stateTalkPlayer == .PLAYING ? Color.black : Color.gray)
-                        .foregroundColor(Color(UIColor.label))
+                        .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
             }  // end HStack
             
@@ -310,7 +310,8 @@ struct TalkPlayerView: View {
                 self.playTalksInSequence = self.playTalksInSequence ? false : true
             })
             {
-                Image(systemName: "equal.circle.fill")
+                //Image(systemName: "equal.circle.fill")
+                Image(playTalksInSequence ? "sequence_active" : "sequence_notactive")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(height:  30)

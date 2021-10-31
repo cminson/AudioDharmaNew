@@ -710,7 +710,7 @@ class Model {
                 talkList = []
                 albumList = []
             
-                print(key)
+                //print(key)
                 switch (key) {
                 case KEY_ALL_TALKS_SPANISH:
                     AllTalksAlbumSpanish = album
@@ -749,7 +749,6 @@ class Model {
                                 
                                 seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date, albumType: AlbumType.ACTIVE)
                                 KeyToAlbum[seriesKey] = seriesAlbum
-                                print("Adding album:", seriesAlbum)
                                 RecommendedAlbumSpanish.albumList.append(seriesAlbum)
                             }
                             seriesAlbum = KeyToAlbum[seriesKey]!
@@ -925,6 +924,7 @@ class Model {
                     let dateShared = talkJSON["date"] as? String ?? ""
                     let city = talkJSON["city"] as? String ?? ""
                     let country = talkJSON["country"] as? String ?? ""
+                    
                     
                     if let talk = self.FileNameToTalk[fileName] {
                         

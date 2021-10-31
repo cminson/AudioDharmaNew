@@ -31,12 +31,21 @@ let FONT_SIZE_DONATION_TEXT : CGFloat = 16
 let FONT_SIZE_TALK_PLAYER : CGFloat = 20
 let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
 
+let LIST_LEFT_MARGIN_OFFSET : CGFloat = -10
+
+let NOTATE_FAVORITE_ICON_WIDTH : CGFloat = 12
+let NOTATE_FAVORITE_ICON_HEIGHT : CGFloat = 12
+let BIO_IMAGE_HEIGHT : CGFloat = 200
+
+
 let COLOR_HEX_BACKGROUND_SECTION = "555555"
 let COLOR_DOWNLOADED_TALK = Color.orange
 let COLOR_HIGHLIGHTED_TALK = Color.gray
 
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
+let MEDIA_CONTROLS_COLOR_LIGHT = Color(hex: "#555555")
+
 
 var AppColorScheme: ColorScheme = .light
 
@@ -323,7 +332,7 @@ struct BiographyView: View {
                     talk.Speaker.toImage()
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 200)
+                        .frame(height: BIO_IMAGE_HEIGHT)
                     Spacer()
                 }
                 Spacer()
@@ -359,7 +368,7 @@ struct HelpPageView: View {
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
-            Text("All talks are organized into albums.\n\nTouch an album and it will display all the talks it contains.\n\nTouch-and-hold a talk to display its menu.  This allows you to do operations like downloading and sharing.\n\nTo resume playing your last talk at the point you left it, touch the Resume button at the bottom of the screen.\n\nTo view a speaker's background, touch the underlined speaker name in the Play Talks window.")
+            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu.  This allows you to notate, download and share the talk.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.")
                 .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
@@ -369,7 +378,7 @@ struct HelpPageView: View {
                 .multilineTextAlignment(.leading)
             Spacer()
                 .frame(height:10)
-            Text("To create a custom album, go to custom albums and touch New Albums.\n\nTouch-and-hold a custom album to display its menu.  This menu allows you to to edit the custom album and add or delete talks.")
+            Text("Tap New Albums in the top right to create a custom album.\n\nLong-press a custom album to display its menu.  This menu allows you to add or delete talks in the album.")
                 .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()

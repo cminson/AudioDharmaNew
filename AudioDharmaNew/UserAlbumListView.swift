@@ -38,7 +38,7 @@ struct UserAlbumRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .padding(.leading, -15)
+                    .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
                 Text("\(album.Title)")
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .padding(.leading, 0)

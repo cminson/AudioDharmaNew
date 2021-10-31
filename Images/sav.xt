@@ -1,0 +1,37 @@
+#
+# album default
+#
+convert -size 240x240 xc:transparent -strokewidth 25 -stroke orange -fill transparent -draw 'circle 120,120 40,120' albumdefault.png
+#
+# light mode icons
+#
+convert -size 240x240 xc:transparent -fill transparent -draw 'rectangle 0,0, 240,240' rect.png
+convert -size 60x60 xc:transparent  -stroke '#555555'  -fill '#555555' -draw 'circle 30,30 30,59' circle.png
+composite -gravity center circle.png rect.png light_personal.png
+composite -gravity center circle.png rect.png light_sequence.png
+composite -gravity east circle.png light_sequence.png light_sequence.png
+composite -gravity west circle.png light_sequence.png  light_sequence.png
+composite -gravity west -geometry +30+0  circle.png rect.png  light_community.png
+composite -gravity east -geometry +30+60  circle.png light_community.png  light_community.png
+composite -gravity east -geometry +30-60  circle.png light_community.png  light_community.png
+convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,190' light_community.png
+convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 45,120, 200,50' light_community.png
+#
+#
+# dark mode icons
+#
+convert -size 240x240 xc:transparent -fill transparent -draw 'rectangle 0,0, 240,240' rect.png
+convert -size 60x60 xc:transparent  -stroke white  -fill white -draw 'circle 30,30 30,59' circle.png
+composite -gravity center circle.png rect.png dark_personal.png
+composite -gravity center circle.png rect.png dark_sequence.png
+composite -gravity east circle.png dark_sequence.png dark_sequence.png
+composite -gravity west circle.png dark_sequence.png  dark_sequence.png
+composite -gravity west -geometry +30+0  circle.png rect.png  dark_community.png
+composite -gravity east -geometry +30+60  circle.png dark_community.png  dark_community.png
+composite -gravity east -geometry +30-60  circle.png dark_community.png  dark_community.png
+convert dark_community.png -strokewidth 5 -stroke white -draw 'line 45,120, 200,190' dark_community.png
+convert dark_community.png -strokewidth 5 -stroke white -draw 'line 45,120, 200,50' dark_community.png
+
+
+
+

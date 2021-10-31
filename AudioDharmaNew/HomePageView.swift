@@ -14,8 +14,6 @@ import UIKit
 
 
 
-
-
 /*
  * HomePageView
  * UI for the top-level display of albums.  Invoked by SplashScreen after data model is loaded.
@@ -100,7 +98,6 @@ struct HomePageView: View {
                     })
                     {
                         Text("Resume Talk")
-                            //.hidden(resumeButtonHidden)
                     }
                      Spacer()
                     Button(action: {

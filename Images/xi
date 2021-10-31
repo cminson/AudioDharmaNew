@@ -1,0 +1,39 @@
+convert -size 200x200 xc:#ff8c00   -stroke white  -fill '#ff8c00' -strokewidth 20 -draw 'circle 100,100 160,100' icon01.png
+convert -size 200x200 xc:white   -stroke '#ff8c00'  -fill transparent -strokewidth 20 -draw 'circle 100,100 160,100' invertedicon02.png
+#
+convert -resize 1024x1024! icon01.png db1024x1024.png
+#
+# iPhone Notifications
+convert -resize 40x40! icon01.png db2x20.png
+convert -resize 60x60! icon01.png db3x20.png
+#
+# iPhone Spotlight
+convert -resize 58x58! icon01.png db2x29.png
+convert -resize 87x87! icon01.png db3x29.png
+#
+# iPhone Spotlight
+convert -resize 80x80! icon01.png db2x40.png
+convert -resize 120x120! icon01.png db3x40.png
+#
+# iPhone App
+convert -resize 120x120! icon01.png db2x60.png
+convert -resize 180x180! icon01.png db3x60.png
+#
+# iPad Notifications
+convert -resize 20x20! icon01.png db1x20.png
+convert -resize 40x40! icon01.png db2x20.png
+#
+# iPad Settings
+convert -resize 29x29! icon01.png db1x29.png
+convert -resize 58x58! icon01.png db2x29.png
+#
+# iPad Settings
+convert -resize 40x40! icon01.png db1x40.png
+convert -resize 80x80! icon01.png db2x40.png
+#
+# iPad App
+convert -resize 76x76! icon01.png db1x76.png
+convert -resize 152x152! icon01.png db2x76.png
+#
+# iPad Pro App
+convert -resize 167x167! icon01.png db2x83.5.png

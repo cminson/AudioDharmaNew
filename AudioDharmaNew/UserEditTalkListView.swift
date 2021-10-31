@@ -39,7 +39,7 @@ struct UserTalkRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .padding(.leading, -15)
+                    .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
                 Spacer()
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + talk.Title : talk.Title)
@@ -57,11 +57,11 @@ struct UserTalkRow: View {
                 VStack() {
                     ICON_TALK_FAVORITE
                         .resizable()
-                        .frame(width: 12, height: 12)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
                         .hidden(!TheDataModel.isFavoriteTalk(talk: talk))
                     ICON_TALK_NOTATED
                         .resizable()
-                        .frame(width: 12, height: 12)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
                         .hidden(!TheDataModel.isNotatedTalk(talk: talk))
                  }
                 .padding(.trailing, -10)
@@ -128,8 +128,6 @@ struct UserEditTalkListView: View {
 
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
-
-
         .navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {

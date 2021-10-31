@@ -32,12 +32,11 @@ struct TalkRow: View {
     @State private var displayDownloadInProgress = false
 
 
-
     init(album: AlbumData, talk: TalkData) {
         
         self.album = album
         self.talk = talk
-                
+        
         stateIsFavoriteTalk = TheDataModel.isFavoriteTalk(talk: talk)
         stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
 
@@ -68,7 +67,7 @@ struct TalkRow: View {
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
-                    .padding(.leading, -15)
+                    .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
                 Spacer()
                     .frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + stateTalkTitle : stateTalkTitle)
@@ -94,11 +93,11 @@ struct TalkRow: View {
                 VStack() {
                     ICON_TALK_FAVORITE
                         .resizable()
-                        .frame(width: 12, height: 12)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
                         .hidden(!stateIsFavoriteTalk)
                     ICON_TALK_NOTATED
                         .resizable()
-                        .frame(width: 12, height: 12)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
                         .hidden(!stateIsNotatedTalk)
                  }
                 .alert(isPresented: $displayDownloadDialog) {
@@ -120,13 +119,13 @@ struct TalkRow: View {
                 }
                 .padding(.trailing, -10)
                 .contextMenu {
-                    Button("Get Similar Talks") {
+                    Button("Show Similar Talks") {
                         let signalComplete = DispatchSemaphore(value: 0)
                         TheDataModel.downloadSimilarityData(talk: talk, signalComplete: signalComplete)
                         signalComplete.wait()
                         selection = "TALKS"
                     }
-                    Button("Favorite | Unfavorite") {
+                    Button("Favorite | Remove Favorite") {
                         self.stateIsFavoriteTalk = TheDataModel.toggleTalkAsFavorite(talk: talk)
                     }
                     Button("Note") {
@@ -136,7 +135,6 @@ struct TalkRow: View {
                     Button("Share Talk") {
                         self.displayShareSheet = true
                     }
-                    .frame(width: 300)
                     Button("Download | Remove Download") {
                         if TheDataModel.DownloadInProgress == false {
                             self.displayDownloadDialog = true
@@ -223,7 +221,9 @@ struct TalkListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-        List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
+       // List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
+        List(album.getFilteredTalks(filter: searchText)) { talk in
+
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
@@ -232,7 +232,6 @@ struct TalkListView: View {
                     selection = "PLAY_TALK"
                 }
         }
-        VStack() {}
         .alert(isPresented: $displayNoCurrentTalk) {
             Alert(
                 title: Text("No talk available"),
@@ -250,7 +249,7 @@ struct TalkListView: View {
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarHidden(false)
-        .navigationViewStyle(StackNavigationViewStyle())
+        //.navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {
