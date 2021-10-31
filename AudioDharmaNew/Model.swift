@@ -890,8 +890,12 @@ class Model {
                     
                     let fileName = talkJSON["filename"] as? String ?? ""
                     let datePlayed = talkJSON["date"] as? String ?? ""
-                    let city = talkJSON["city"] as? String ?? ""
-                    let country = talkJSON["country"] as? String ?? ""
+                    var city = talkJSON["city"] as? String ?? ""
+                    var country = talkJSON["country"] as? String ?? ""
+                    
+                    if city.isEmpty {city = " "}
+                    if country.isEmpty {country = " "}
+
                    
                     if let talk = self.FileNameToTalk[fileName] {
                         
@@ -922,9 +926,11 @@ class Model {
                     
                     let fileName = talkJSON["filename"] as? String ?? ""
                     let dateShared = talkJSON["date"] as? String ?? ""
-                    let city = talkJSON["city"] as? String ?? ""
-                    let country = talkJSON["country"] as? String ?? ""
+                    var city = talkJSON["city"] as? String ?? ""
+                    var country = talkJSON["country"] as? String ?? ""
                     
+                    if city.isEmpty {city = " "}
+                    if country.isEmpty {country = " "}
                     
                     if let talk = self.FileNameToTalk[fileName] {
                         
