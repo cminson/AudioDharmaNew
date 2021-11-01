@@ -6,8 +6,8 @@ convert -size 240x240 xc:transparent -strokewidth 25 -stroke orange -fill transp
 #
 # note and favorite icons
 #
-convert -size 40x40 xc:transparent  -stroke '#ff8c00'  -fill '#ff8c00' -draw 'circle 20,20 20,39' favoritebar.png
-convert -size 40x40 xc:transparent  -stroke '#6ba1c4'  -fill '#ADD8E6' -draw 'circle 20,20 20,39' notebar.png
+convert -size 60x60 xc:transparent  -stroke '#ff8c00'  -fill '#ff8c00' -draw 'circle 30,30 30,50' favoritebar.png
+convert -size 60x60 xc:transparent  -stroke '#0077ed'  -fill '#0077ed' -draw 'circle 30,30 30,50' notebar.png
 
 #
 #

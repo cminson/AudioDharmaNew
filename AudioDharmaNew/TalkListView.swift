@@ -65,6 +65,7 @@ struct TalkRow: View {
             HStack() {
                 talk.Speaker.toImage()
                     .resizable()
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
@@ -90,14 +91,17 @@ struct TalkRow: View {
                         }
                     )
                 }
-                VStack() {
+                VStack(spacing: 5) {
                     ICON_TALK_FAVORITE
                         .resizable()
-                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_WIDTH)
+                        .foregroundColor(Color.orange)
                         .hidden(!stateIsFavoriteTalk)
                     ICON_TALK_NOTATED
                         .resizable()
-                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_HEIGHT)
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: NOTATE_FAVORITE_ICON_WIDTH, height: NOTATE_FAVORITE_ICON_WIDTH)
                         .hidden(!stateIsNotatedTalk)
                  }
                 .alert(isPresented: $displayDownloadDialog) {

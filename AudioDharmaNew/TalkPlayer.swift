@@ -6,7 +6,6 @@
 //  Created by Christopher Minson on 9/4/21.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
-
 import Foundation
 import UIKit
 import AVFoundation
@@ -16,7 +15,6 @@ import CoreMedia
 var TalkList : [TalkData]!
 var TalkTimer : Timer?
 let FAST_SEEK : Int64 = 25  // number of seconds to move for each Seek operation
-
 
 class TalkPlayer : NSObject {
     

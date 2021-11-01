@@ -68,10 +68,8 @@ struct TalkPlayerView: View {
         self.talk = talk
         self.elapsedTime = elapsedTime
        
-        
         self.silderElapsedTime = elapsedTime
         self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
-        
     }
     
     
@@ -93,7 +91,6 @@ struct TalkPlayerView: View {
             
             let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
             
-            print("Will play talk: ", talk.Title)
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"
 
@@ -103,7 +100,6 @@ struct TalkPlayerView: View {
         }
         
         stateTalkPlayer = .PLAYING
-
     }
 
     
@@ -113,13 +109,14 @@ struct TalkPlayerView: View {
             self.displayNoInternet = true
             return
         }
+        
 
         if stateTalkPlayer == .PAUSED {
             TheTalkPlayer.play()
         } else {
         
             let talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
-            print("Will play talk: ", talk.Title)
+
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"
 
@@ -141,7 +138,6 @@ struct TalkPlayerView: View {
     
     func finishTalk() {
     
-        print("TalkPlayerView finishTalk")
         TheTalkPlayer?.stop()
         stateTalkPlayer = .FINISHED
     }
@@ -154,7 +150,6 @@ struct TalkPlayerView: View {
 
         // if option is enabled, play the next talk in the current series
         if self.playTalksInSequence == true {
-
 
             if var index = self.album.talkList.firstIndex(of: self.talk) {
             
@@ -173,6 +168,10 @@ struct TalkPlayerView: View {
     
     // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
+        
+        if (TheTalkPlayer.Player.error != nil) {
+            print("ERROR")
+        }
 
         if self.sliderUpdating == true {
             self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
@@ -214,7 +213,7 @@ struct TalkPlayerView: View {
         }
     }
     
-       
+         
     var body: some View {
 
         VStack(alignment: .center, spacing: 0) {
@@ -317,7 +316,7 @@ struct TalkPlayerView: View {
                     .frame(height:  30)
                     .foregroundColor(self.playTalksInSequence == true ? Color(UIColor.label) : Color.gray)
             }
-            Spacer()
+             Spacer()
                 .frame(height:  5)
             Text("play talks in sequence")
                 .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))

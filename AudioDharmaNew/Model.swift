@@ -29,6 +29,8 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 //
 let CONFIG_JSON_NAME = "DEV.JSON"
 let CONFIG_ZIP_NAME = "DEV.ZIP"
+//let CONFIG_JSON_NAME = "CONFIG00.JSON"
+//let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
