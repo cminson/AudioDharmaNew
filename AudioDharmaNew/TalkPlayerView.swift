@@ -250,7 +250,7 @@ struct TalkPlayerView: View {
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
                 Spacer()
-                    .frame(width: 20)
+                    .frame(width: 25)
                 ZStack() {
                     ProgressView()
                         .hidden(self.stateTalkPlayer != .LOADING)
@@ -270,8 +270,10 @@ struct TalkPlayerView: View {
                         .hidden(self.stateTalkPlayer == .LOADING)
 
                 }  // end ZStack
+                .frame(width: 45, height: 45)
+
                 Spacer()
-                    .frame(width: 15)
+                    .frame(width: 25)
                 Button(action: {
                     TheTalkPlayer.seekFastForward()
                 })
@@ -279,7 +281,7 @@ struct TalkPlayerView: View {
                     Image(systemName: "forward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  20)
+                        .frame(height:  15)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
             }  // end HStack
@@ -332,7 +334,6 @@ struct TalkPlayerView: View {
           tappedUrl = url.absoluteString
         }
 
-      
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())

@@ -28,7 +28,7 @@ let FONT_SIZE_SECTION : CGFloat = 14
 let FONT_SIZE_BIOGRAPHY_TEXT : CGFloat = 16
 let FONT_SIZE_HELP_TEXT : CGFloat = 16
 let FONT_SIZE_DONATION_TEXT : CGFloat = 16
-let FONT_SIZE_TALK_PLAYER : CGFloat = 20
+let FONT_SIZE_TALK_PLAYER : CGFloat = 18
 let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
 
 let LIST_LEFT_MARGIN_OFFSET : CGFloat = -10
@@ -45,6 +45,7 @@ let COLOR_HIGHLIGHTED_TALK = Color.gray
 let MAIN_FONT_COLOR = UIColor.darkGray      // #555555ff
 let SECONDARY_FONT_COLOR = UIColor.gray
 let MEDIA_CONTROLS_COLOR_LIGHT = Color(hex: "#555555")
+let DEFAULT_LINK_COLOR = Color(hex: "#0077ed")
 
 
 var AppColorScheme: ColorScheme = .light
@@ -336,7 +337,7 @@ struct BiographyView: View {
                     Spacer()
                 }
                 Spacer()
-                    .frame(height: 15)
+                    .frame(height: 30)
                 Text(stateBiographyText)
                     .font(.system(size: FONT_SIZE_BIOGRAPHY_TEXT, weight: .regular))
                     .padding(.leading, 20)
@@ -360,24 +361,29 @@ struct HelpPageView: View {
         VStack(alignment: .leading, spacing: 0) {
            
             ScrollView {
-
             Spacer()
                 .frame(height:30)
-            Text("General")
-                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
-                .multilineTextAlignment(.leading)
+            HStack() {
+                Text("General")
+                    .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
+                    .frame(alignment: .leading)
+                Spacer()
+                }
             Spacer()
-                .frame(height:10)
-            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu.  This allows you to notate, download and share the talk.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.")
+                .frame(height:15)
+            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu.  This allows you to notate, download and share the talk.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.\n\nDownloaded talks display as orange.  Played talks display a * in front of the title")
                 .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
-                .frame(height:20)
-            Text("Custom Albums")
-                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
-                .multilineTextAlignment(.leading)
+                .frame(height:30)
+                HStack() {
+                    Text("Custom Albums")
+                        .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
+                        .frame(alignment: .leading)
+                    Spacer()
+                }
             Spacer()
-                .frame(height:10)
+                .frame(height:15)
             Text("Tap New Albums in the top right to create a custom album.\n\nLong-press a custom album to display its menu.  This menu allows you to add or delete talks in the album.")
                 .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
@@ -398,14 +404,16 @@ struct DonationPageView: View {
         VStack(alignment: .leading, spacing: 0) {
             Spacer()
                 .frame(height:30)
-            Text("Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs. Our financial support comes from the generosity of people who value what we do.")
+            Text("Audio Dharma is a free service provided by the Insight Meditation Center in Redwood City, California. IMC is run solely by volunteers and does not require payment for any of its programs.")
                     .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
                     .multilineTextAlignment(.leading)
+            /*
             Spacer()
                 .frame(height:10)
            Text("If you wish to donate please click the link below.")
                 .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
+             */
             Spacer()
                 .frame(height:30)
             HStack() {
@@ -413,9 +421,9 @@ struct DonationPageView: View {
                 Link(destination: URL(string: URL_DONATE)!, label: {
                     Text("Donate")
                         .underline()
-                        .foregroundColor(.black)
-                        .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .heavy))
-
+                        .foregroundColor(DEFAULT_LINK_COLOR)
+                        //.font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
+                       .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .heavy))
                 })
                 Spacer()
             }
