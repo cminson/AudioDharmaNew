@@ -246,11 +246,11 @@ struct TalkPlayerView: View {
                     Image(systemName: "backward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  15)
+                        .frame(height:  12)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
                 Spacer()
-                    .frame(width: 25)
+                    .frame(width: 45)
                 ZStack() {
                     ProgressView()
                         .hidden(self.stateTalkPlayer != .LOADING)
@@ -261,7 +261,7 @@ struct TalkPlayerView: View {
                             Image(systemName: self.stateTalkPlayer == .PLAYING ? "pause.fill" : "play.fill")
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(height: 45)
+                                .frame(height: 35)
                                 //.foregroundColor(Color(UIColor.label))
                                 .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
 
@@ -270,10 +270,10 @@ struct TalkPlayerView: View {
                         .hidden(self.stateTalkPlayer == .LOADING)
 
                 }  // end ZStack
-                .frame(width: 45, height: 45)
+                .frame(width: 35, height: 35)
 
                 Spacer()
-                    .frame(width: 25)
+                    .frame(width: 45)
                 Button(action: {
                     TheTalkPlayer.seekFastForward()
                 })
@@ -281,7 +281,7 @@ struct TalkPlayerView: View {
                     Image(systemName: "forward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  15)
+                        .frame(height:  12)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
             }  // end HStack

@@ -63,7 +63,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     
     static func empty () -> AlbumData {
-        return AlbumData(title: "", key: "", section: "", imageName: "albumDefault", date: "", albumType: AlbumType.ACTIVE)
+        return AlbumData(title: "", key: "", section: "", imageName: "sequence", date: "", albumType: AlbumType.ACTIVE)
     }
 
     

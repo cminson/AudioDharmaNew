@@ -15,7 +15,7 @@ import WebKit
 //
 // Global Vars and Constants
 //
-let HOMEPAGE_SECTIONS = ["Main Albums", "Personal Albums", "Community Activity"]
+let HOMEPAGE_SECTIONS = ["Talks", "Albums", "Personal Albums", "Community Activity"]
 
 let LIST_IMAGE_HEIGHT : CGFloat = 40.0
 let LIST_IMAGE_WIDTH : CGFloat = 40.0
@@ -28,7 +28,7 @@ let FONT_SIZE_SECTION : CGFloat = 14
 let FONT_SIZE_BIOGRAPHY_TEXT : CGFloat = 16
 let FONT_SIZE_HELP_TEXT : CGFloat = 16
 let FONT_SIZE_DONATION_TEXT : CGFloat = 16
-let FONT_SIZE_TALK_PLAYER : CGFloat = 18
+let FONT_SIZE_TALK_PLAYER : CGFloat = 16
 let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
 
 let LIST_LEFT_MARGIN_OFFSET : CGFloat = -10
@@ -371,7 +371,7 @@ struct HelpPageView: View {
                 }
             Spacer()
                 .frame(height:15)
-            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu.  This allows you to notate, download and share the talk.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.\n\nDownloaded talks display as orange.  Played talks display a * in front of the title")
+            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk. A orange dot marks a favorite talk.  A blue dot marks a notated talk. Downloaded talks are highlighted in orange\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.\n\nDownloaded talks display as orange. Played talks display a * in front of the title")
                 .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                 .multilineTextAlignment(.leading)
             Spacer()
@@ -420,10 +420,10 @@ struct DonationPageView: View {
                 Spacer()
                 Link(destination: URL(string: URL_DONATE)!, label: {
                     Text("Donate")
-                        .underline()
+                        //.underline()
                         .foregroundColor(DEFAULT_LINK_COLOR)
-                        //.font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
-                       .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .heavy))
+                        .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
+                       //.font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .heavy))
                 })
                 Spacer()
             }

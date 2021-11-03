@@ -27,10 +27,10 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 //
 // Paths for Services
 //
-//let CONFIG_JSON_NAME = "DEV.JSON"
-//let CONFIG_ZIP_NAME = "DEV.ZIP"
-let CONFIG_JSON_NAME = "CONFIG00.JSON"
-let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
+let CONFIG_JSON_NAME = "DEV.JSON"
+let CONFIG_ZIP_NAME = "DEV.ZIP"
+//let CONFIG_JSON_NAME = "CONFIG00.JSON"
+//let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
@@ -153,8 +153,9 @@ class Model {
     var ListSeriesAlbums: [AlbumData] = []
     var ListRecommenedAlbums: [AlbumData] = []
     var ListFavoriteTalls : [TalkData] = []
-    
-    var ListAllTalksSpanish: [TalkData] = []
+    var ListTranscriptTalks : [TalkData] = []
+
+        var ListAllTalksSpanish: [TalkData] = []
     var ListSpeakerAlbumsSpanish: [AlbumData] = []
     var ListSeriesAlbumsSpanish: [AlbumData] = []
 
@@ -438,10 +439,7 @@ class Model {
                                          pdf: pdf)
                     
            
-                if talk.hasTranscript() {
-                    TranscriptsAlbum.talkList.append(talk)
-                }
-            
+               
             
                 self.FileNameToTalk[fileName] = talk
                 
@@ -450,8 +448,10 @@ class Model {
                 if talk.ln == "es" {
                     ListAllTalksSpanish.append(talk)
                 }
+                if talk.hasTranscript() {
+                    ListTranscriptTalks.append(talk)
+                }
 
-            
                 var speakerAlbum : AlbumData
                 var seriesAlbum : AlbumData
 
@@ -517,8 +517,7 @@ class Model {
         }
 
         
-        TranscriptsAlbum.talkList = TranscriptsAlbum.talkList.sorted(by: { $0.Date > $1.Date })
-        ListSeriesAlbums.insert(TranscriptsAlbum, at: 0)
+        ListTranscriptTalks = ListTranscriptTalks.sorted(by: { $0.Date > $1.Date })
         computeAlbumStats(album: TranscriptsAlbum)
     }
     
@@ -572,7 +571,7 @@ class Model {
         
         for jsonAlbum in jsonDict["albums"] as? [AnyObject] ?? [] {
             
-                let albumSection = jsonAlbum["section"] as? String ?? ""
+                let albumSection = jsonAlbum["section2"] as? String ?? ""
                 let title = jsonAlbum["title"] as? String ?? ""
                 let key = jsonAlbum["content"] as? String ?? ""
                 let image = jsonAlbum["image"] as? String ?? ""
@@ -582,10 +581,11 @@ class Model {
                 talkList = []
                 albumList = []
             
+                print(key)
                 switch (key) {
                 case KEY_ALL_TALKS:
                     AllTalksAlbum = album
-                    talkList = self.ListAllTalks
+                    talkList = ListAllTalks
                 case KEY_ALBUMROOT_SPANISH:
                     RootAlbumSpanish = album
                     jsonTalkList = [] // clear this.  bridge old vs new use of this album
@@ -597,6 +597,9 @@ class Model {
                     RecommendedAlbum = album
                     albumList = []
                     talkList = []
+                case KEY_TRANCRIPT_TALKS:
+                    TranscriptsAlbum = album
+                    talkList = ListTranscriptTalks
                 case KEY_USER_FAVORITES:
                     UserFavoritesAlbum = album
                     UserFavorites = TheDataModel.loadUserFavoriteData()
@@ -669,7 +672,8 @@ class Model {
                     let URL = jsonTalk["url"] as? String ?? ""
                     let series = jsonTalk["series"] as? String ?? ""
                     let fileName = URL.components(separatedBy: "/").last ?? ""
-                                       
+                         
+                    print("fileName", fileName)
                     if let talk = self.FileNameToTalk[fileName] {
                         // if series specified, these always go into RecommendedAlbum
                         var seriesAlbum : AlbumData
@@ -686,6 +690,7 @@ class Model {
                             seriesAlbum.totalSeconds += talk.TotalSeconds
 
                         } else {
+                            print("appending", talk.Title)
                             album.talkList.append(talk)
                         }
                     }
@@ -1206,7 +1211,10 @@ class Model {
 
          if (noteText.count > 0) && noteText.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
              TheDataModel.UserNotes[talkFileName] = UserNoteData(notes: noteText)
-             TheDataModel.UserNoteAlbum.talkList.append(talk)
+             
+             if TheDataModel.UserNoteAlbum.talkList.contains(talk) == false {
+                 TheDataModel.UserNoteAlbum.talkList.append(talk)
+             }
          } else {
              TheDataModel.UserNotes[talkFileName] = nil
              if let index = TheDataModel.UserNoteAlbum.talkList.firstIndex(of: talk) {
@@ -1293,7 +1301,7 @@ class Model {
     
     func addToShareHistory(talk: TalkData) {
         
-        
+        print("addToShareHistory")
         let date = Date()
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy.MM.dd"
@@ -1315,6 +1323,8 @@ class Model {
         
         // save the data, recompute stats, reload root view to display updated stats
         saveShareHistoryData()
+        computeAlbumStats(album: UserShareHistoryAlbum)
+
     }
     
     

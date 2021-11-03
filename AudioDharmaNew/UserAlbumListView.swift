@@ -50,11 +50,8 @@ struct UserAlbumRow: View {
                 }
             }
             .contextMenu {
-                Button("Edit Album Talks") {
-                    selection = "EDIT_TALKS_IN__ALBUM"
-                }
-                Button("Edit Album Title") {
-                    displayEditCustomAlbum = true
+                Button("Edit Album ") {
+                    selection = "EDIT_ALBUM"
                 }
                 Button("Delete Album") {
                     print("delete ablum")
@@ -68,7 +65,9 @@ struct UserAlbumRow: View {
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UserEditTalkListView(album: album), tag: "EDIT_TALKS_IN__ALBUM", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: UserEditTalkListView(album: album, editing: true), tag: "EDIT_ALBUM", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: UserEditTalkListView(album: album, editing: false), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
+
         // The Following line is NECESSARY.   (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .frame(height: LIST_ROW_SIZE_STANDARD)
@@ -86,36 +85,6 @@ struct UserAlbumRow: View {
                 },
                 secondaryButton: .cancel()
             )
-        }
-        .popover(isPresented: $displayEditCustomAlbum) {
-            VStack() {
-                Spacer()
-                    .frame(height:20)
-                Text("Edit Album Title")
-                Spacer()
-                    .frame(height:5)
-                TextField("", text: $albumTitle)
-                    .padding(.horizontal)
-                    .frame(height: 40)
-                    .border(Color.gray)
-                Spacer()
-                    .frame(height:20)
-                HStack() {
-                    Button("Cancel") {
-                        displayEditCustomAlbum = false
-                    }
-                    Spacer()
-                        .frame(width: 60)
-                    Button("OK") {
-                        displayEditCustomAlbum = false
-                        album.Title = albumTitle
-                        TheDataModel.saveCustomUserAlbums()
-                    }
-                }
-                Spacer()
-            }
-            .frame(width: 300)
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         }
 
      }
@@ -165,6 +134,8 @@ struct UserAlbumListView: View {
                 }
             )
          }
+        .background(NavigationLink(destination: UserEditTalkListView(album: selectedAlbum, editing: true), tag: "EDIT_ALBUM", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: UserEditTalkListView(album: selectedAlbum, editing: false), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
@@ -172,7 +143,9 @@ struct UserAlbumListView: View {
         .navigationBarTitle(album.Title, displayMode: .inline)
         .toolbar {
             Button("New Album") {
-                displayNewCustomAlbum = true
+                
+                selectedAlbum.Title = "New Album"
+                selection = "NEW_ALBUM"
             }
         }
         .navigationBarHidden(false)
@@ -207,46 +180,9 @@ struct UserAlbumListView: View {
               }) {
                    Image(systemName: "heart.circle")
                }
-
            }
        }
-        .popover(isPresented: $displayNewCustomAlbum) {
-            VStack() {
-                Spacer()
-                    .frame(height:20)
-                Text("New Album Title")
-                Spacer()
-                    .frame(height:5)
-                TextField("", text: $albumTitle)
-                    .padding(.horizontal)
-                    .frame(height: 40)
-                    .border(Color.gray)
-                Spacer()
-                    .frame(height:20)
-                HStack() {
-                    Button("Cancel") {
-                        displayNewCustomAlbum = false
-                    }
-                    Spacer()
-                        .frame(width: 60)
-                    Button("OK") {
-                        displayNewCustomAlbum = false
-                        let newAlbum = AlbumData(title: albumTitle, key: "KEY_CUSTOM_ALBUM", section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
-                        TheDataModel.CustomUserAlbums.albumList.append(newAlbum)
-                        TheDataModel.saveCustomUserAlbums()
-                    }
-                }
-                Spacer()
-            }
-            .frame(width: 300)
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
-        }
-        
-
     }
-    
-       
-
     
 }
 

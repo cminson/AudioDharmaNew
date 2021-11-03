@@ -107,8 +107,9 @@ struct TalkRow: View {
                 .alert(isPresented: $displayDownloadDialog) {
                     Alert(
                         title: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
-                        message: Text(TheDataModel.hasBeenDownloaded(talk: talk) ? "Remove Downloaded Talk" : "Download Talk"),
-                        primaryButton: .destructive(Text("OK")) {
+                        //primaryButton: .destructive(Text("OK")) {
+                        primaryButton: .default (Text("OK")) {
+
                             if TheDataModel.hasBeenDownloaded(talk: talk) {
                                 TheDataModel.unsetTalkAsDownloaded(talk:talk)
                             } else {

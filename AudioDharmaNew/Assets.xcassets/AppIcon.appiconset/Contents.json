@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "db1x40.png",
+      "filename" : "db2x20-1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
@@ -73,7 +73,7 @@
       "size" : "29x29"
     },
     {
-      "filename" : "db1x40-1.png",
+      "filename" : "db1x40.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"

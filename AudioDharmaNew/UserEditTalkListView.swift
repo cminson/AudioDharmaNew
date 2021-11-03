@@ -71,7 +71,7 @@ struct UserTalkRow: View {
                 stateIsInCustomAlbum.toggle()
                 
                 if stateIsInCustomAlbum == true {
-                    print("Adding: ", talk.Title)
+                    print("Adding: ", talk.Title, album.Title)
                     self.album.talkList.append(self.talk)
                 } else {
                     if let index = album.talkList.firstIndex(of: self.talk) {
@@ -93,6 +93,8 @@ struct UserTalkRow: View {
 
 struct UserEditTalkListView: View {
     var album: AlbumData
+    var editing: Bool
+
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
@@ -102,23 +104,38 @@ struct UserEditTalkListView: View {
 
     var talkSet : Set <TalkData>
     
-    init(album: AlbumData) {
+    init(album: AlbumData, editing:  Bool) {
         
         self.album = album
+        self.editing = editing
+        
+        selectedAlbum = album
         selectedTalk = TalkData.empty()
-        selectedAlbum = AlbumData.empty()
  
         self.talkSet = Set(album.talkList)
     }
-
+    
+    
     var body: some View {
 
-        SearchBar(text: $searchText)
-           .padding(.top, 0)
-      
-        List(album.getFilteredUserTalks(filter: searchText, editing: EditingCustomAlbumTalks)) { talk in
-            
-            UserTalkRow(album: album, talk: talk, talkSet: talkSet)
+        VStack(spacing: 0) {
+            Spacer().frame(height: 10)
+            Text("Album Title")
+            Spacer().frame(height:5)
+            TextField("", text: $selectedAlbum.Title)
+                .padding(.horizontal)
+                .frame(width: 200, height: 20)
+                .border(Color.gray)
+            Spacer().frame(height:15)
+            Text("Choose Talks in Album")
+            Spacer().frame(height:5)
+
+            SearchBar(text: $searchText)
+               .padding(.top, 0)
+            List(album.getFilteredUserTalks(filter: searchText, editing: EditingCustomAlbumTalks)) { talk in
+                
+                UserTalkRow(album: album, talk: talk, talkSet: talkSet)
+            }
         }
         .navigationBarTitle(album.Title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
@@ -161,12 +178,20 @@ struct UserEditTalkListView: View {
         }
         .onDisappear {
             EditingCustomAlbumTalks = false
+            
+            print("disappear",  editing)
+
+            if editing == false {
+                print("saving new album")
+
+                  TheDataModel.CustomUserAlbums.albumList.append(album)
+
+            }
             TheDataModel.computeAlbumStats(album: album)
             TheDataModel.saveCustomUserAlbums()
-            print("OnDisappear")
-            for talk in album.talkList {
-                print("talk:", talk.Title)
-            }
+            
+
+        
         }
     }
     
