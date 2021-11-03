@@ -10,7 +10,8 @@
 import SwiftUI
 import UIKit
 
-var EditingCustomAlbumTalks = false
+
+var EditTalkList : [TalkData] = []
 
 struct UserTalkRow: View {
   
@@ -18,16 +19,15 @@ struct UserTalkRow: View {
     @ObservedObject var talk: TalkData
     var talkSet: Set<TalkData>
     @State var selection: String?  = nil
-    @State private var stateIsInCustomAlbum : Bool
+    @State var talkInAlbum : Bool
 
-
+    
     init(album: AlbumData, talk: TalkData, talkSet: Set<TalkData>) {
         
-        //self.id = UUID()
         self.album = album
         self.talk = talk
         self.talkSet = talkSet
-        self.stateIsInCustomAlbum = talkSet.contains(talk)
+        self.talkInAlbum = talkSet.contains(talk)
     }
     
     
@@ -67,25 +67,20 @@ struct UserTalkRow: View {
                 .padding(.trailing, -10)
             }
             .onTapGesture {
-                EditingCustomAlbumTalks = true
-                stateIsInCustomAlbum.toggle()
-                
-                if stateIsInCustomAlbum == true {
+                talkInAlbum.toggle()
+                if talkInAlbum == true {
                     print("Adding: ", talk.Title, album.Title)
-                    self.album.talkList.append(self.talk)
+                    EditTalkList.append(self.talk)
                 } else {
-                    if let index = album.talkList.firstIndex(of: self.talk) {
+                    if let index = EditTalkList.firstIndex(of: self.talk) {
                         print("Removing: ", talk.Title)
-
-                        self.album.talkList.remove(at: index)
+                        EditTalkList.remove(at: index)
                     }
                 }
-                TheDataModel.computeAlbumStats(album: album)
             }
         }
         .contentShape(Rectangle())
-        .background(stateIsInCustomAlbum ? COLOR_HIGHLIGHTED_TALK : Color(UIColor.systemBackground))
-        .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(talkInAlbum ? COLOR_HIGHLIGHTED_TALK : Color(UIColor.systemBackground))
         .frame(height: LIST_ROW_SIZE_STANDARD)
     }
 }
@@ -93,24 +88,20 @@ struct UserTalkRow: View {
 
 struct UserEditTalkListView: View {
     var album: AlbumData
-    var editing: Bool
+    var creatingNewAlbum: Bool
 
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
-    @State var selectedTalkTime: Double = 0
-    @State var selectedTalk: TalkData
     @State var selectedAlbum: AlbumData
-
     var talkSet : Set <TalkData>
     
-    init(album: AlbumData, editing:  Bool) {
+    init(album: AlbumData, creatingNewAlbum:  Bool) {
         
         self.album = album
-        self.editing = editing
+        self.creatingNewAlbum = creatingNewAlbum
         
         selectedAlbum = album
-        selectedTalk = TalkData.empty()
  
         self.talkSet = Set(album.talkList)
     }
@@ -119,73 +110,41 @@ struct UserEditTalkListView: View {
     var body: some View {
 
         VStack(spacing: 0) {
+
             Spacer().frame(height: 10)
-            Text("Album Title")
-            Spacer().frame(height:5)
-            TextField("", text: $selectedAlbum.Title)
-                .padding(.horizontal)
-                .frame(width: 200, height: 20)
-                .border(Color.gray)
-            Spacer().frame(height:15)
+            HStack() {
+                Text("Title:")
+                Spacer().frame(width:5)
+                TextField("", text: $selectedAlbum.Title)
+                    .padding(.horizontal)
+                    .frame(width: 200, height: 30)
+                    .border(Color.gray)
+            }
+            Spacer().frame(height:25)
             Text("Choose Talks in Album")
             Spacer().frame(height:5)
 
             SearchBar(text: $searchText)
                .padding(.top, 0)
-            List(album.getFilteredUserTalks(filter: searchText, editing: EditingCustomAlbumTalks)) { talk in
+            List(album.getFilteredUserTalks(filter: searchText)) { talk in
                 
                 UserTalkRow(album: album, talk: talk, talkSet: talkSet)
+
             }
         }
         .navigationBarTitle(album.Title, displayMode: .inline)
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
-
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
-        .toolbar {
-           ToolbarItemGroup(placement: .bottomBar) {
-               Button {
-                   selection = "HELP"
-
-               } label: {
-                   Image(systemName: "questionmark.circle")
-               }
-               Spacer()
-               Button(action: {
-                   selection = "RESUME_TALK"
-                   selectedTalk = CurrentTalk
-                   selectedTalkTime = CurrentTalkElapsedTime
-               }) {
-                   Text("Resume Talk")
-                      
-               }
-               Spacer()
-               Button(action: {
-                   selection = "DONATE"
-
-              }) {
-                   Image(systemName: "heart.circle")
-               }
-
-           }
-       }
         .onAppear {
-            EditingCustomAlbumTalks = false
+            EditTalkList = album.talkList
         }
         .onDisappear {
-            EditingCustomAlbumTalks = false
             
-            print("disappear",  editing)
-
-            if editing == false {
-                print("saving new album")
+            album.talkList = EditTalkList
+            if creatingNewAlbum == true {
 
                   TheDataModel.CustomUserAlbums.albumList.append(album)
-
             }
             TheDataModel.computeAlbumStats(album: album)
             TheDataModel.saveCustomUserAlbums()

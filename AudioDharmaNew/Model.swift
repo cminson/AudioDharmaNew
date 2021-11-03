@@ -147,6 +147,7 @@ class Model {
 
 
     var UserTalkHistoryList: [TalkHistoryData] = []
+    var UserTalkShareList: [TalkHistoryData] = []
 
     var ListAllTalks: [TalkData] = []
     var ListSpeakerAlbums: [AlbumData] = []
@@ -460,6 +461,7 @@ class Model {
                     KeyToAlbum[speaker+talk.ln] = speakerAlbum
                     if talk.ln == "es" {
                         ListSpeakerAlbumsSpanish.append(speakerAlbum)
+                        ListSpeakerAlbums.append(speakerAlbum)
                     } else {
                         ListSpeakerAlbums.append(speakerAlbum)
                     }
@@ -472,6 +474,7 @@ class Model {
                 // if a series is specified, create an album if one doesn't exist.  add talk to album
                 if !series.isEmpty {
                     
+                    if series == "Dharmettes" {continue}
                     let seriesKey = "SERIES" + series
                     if self.KeyToAlbum[seriesKey] == nil {
                         seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: speaker, date : date, albumType: AlbumType.ACTIVE)
@@ -628,7 +631,7 @@ class Model {
                     UserAlbums = TheDataModel.loadUserAlbumData()
                     for userAlbumData in self.UserAlbums {
                         let albumKey = self.randomKey()
-                        let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
+                        let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "sequence", date: "", albumType: AlbumType.ACTIVE)
                         KeyToAlbum[albumKey] = customAlbum
                         albumList.append(customAlbum)
                         for fileName in userAlbumData.TalkFileNames {
@@ -650,6 +653,13 @@ class Model {
                 case KEY_USER_SHAREHISTORY:
                     album.albumType = AlbumType.HISTORICAL
                     UserShareHistoryAlbum = album
+                    
+                    UserTalkShareList = TheDataModel.loadShareHistoryData()
+                    for talkHistory in self.UserTalkShareList {
+                        if let talk = FileNameToTalk[talkHistory.FileName] {
+                            talkList.append(talk)
+                        }
+                    }
                 case KEY_SANGHA_TALKHISTORY:
                     album.albumType = AlbumType.HISTORICAL
                     SanghaTalkHistoryAlbum = album
@@ -1493,7 +1503,7 @@ class Model {
     func saveShareHistoryData() {
         
         do {
-            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserShareHistoryAlbum, requiringSecureCoding: false) {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserTalkShareList, requiringSecureCoding: false) {
                 try data.write(to: TalkHistoryData.ArchiveShareHistoryURL)
             }
         }

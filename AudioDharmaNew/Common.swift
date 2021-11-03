@@ -252,18 +252,26 @@ struct ShareSheet: UIViewControllerRepresentable {
     let applicationActivities: [UIActivity]? = nil
     let excludedActivityTypes: [UIActivity.ActivityType]? = nil
     let callback: Callback? = nil
-    
+
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(
             activityItems: activityItems,
             applicationActivities: applicationActivities)
         controller.excludedActivityTypes = excludedActivityTypes
-        controller.completionWithItemsHandler = callback
+        controller.completionWithItemsHandler = shareCompleted
         return controller
     }
     
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
         // nothing to do here
+    }
+    
+    func shareCompleted(activityType: UIActivity.ActivityType?, successfulShare: Bool, thing: [Any]?, error: Error?) {
+    
+        if successfulShare {
+            
+            TheDataModel.addToShareHistory(talk: SharedTalk)
+        }
     }
 }
 

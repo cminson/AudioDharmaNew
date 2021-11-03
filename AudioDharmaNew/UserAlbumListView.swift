@@ -64,10 +64,7 @@ struct UserAlbumRow: View {
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UserEditTalkListView(album: album, editing: true), tag: "EDIT_ALBUM", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UserEditTalkListView(album: album, editing: false), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
-
+        .background(NavigationLink(destination: UserEditTalkListView(album: album, creatingNewAlbum: false), tag: "EDIT_ALBUM", selection: $selection) { EmptyView() } .hidden())
         // The Following line is NECESSARY.   (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())  // don't delete this mofo
         .frame(height: LIST_ROW_SIZE_STANDARD)
@@ -81,6 +78,7 @@ struct UserAlbumRow: View {
                         
                         TheDataModel.CustomUserAlbums.albumList.remove(at: index)
                         TheDataModel.saveCustomUserAlbums()
+                        displayDeleteAlbum = false
                     }
                 },
                 secondaryButton: .cancel()
@@ -95,26 +93,15 @@ struct UserAlbumListView: View {
     
     @ObservedObject var album: AlbumData
 
-    @State var selectedAlbum: AlbumData
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var noCurrentTalk: Bool = false
-    
-    @State var selectedTalk: TalkData
-    @State var selectedTalkTime: Double
-    @State var displayNewCustomAlbum = false
-    
-    @State private var textStyle = UIFont.TextStyle.body
-    @State private var albumTitle = ""
     @State var displayNoCurrentTalk: Bool = false
 
     
     init(album: AlbumData) {
         
         self.album = album
-        self.selectedAlbum = AlbumData.empty()
-        self.selectedTalk = TalkData.empty()
-        self.selectedTalkTime = 0
     }
     
     
@@ -134,17 +121,14 @@ struct UserAlbumListView: View {
                 }
             )
          }
-        .background(NavigationLink(destination: UserEditTalkListView(album: selectedAlbum, editing: true), tag: "EDIT_ALBUM", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UserEditTalkListView(album: selectedAlbum, editing: false), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: UserEditTalkListView(album: AlbumData.empty(), creatingNewAlbum: true), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: CurrentAlbum, talk: CurrentTalk, elapsedTime: CurrentTalkElapsedTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
         .toolbar {
             Button("New Album") {
-                
-                selectedAlbum.Title = "New Album"
                 selection = "NEW_ALBUM"
             }
         }
@@ -164,9 +148,6 @@ struct UserAlbumListView: View {
                Button(action: {
                    if TheDataModel.currentTalkExists() {
                        selection = "RESUME_TALK"
-                       selectedTalk = CurrentTalk
-                       selectedAlbum = CurrentAlbum
-                       selectedTalkTime = CurrentTalkElapsedTime
                    } else {
                        displayNoCurrentTalk = true
                    }

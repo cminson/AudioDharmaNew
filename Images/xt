@@ -26,10 +26,10 @@ composite -gravity east -geometry +30+0  circle.png light_sequence.png light_seq
 composite -gravity west -geometry +30+0 circle.png light_sequence.png  light_sequence.png
 #
 composite -gravity west -geometry +40+0  circle.png rect.png  light_community.png
-composite -gravity east -geometry +70+50  circle.png light_community.png  light_community.png
-composite -gravity east -geometry +70-50  circle.png light_community.png  light_community.png
-convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 50,120, 160,180' light_community.png
-convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 50,120, 160,60' light_community.png
+composite -gravity east -geometry +70+60  circle.png light_community.png  light_community.png
+composite -gravity east -geometry +70-60  circle.png light_community.png  light_community.png
+convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 50,120, 160,190' light_community.png
+convert light_community.png -strokewidth 5 -stroke '#555555' -draw 'line 50,120, 160,50' light_community.png
 #
 #
 # homepage dark mode icons
@@ -42,10 +42,10 @@ composite -gravity east  -geometry +30+0  circle.png dark_sequence.png dark_sequ
 composite -gravity west  -geometry +30+0 circle.png dark_sequence.png  dark_sequence.png
 #
 composite -gravity west -geometry +40+0  circle.png rect.png  dark_community.png
-composite -gravity east -geometry +70+50  circle.png dark_community.png  dark_community.png
-composite -gravity east -geometry +70-50  circle.png dark_community.png  dark_community.png
-convert dark_community.png -strokewidth 5 -stroke white -draw 'line 50,120, 160,180' dark_community.png
-convert dark_community.png -strokewidth 5 -stroke white -draw 'line 50,120, 160,60' dark_community.png
+composite -gravity east -geometry +70+60  circle.png dark_community.png  dark_community.png
+composite -gravity east -geometry +70-60  circle.png dark_community.png  dark_community.png
+convert dark_community.png -strokewidth 5 -stroke white -draw 'line 50,120, 160,190' dark_community.png
+convert dark_community.png -strokewidth 5 -stroke white -draw 'line 50,120, 160,50' dark_community.png
 #
 # Sequence Button
 #

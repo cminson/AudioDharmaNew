@@ -13,6 +13,7 @@ import UIKit
 let ICON_TALK_FAVORITE = Image("favoritebar")
 let ICON_TALK_NOTATED = Image("notebar")
 
+var SharedTalk = TalkData.empty()
 
 struct TalkRow: View {
 
@@ -50,6 +51,12 @@ struct TalkRow: View {
         if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
+    }
+    
+    
+    func sanghaActivityCompleted() {
+    
+        print("sanghaActivityCompleted")
     }
     
     
@@ -138,6 +145,7 @@ struct TalkRow: View {
                         self.displayNoteDialog = true
                     }
                     Button("Share Talk") {
+                        SharedTalk = self.talk
                         self.displayShareSheet = true
                     }
                     Button("Download | Remove Download") {
@@ -155,11 +163,12 @@ struct TalkRow: View {
                 let sharedObjects:[AnyObject] = [objectsToShare as AnyObject, shareText as AnyObject]
 
                 ShareSheet(activityItems: sharedObjects)
+                 
+                 //print("Returned from Share Sheet")
             }
             
         }
         .contentShape(Rectangle())
-      
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
