@@ -61,7 +61,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     
     static func empty () -> AlbumData {
-        return AlbumData(title: "New Album", key: "", section: "", imageName: "sequence", date: "", albumType: AlbumType.ACTIVE)
+        return AlbumData(title: "New Album", key: "", section: "", imageName: "personal", date: "", albumType: AlbumType.ACTIVE)
     }
 
     
@@ -89,9 +89,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var filteredAlbumList = [AlbumData] ()
 
-        ModelUpdatedSemaphore.wait()
         if filter.isEmpty {
-            ModelUpdatedSemaphore.signal()
             return self.albumList
         } else {
             for album in self.albumList {
@@ -99,7 +97,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                 if searchedData.contains(filter.lowercased()) {filteredAlbumList.append(album)}
             }
         }
-        ModelUpdatedSemaphore.signal()
 
         return filteredAlbumList
     }
@@ -107,23 +104,19 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredTalks(filter: String) -> [TalkData] {
 
-            //print("getfilteredtalks")
             if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
-
-            ModelUpdatedSemaphore.wait()
-
+            
             var filteredTalkList = self.talkList
             if !filter.isEmpty {
                 filteredTalkList = []
                 for talk in self.talkList {
                     let transcript = talk.hasTranscript() ? "transcript" : ""
-                    let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript
+                    let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
                     if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
                 }
             }
-            ModelUpdatedSemaphore.signal()
 
             if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
@@ -137,7 +130,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var allTalks : [TalkData] = []
         
-        ModelUpdatedSemaphore.wait()
 
         let talkSet = Set(self.talkList)
         var listAllTalks = TheDataModel.ListAllTalks
@@ -147,14 +139,13 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
         if !filter.isEmpty {
             var filteredTalkList: [TalkData] = []
             for talk in allTalks {
-                let searchedData = talk.Title.lowercased()
+                let transcript = talk.hasTranscript() ? "transcript" : ""
+                let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
                 if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
             }
             allTalks = filteredTalkList
         }
         
-        ModelUpdatedSemaphore.signal()
-
         return allTalks
     }
 }

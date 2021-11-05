@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8302EC2D270F384B00F67EAD /* Gil Fronsdal.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8302EC2C270F384B00F67EAD /* Gil Fronsdal.txt */; };
+		830D711D273411B700CBDCCE /* UpdateScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830D711C273411B700CBDCCE /* UpdateScreen.swift */; };
 		831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831B775826E9207A0028B88E /* TalkPlayerView.swift */; };
 		832031CE270E48010042CF47 /* help.txt in Resources */ = {isa = PBXBuildFile; fileRef = 832031CD270E48010042CF47 /* help.txt */; };
 		8322D746270E872400C10ED3 /* donate.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8322D745270E872400C10ED3 /* donate.txt */; };
@@ -203,6 +204,7 @@
 
 /* Begin PBXFileReference section */
 		8302EC2C270F384B00F67EAD /* Gil Fronsdal.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "Gil Fronsdal.txt"; sourceTree = "<group>"; };
+		830D711C273411B700CBDCCE /* UpdateScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateScreen.swift; sourceTree = "<group>"; };
 		831B775826E9207A0028B88E /* TalkPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayerView.swift; sourceTree = "<group>"; };
 		832031CD270E48010042CF47 /* help.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = help.txt; sourceTree = "<group>"; };
 		8322D745270E872400C10ED3 /* donate.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = donate.txt; sourceTree = "<group>"; };
@@ -584,6 +586,7 @@
 			children = (
 				83C416A3272C513800191872 /* AudioDharmaNew.entitlements */,
 				83EB0CC626F6A4E200570A48 /* SplashScreen.swift */,
+				830D711C273411B700CBDCCE /* UpdateScreen.swift */,
 				83A2E4C026E0415700F8B531 /* HomePageView.swift */,
 				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
 				8327924526EA4ECF00F9A006 /* TalkListView.swift */,
@@ -883,6 +886,7 @@
 				8376AB1326E3ECAE000F9848 /* StoredData.swift in Sources */,
 				83EB42DB26EACE6C00AD069B /* Common.swift in Sources */,
 				83A2E4C126E0415700F8B531 /* HomePageView.swift in Sources */,
+				830D711D273411B700CBDCCE /* UpdateScreen.swift in Sources */,
 				83974BCA2718935D0013FF87 /* UserEditTalkListView.swift in Sources */,
 				83A2E4BF26E0415700F8B531 /* AudioDharmaNewApp.swift in Sources */,
 				83974BC82718934A0013FF87 /* UserAlbumListView.swift in Sources */,

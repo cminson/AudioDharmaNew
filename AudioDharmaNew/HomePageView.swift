@@ -13,6 +13,7 @@ import SwiftUI
 import UIKit
 
 
+var CurrentHomePage: HomePageView? = nil
 
 /*
  * HomePageView
@@ -37,6 +38,9 @@ struct HomePageView: View {
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        
+        CurrentHomePage = self
+        
     }
     
     

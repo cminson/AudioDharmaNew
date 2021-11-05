@@ -51,6 +51,7 @@ struct TalkRow: View {
         if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
+        
     }
     
     
@@ -205,6 +206,7 @@ struct TalkRow: View {
             .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         }
         .frame(height: LIST_ROW_SIZE_STANDARD)
+
     }
 }
 
@@ -230,6 +232,10 @@ struct TalkListView: View {
         self.selectedAlbum = AlbumData.empty()
     }
     
+    func debug() -> String {
+        print("Calling UPDATE APP")
+        return "UPDATE_APP"
+    }
 
     var body: some View {
 
@@ -241,9 +247,14 @@ struct TalkListView: View {
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
-                    selectedTalk = talk
-                    selectedTalkTime = 0
-                    selection = "PLAY_TALK"
+                    if AppUpdateRequested {
+                        //selection = "UPDATE_APP"
+                        selection = debug()
+                    } else {
+                        selectedTalk = talk
+                        selectedTalkTime = 0
+                        selection = "PLAY_TALK"
+                    }
                 }
         }
         .alert(isPresented: $displayNoCurrentTalk) {
@@ -261,6 +272,8 @@ struct TalkListView: View {
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
+
 
         .navigationBarHidden(false)
         //.navigationViewStyle(StackNavigationViewStyle())
@@ -296,6 +309,14 @@ struct TalkListView: View {
 
            }
        }
+        .onAppear {
+            
+            if AppUpdateRequested {
+                print("Update")
+                //selection = "APP_UPDATE"
+            }
+        }
+
     }
 
 }
