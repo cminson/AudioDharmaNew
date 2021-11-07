@@ -93,7 +93,7 @@ struct UpdateScreen : View {
             DispatchQueue.main.async {
                 
                 // refreshes talkListView and albumListView
-                CurrentAlbum.totalTalks = 42
+                CurrentAlbum.totalTalks = CurrentAlbum.totalTalks
             }
 
         }

@@ -40,7 +40,7 @@ struct SplashScreen : View {
                 if SharedRTalkActive == true {
                     if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
                         if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
-                            TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: talk, elapsedTime: 0)
+                            TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: talk, startTime: 0)
                         }
                     }
                 } else {

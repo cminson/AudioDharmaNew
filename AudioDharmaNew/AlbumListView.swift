@@ -58,6 +58,8 @@ struct AlbumRow: View {
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                     Spacer()
                 }
+                Spacer().frame(width: 8)
+
             }
             .contentShape(Rectangle())
             .onTapGesture {
@@ -129,7 +131,7 @@ struct AlbumListView: View {
             )
         }
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
 

@@ -79,7 +79,7 @@ struct TalkRow: View {
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
                 Spacer()
                     .frame(width: 6)
-                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + stateTalkTitle : stateTalkTitle)
+                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "\u{2022} " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
@@ -268,9 +268,9 @@ struct TalkListView: View {
         }
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationBarTitle(album.Title, displayMode: .inline)
-        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, elapsedTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
 

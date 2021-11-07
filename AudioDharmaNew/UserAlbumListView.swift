@@ -48,6 +48,7 @@ struct UserAlbumRow: View {
                         .padding(.trailing, -10)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
+                Spacer().frame(width: 8)
             }
             .contextMenu {
                 Button("Edit Album ") {
@@ -71,9 +72,9 @@ struct UserAlbumRow: View {
         .frame(maxWidth: .infinity)
         .alert(isPresented: $displayDeleteAlbum) {
             Alert(
-                title: Text("Remove Custom Album?"),
-                message: Text("Press OK to delete this album"),
-                primaryButton: .destructive(Text("OK")) {
+                title: Text("Delete Custom Album?"),
+                //message: Text("Press OK to delete this album"),
+                primaryButton: .default(Text("OK")) {
                     if let index = TheDataModel.CustomUserAlbums.albumList.firstIndex(of: album) {
                         
                         TheDataModel.CustomUserAlbums.albumList.remove(at: index)
@@ -123,7 +124,7 @@ struct UserAlbumListView: View {
          }
         .background(NavigationLink(destination: UserEditTalkListView(album: AlbumData.empty(), creatingNewAlbum: true), tag: "NEW_ALBUM", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: TalkPlayerView(album: CurrentAlbum, talk: CurrentTalk, elapsedTime: CurrentTalkElapsedTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkPlayerView(album: CurrentAlbum, talk: CurrentTalk, startTime: CurrentTalkElapsedTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)

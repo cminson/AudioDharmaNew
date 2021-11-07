@@ -47,12 +47,11 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
 struct TalkPlayerView: View {
     var album: AlbumData
     @State var talk: TalkData
-    var elapsedTime: Double
+    var startTime: Double
 
     @State var selection: String?  = nil
-    @State private var displayedElapsedTime: String
-    @State private var sliderUpdating = false
-    @State private var silderElapsedTime: Double = 0
+    @State private var elapsedTimeUpdating = false
+    @State private var elapsedTime: Double = 0
     @State var displayTranscriptView: Bool = false
     @State var displayBiographyView: Bool = false
     @State var playTalksInSequence: Bool = false
@@ -62,14 +61,13 @@ struct TalkPlayerView: View {
     @State var tappedUrl: String = ""
 
     
-    init(album: AlbumData, talk: TalkData, elapsedTime: Double) {
+    init(album: AlbumData, talk: TalkData, startTime: Double) {
         
         self.album = album
         self.talk = talk
-        self.elapsedTime = elapsedTime
+        self.startTime = startTime
        
-        self.silderElapsedTime = elapsedTime
-        self.displayedElapsedTime = Int(elapsedTime).displayInClockFormat()
+        self.elapsedTime = startTime
     }
     
     
@@ -146,7 +144,13 @@ struct TalkPlayerView: View {
     // invoked upon TheTalkPlayer completion
     mutating func talkHasCompleted () {
         
+        print("talkHasCompleted")
+
         TheTalkPlayer.stop()
+        
+        stateTalkPlayer = .FINISHED
+        self.playerTitle = getPlayerTitle()
+        self.elapsedTime = 0
 
         // if option is enabled, play the next talk in the current series
         if self.playTalksInSequence == true {
@@ -156,7 +160,6 @@ struct TalkPlayerView: View {
                 index += 1
                 if index >= self.album.talkList.count { index = 0}
                 
-                self.silderElapsedTime = 0
                 self.talk = self.album.talkList[index]
                 self.elapsedTime = 0
                 TheDataModel.saveLastAlbumTalkState(album: self.album, talk: self.talk, elapsedTime: self.elapsedTime)
@@ -169,48 +172,77 @@ struct TalkPlayerView: View {
     // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
         
+        print("updateView")
         if (TheTalkPlayer.Player.error != nil) {
             print("ERROR")
         }
 
-        if self.sliderUpdating == true {
-            self.displayedElapsedTime = Int(self.silderElapsedTime).displayInClockFormat()
-            self.elapsedTime = self.silderElapsedTime
+        if self.elapsedTimeUpdating == false {
+            self.elapsedTime += 1
         }
-        else {
-            self.elapsedTime = Double(TheTalkPlayer.getCurrentTimeInSeconds())
-            self.silderElapsedTime = self.elapsedTime
-            self.displayedElapsedTime = Int(self.elapsedTime).displayInClockFormat()
-        }
+        
 
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
         if self.elapsedTime > 0 {
 
-
             // if play time exceeds reporting threshold and not previously reported, report it
+            /*
+            if self.elapsedTime > REPORT_TALK_THRESHOLD {
+                print("THRESHOLD CROSSED")
+
+                if TheDataModel.isMostRecentTalk(talk: talk) == false {
+                    print("REPORTING ACTIVITY")
+
+                }
+                
+            }
+             */
+            
             if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
+                
+                print("REPORTING ACTIVITY")
 
                 TheDataModel.addToTalkHistory(talk: self.talk)
-                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
+                //TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
 
             // persistent store off the current talk and position in talk
             TheDataModel.saveLastAlbumTalkState(album: album, talk: self.talk, elapsedTime: self.elapsedTime)
 
+        }
+    }
+    
+    
+    func getPlayerTitle() -> String {
+        
+        var playerTitle: String
+        
+        switch stateTalkPlayer {
+        case .INITIAL:
+            playerTitle = ""
+        case .LOADING:
+            playerTitle = "Loading"
+        case .PLAYING:
             if playTalksInSequence {
-                
+
                 playerTitle = Int(self.elapsedTime).displayInClockFormat()
                 if var index = self.album.talkList.firstIndex(of: self.talk) {
                     index += 1
                     let count = self.album.talkList.count
-                    let position = String(index) + "/" + String(count) + "  "
-                    playerTitle = position + Int(self.elapsedTime).displayInClockFormat()
+                    let position = index.displayInCommaFormat() + "/" + count.displayInCommaFormat() + "  "
+                    playerTitle = "Playing " + position + Int(self.elapsedTime).displayInClockFormat()
                 }
             } else {
-                //playerTitle = Int(self.elapsedTime).displayInClockFormat() + " | " + Int(self.talk.TotalSeconds).displayInClockFormat()
-                playerTitle = Int(self.elapsedTime).displayInClockFormat()
+                
+                playerTitle = "Playing " + Int(elapsedTime).displayInClockFormat()
             }
+        case .PAUSED:
+            playerTitle = "Talk Paused"
+        case .FINISHED:
+            playerTitle = "Talk Finished"
+            
         }
+        return playerTitle
     }
     
          
@@ -246,7 +278,7 @@ struct TalkPlayerView: View {
                     Image(systemName: "backward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  12)
+                        .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
                 Spacer()
@@ -281,7 +313,7 @@ struct TalkPlayerView: View {
                     Image(systemName: "forward.fill")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height:  12)
+                        .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
             }  // end HStack
@@ -292,19 +324,28 @@ struct TalkPlayerView: View {
                 
             Spacer()
                 .frame(height: 30)
-                      
-            // talk current position control
-            Slider(value: $silderElapsedTime,
+                                      
+            Slider(value: $elapsedTime,
                    in: 0...Double(self.talk.TotalSeconds),
+                   step: 1,
                    onEditingChanged: { editing in
-                        sliderUpdating = editing
-                    if sliderUpdating == false {
-                        TheTalkPlayer.seekToTime(seconds: Int64(silderElapsedTime))
-                    }
-            })
+                
+                        if editing == true {
+                            self.elapsedTimeUpdating = true
+                        }  else {
+                            if stateTalkPlayer == .PLAYING {
+                                self.playerTitle = getPlayerTitle()
+                                TheTalkPlayer.seekToTime(seconds: Int64(self.elapsedTime))
+                            }
+                            self.elapsedTimeUpdating = false
+                        }
+                    }  // end onEditingChanged
+            ) // end Slider
             .padding(.trailing, 20)
             .padding(.leading, 20)
             .frame(height: 30)
+            .disabled(stateTalkPlayer != .PLAYING)
+                
             Spacer()
                 .frame(height: 25)
             Button(action: {
@@ -350,7 +391,7 @@ struct TalkPlayerView: View {
             TalkIsCurrentlyPlaying = false
 
         }
-        .navigationBarTitle(Text(playerTitle))
+        .navigationBarTitle(Text(getPlayerTitle()))
         .navigationBarTitle(album.Title, displayMode: .inline)
         .toolbar {
             Button(self.talk.hasTranscript() ? "Transcript" : "") {

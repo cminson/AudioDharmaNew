@@ -19,6 +19,7 @@ struct UserTalkRow: View {
     @ObservedObject var talk: TalkData
     var talkSet: Set<TalkData>
     @State var selection: String?  = nil
+    @State var stateTalkTitle: String
     @State var talkInAlbum : Bool
 
     
@@ -28,6 +29,8 @@ struct UserTalkRow: View {
         self.talk = talk
         self.talkSet = talkSet
         self.talkInAlbum = talkSet.contains(talk)
+        self.stateTalkTitle = talk.Title + " | " + talk.Speaker
+
     }
     
     
@@ -42,7 +45,7 @@ struct UserTalkRow: View {
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
                 Spacer()
                     .frame(width: 6)
-                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + talk.Title : talk.Title)
+                Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "* " + self.stateTalkTitle : self.stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
@@ -66,6 +69,7 @@ struct UserTalkRow: View {
                  }
                 .padding(.trailing, -10)
             }
+            .contentShape(Rectangle())
             .onTapGesture {
                 talkInAlbum.toggle()
                 if talkInAlbum == true {

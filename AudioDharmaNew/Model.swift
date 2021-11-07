@@ -27,10 +27,10 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 //
 // Paths for Services
 //
-let CONFIG_JSON_NAME = "DEV.JSON"
-let CONFIG_ZIP_NAME = "DEV.ZIP"
-//let CONFIG_JSON_NAME = "CONFIG00.JSON"
-//let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
+//let CONFIG_JSON_NAME = "DEV.JSON"
+//let CONFIG_ZIP_NAME = "DEV.ZIP"
+let CONFIG_JSON_NAME = "CONFIG00.JSON"
+let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
@@ -97,8 +97,8 @@ var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
 var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_MODEL_INTERVAL =  (5 * 60) + 1  // amount of time (in seconds) between each poll of the cloud for updated model info
-//var UPDATE_MODEL_INTERVAL =  20   // amount of time (in seconds) between each poll of the cloud for updated model info
+//var UPDATE_MODEL_INTERVAL =  (5 * 60) + 1  // amount of time (in seconds) between each poll of the cloud for updated model info
+var UPDATE_MODEL_INTERVAL =  360 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
 
 //var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
 //var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
@@ -450,9 +450,7 @@ class Model {
                 if talk.ln == "es" {
                     ListAllTalksSpanish.append(talk)
                 }
-                if talk.hasTranscript() {
-                    ListTranscriptTalks.append(talk)
-                }
+
 
                 var speakerAlbum : AlbumData
                 var seriesAlbum : AlbumData
@@ -570,11 +568,8 @@ class Model {
                 album.talkList.append(talk)
             }
         }
-
-        computeAlbumStats(album: AllTalksAlbum)
     }
 
-    
     
 
     func loadAlbums(jsonDict: [String: AnyObject]) {
@@ -1127,6 +1122,7 @@ class Model {
         DispatchQueue.main.async {
             
             if TalkIsCurrentlyPlaying == false {
+                //print("computeAlbum", album.Title, totalTalks)
                 album.totalTalks = totalTalks
             }
         }
@@ -1276,6 +1272,7 @@ class Model {
      
          
          if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.first {
+             print("most recent talk: ", talk.Title)
              return talk.FileName == lastTalk.FileName
          }
          return false
@@ -1287,6 +1284,7 @@ class Model {
     //
     func addToTalkHistory(talk: TalkData) {
         
+        print("addToTalkHistory: ", talk.Title)
         self.PlayedTalks[talk.FileName] = true
 
         let date = Date()

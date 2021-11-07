@@ -28,6 +28,7 @@ let FONT_SIZE_SECTION : CGFloat = 16
 let FONT_SIZE_BIOGRAPHY_TEXT : CGFloat = 16
 let FONT_SIZE_HELP_TEXT : CGFloat = 16
 let FONT_SIZE_DONATION_TEXT : CGFloat = 16
+let FONT_SIZE_DONATION_LINK : CGFloat = 20
 let FONT_SIZE_TALK_PLAYER : CGFloat = 16
 let FONT_SIZE_TALK_PLAYER_SMALL : CGFloat = 12
 
@@ -36,7 +37,7 @@ let LIST_LEFT_MARGIN_OFFSET : CGFloat = -10
 let NOTATE_FAVORITE_ICON_WIDTH : CGFloat = 12
 let NOTATE_FAVORITE_ICON_HEIGHT : CGFloat = 12
 let BIO_IMAGE_HEIGHT : CGFloat = 200
-
+let BIO_TEXT_MAX_WIDTH : CGFloat = 600
 
 let COLOR_HEX_BACKGROUND_SECTION = "555555"
 let COLOR_DOWNLOADED_TALK = Color.orange
@@ -369,34 +370,51 @@ struct HelpPageView: View {
         VStack(alignment: .leading, spacing: 0) {
            
             ScrollView {
-            Spacer()
-                .frame(height:30)
-            HStack() {
-                Text("General")
-                    .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
-                    .frame(alignment: .leading)
+                VStack() {
                 Spacer()
+                    .frame(height:30)
+                HStack() {
+                    Text("General")
+                        .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
+                    Spacer()
                 }
-            Spacer()
-                .frame(height:15)
-            Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nA orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nDownloaded talks are highlighted in orange.\nPlayed talks display a * in front of the title.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's background, tap the speaker name in the Play Talks window.")
-                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
-                .multilineTextAlignment(.leading)
-            Spacer()
-                .frame(height:40)
+                .frame(alignment: .leading)
+     
+
+                Spacer().frame(height:25)
+                    HStack() {
+                        Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nAn orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nA black dot marks a talk that has been previously played.\nDownloaded talks are highlighted in orange.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's biography, tap the speaker's name in the Play Talks screen.")
+                            .frame(alignment: .leading)
+                            .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                    .frame(alignment: .leading)
+
+                Spacer().frame(height:40)
                 HStack() {
                     Text("Custom Albums")
                         .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
-                        .frame(alignment: .leading)
                     Spacer()
                 }
-            Spacer()
-                .frame(height:15)
-            Text("Tap New Albums in the top right to create a custom album.\n\nLong-press a custom album to display its menu.  This menu allows you to add or delete talks in the album.")
-                .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
-                .multilineTextAlignment(.leading)
-            Spacer()
+                .frame(alignment: .leading)
+
+                Spacer().frame(height:25)
+                HStack() {
+                     Text("Tap New Albums in the top right to create a custom album.\n\nLong-press a custom album to display its menu. This menu allows you to add or delete talks in the album.")
+                        .frame(alignment: .leading)
+                        .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
+                        .multilineTextAlignment(.leading)
+                }
+                .frame(alignment: .leading)
+
+
+                Spacer()
+
             }
+                .frame(maxWidth: BIO_TEXT_MAX_WIDTH)
+            }
+           
 
         }
         .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
@@ -429,12 +447,13 @@ struct DonationPageView: View {
                 Link(destination: URL(string: URL_DONATE)!, label: {
                     Text("Donate")
                         .foregroundColor(DEFAULT_LINK_COLOR)
-                        .font(.system(size: FONT_SIZE_DONATION_TEXT, weight: .regular))
+                        .font(.system(size: FONT_SIZE_DONATION_LINK, weight: .regular))
                 })
                 Spacer()
             }
             Spacer()
         }
+        .frame(maxWidth: BIO_TEXT_MAX_WIDTH)
         .padding(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
         .navigationBarTitle("Donations", displayMode: .inline)
 
