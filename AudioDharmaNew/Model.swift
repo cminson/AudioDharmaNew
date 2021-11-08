@@ -659,8 +659,10 @@ class Model {
                     UserShareHistoryAlbum = album
                     
                     UserTalkShareList = TheDataModel.loadShareHistoryData()
-                    for talkHistory in self.UserTalkShareList {
+                    for talkHistory in UserTalkShareList {
+                        print("talkHistory", talkHistory.FileName)
                         if let talk = FileNameToTalk[talkHistory.FileName] {
+                            print("getting stored shared talk: ", talk.Title)
                             talkList.append(talk)
                         }
                     }
@@ -1069,6 +1071,7 @@ class Model {
     
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
        
+        print("Report Activity: ", talk.Title, type)
         var operation : String
         switch (type) {
         
@@ -1326,12 +1329,16 @@ class Model {
         PlayedTalks[talk.FileName] = true
         talk.DatePlayed = datePlayed
         talk.TimePlayed = timePlayed
-        UserShareHistoryAlbum.talkList.append(talk)
+        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
+
         
+        UserShareHistoryAlbum.talkList.append(talk)
+        UserTalkShareList.insert(talkHistory, at: 0)
+
         let excessTalkCount = UserShareHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
             for _ in 0 ... excessTalkCount {
-                UserShareHistoryAlbum.talkList.remove(at: 0)
+                UserTalkShareList.remove(at: 0)
             }
         }
         
@@ -1506,8 +1513,15 @@ class Model {
     
     func saveShareHistoryData() {
         
+        print("saveShareHistoryData")
         do {
             if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserTalkShareList, requiringSecureCoding: false) {
+                /*
+                print("writing UserTalkShareList")
+                for talk in TheDataModel.UserTalkShareList {
+                    print(talk.FileName)
+                }
+                 */
                 try data.write(to: TalkHistoryData.ArchiveShareHistoryURL)
             }
         }
@@ -1519,8 +1533,11 @@ class Model {
     
     func loadShareHistoryData() -> [TalkHistoryData]  {
         
+        print("loadShareHistoryData")
+
         if let data = try? Data(contentsOf: TalkHistoryData.ArchiveShareHistoryURL) {
             if let talkHistory = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [TalkHistoryData] {
+
                 return talkHistory
             } else {
                 return [TalkHistoryData] ()

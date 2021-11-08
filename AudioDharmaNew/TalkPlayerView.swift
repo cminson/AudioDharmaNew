@@ -47,26 +47,23 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
 struct TalkPlayerView: View {
     var album: AlbumData
     @State var talk: TalkData
-    var startTime: Double
+    @State private var elapsedTime: Double
 
-    @State var selection: String?  = nil
+    @State private var selection: String?  = nil
     @State private var elapsedTimeUpdating = false
-    @State private var elapsedTime: Double = 0
-    @State var displayTranscriptView: Bool = false
-    @State var displayBiographyView: Bool = false
-    @State var playTalksInSequence: Bool = false
+    @State private var displayTranscriptView: Bool = false
+    @State private var displayBiographyView: Bool = false
+    @State private var playTalksInSequence: Bool = false
     @State private var playerTitle: String = "Play Talk"
     @State private var displayNoInternet = false
     @State private var stateTalkPlayer = TalkStates.INITIAL
-    @State var tappedUrl: String = ""
+    @State private var tappedUrl: String = ""
 
     
     init(album: AlbumData, talk: TalkData, startTime: Double) {
         
         self.album = album
         self.talk = talk
-        self.startTime = startTime
-       
         self.elapsedTime = startTime
     }
     
@@ -118,6 +115,8 @@ struct TalkPlayerView: View {
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"
 
+            print("Startng talk at: ", self.elapsedTime)
+
             TheTalkPlayer = TalkPlayer()
             TheTalkPlayer.talkPlayerView = self
             TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
@@ -134,7 +133,7 @@ struct TalkPlayerView: View {
     }
     
     
-    func finishTalk() {
+    func terminateTalk() {
     
         TheTalkPlayer?.stop()
         stateTalkPlayer = .FINISHED
@@ -203,7 +202,7 @@ struct TalkPlayerView: View {
                 print("REPORTING ACTIVITY")
 
                 TheDataModel.addToTalkHistory(talk: self.talk)
-                //TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
+                TheDataModel.reportTalkActivity(type: ACTIVITIES.PLAY_TALK, talk: self.talk)
             }
 
             // persistent store off the current talk and position in talk
@@ -237,9 +236,9 @@ struct TalkPlayerView: View {
                 playerTitle = "Playing " + Int(elapsedTime).displayInClockFormat()
             }
         case .PAUSED:
-            playerTitle = "Talk Paused"
+            playerTitle = "Paused " + Int(elapsedTime).displayInClockFormat()
         case .FINISHED:
-            playerTitle = "Talk Finished"
+            playerTitle = "Finished"
             
         }
         return playerTitle
@@ -272,7 +271,7 @@ struct TalkPlayerView: View {
             // play, pause, fast-forward,  fast-backward buttons
             HStack() {
                 Button(action: {
-                    TheTalkPlayer.seekFastBackward()
+                    self.elapsedTime = TheTalkPlayer.seekFastBackward()
                 })
                 {
                     Image(systemName: "backward.fill")
@@ -281,6 +280,8 @@ struct TalkPlayerView: View {
                         .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
+                .disabled(stateTalkPlayer != .PLAYING)
+
                 Spacer()
                     .frame(width: 45)
                 ZStack() {
@@ -307,7 +308,7 @@ struct TalkPlayerView: View {
                 Spacer()
                     .frame(width: 45)
                 Button(action: {
-                    TheTalkPlayer.seekFastForward()
+                    self.elapsedTime = TheTalkPlayer.seekFastForward()
                 })
                 {
                     Image(systemName: "forward.fill")
@@ -316,6 +317,8 @@ struct TalkPlayerView: View {
                         .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
                 }
+                .disabled(stateTalkPlayer != .PLAYING)
+
             }  // end HStack
             
             }  //end group 1
@@ -386,7 +389,7 @@ struct TalkPlayerView: View {
         }
         .onDisappear {
             if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view
-                finishTalk()
+                terminateTalk()
             }
             TalkIsCurrentlyPlaying = false
 

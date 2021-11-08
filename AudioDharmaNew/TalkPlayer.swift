@@ -113,38 +113,52 @@ class TalkPlayer : NSObject {
     }
     
     
-    func seekFastForward() {
+    func seekFastForward() -> Double {
+        
+        var seekEndPoint: Int64 = 0
         
         if let ct = PlayerItem?.currentTime(), let dt = Player.currentItem?.asset.duration {
             let currentTimeInSeconds = Int64(CMTimeGetSeconds(ct))
             let durationTimeInSeconds = Int64(CMTimeGetSeconds(dt))
             
             if currentTimeInSeconds + FAST_SEEK < durationTimeInSeconds {
-                Player.seek(to: CMTimeMake(value: currentTimeInSeconds + FAST_SEEK, timescale: 1))
+                seekEndPoint = currentTimeInSeconds + FAST_SEEK
 
             } else {
-                Player.seek(to: CMTimeMake(value: durationTimeInSeconds, timescale: 1))
+                seekEndPoint = durationTimeInSeconds
             }
+            
+            Player.seek(to: CMTimeMake(value: seekEndPoint, timescale: 1))
+
         }
         
         if getCurrentTimeInSeconds() >= getDurationInSeconds() {
             talkHasCompleted()
         }
+        
+        return Double(seekEndPoint)
+
     }
     
     
-    func seekFastBackward() {
+    func seekFastBackward() -> Double {
         
+        var seekEndPoint: Int64 = 0
+
         if let ct = PlayerItem?.currentTime() {
             let currentTimeInSeconds = Int64(CMTimeGetSeconds(ct))
             
             if currentTimeInSeconds - FAST_SEEK > Int64(0) {
-                Player.seek(to: CMTimeMake(value: currentTimeInSeconds - FAST_SEEK, timescale: 1))
+                seekEndPoint = currentTimeInSeconds - FAST_SEEK
                 
             } else {
-                Player.seek(to: CMTimeMake(value: 0, timescale: 1))
+                seekEndPoint = 0
             }
+            
+            Player.seek(to: CMTimeMake(value: seekEndPoint, timescale: 1))
         }
+        
+        return Double(seekEndPoint)
     }
     
     
