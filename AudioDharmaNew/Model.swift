@@ -96,7 +96,7 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
 //var UPDATE_MODEL_INTERVAL =  (5 * 60) + 1  // amount of time (in seconds) between each poll of the cloud for updated model info
 var UPDATE_MODEL_INTERVAL =  360 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
 
@@ -149,9 +149,6 @@ class Model {
     var AllTalksAlbumSpanish =  AlbumData(title: "All Spanish Talks", key: KEY_USER_ALBUMS, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
     var RecommendedAlbumSpanish: AlbumData = AlbumData(title: "RECOMMENDED", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
 
-
-    var UserTalkHistoryList: [TalkHistoryData] = []
-    var UserTalkShareList: [TalkHistoryData] = []
 
     var ListAllTalks: [TalkData] = []
     var ListSpeakerAlbums: [AlbumData] = []
@@ -213,7 +210,7 @@ class Model {
     func startBackgroundTimers() {
         
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
-        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+        //Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
     }
     
 
@@ -647,25 +644,13 @@ class Model {
                     }
                 case KEY_USER_TALKHISTORY:
                     UserTalkHistoryAlbum = album
-                    UserTalkHistoryList = TheDataModel.loadTalkHistoryData()
+                    talkList = TheDataModel.loadTalkHistoryData()
 
-                    for talkHistory in self.UserTalkHistoryList {
-                        if let talk = FileNameToTalk[talkHistory.FileName] {
-                            talkList.append(talk)
-                        }
-                    }
                 case KEY_USER_SHAREHISTORY:
                     album.albumType = AlbumType.HISTORICAL
                     UserShareHistoryAlbum = album
-                    
-                    UserTalkShareList = TheDataModel.loadShareHistoryData()
-                    for talkHistory in UserTalkShareList {
-                        print("talkHistory", talkHistory.FileName)
-                        if let talk = FileNameToTalk[talkHistory.FileName] {
-                            print("getting stored shared talk: ", talk.Title)
-                            talkList.append(talk)
-                        }
-                    }
+                    talkList = TheDataModel.loadShareHistoryData()
+
                 case KEY_SANGHA_TALKHISTORY:
                     album.albumType = AlbumType.HISTORICAL
                     SanghaTalkHistoryAlbum = album
@@ -1072,6 +1057,8 @@ class Model {
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
        
         print("Report Activity: ", talk.Title, type)
+        //CJM DEV
+        /*
         var operation : String
         switch (type) {
         
@@ -1100,6 +1087,7 @@ class Model {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in }
         
         task.resume()
+         */
     }
     
     
@@ -1124,10 +1112,11 @@ class Model {
         // therefore need to update it via a dispatch to the main thread
         DispatchQueue.main.async {
             
-            if TalkIsCurrentlyPlaying == false {
-                //print("computeAlbum", album.Title, totalTalks)
+            print("In dispatch", TalkIsCurrentlyPlaying)
+           // if TalkIsCurrentlyPlaying == false {
+                print("computeAlbum", album.Title, totalTalks)
                 album.totalTalks = totalTalks
-            }
+           // }
         }
         album.totalSeconds = totalSeconds
     }
@@ -1285,36 +1274,36 @@ class Model {
     //
     // invoked in background by TalkPlayerView
     //
-    func addToTalkHistory(talk: TalkData) {
-        
-        print("addToTalkHistory: ", talk.Title)
-        self.PlayedTalks[talk.FileName] = true
+     func addToTalkHistory(talk: TalkData) {
+         
+         print("addToTalkHistory: ", talk.Title)
+         
+         self.PlayedTalks[talk.FileName] = true
 
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy.MM.dd"
-        let datePlayed = formatter.string(from: date)
-        formatter.dateFormat = "HH:mm:ss"
-        let timePlayed = formatter.string(from: date)
+         let date = Date()
+         let formatter = DateFormatter()
+         formatter.dateFormat = "yyyy.MM.dd"
+         let datePlayed = formatter.string(from: date)
+         formatter.dateFormat = "HH:mm:ss"
+         let timePlayed = formatter.string(from: date)
 
-        talk.DatePlayed = datePlayed
-        talk.TimePlayed = timePlayed
+         talk.DatePlayed = datePlayed
+         talk.TimePlayed = timePlayed
+         
+         UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
+         
+         let excessTalkCount = UserTalkHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
+         if excessTalkCount > 0 {
+             for _ in 1 ... excessTalkCount {
+                 UserTalkHistoryAlbum.talkList.removeLast()
+             }
+         }
 
-        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
-
-        UserTalkHistoryAlbum.talkList.insert(talk, at: 0)
-        UserTalkHistoryList.insert(talkHistory, at: 0)
-        let excessTalkCount = UserTalkHistoryList.count - MAX_HISTORY_COUNT
-        if excessTalkCount > 0 {
-            for _ in 0 ... excessTalkCount {
-                UserTalkHistoryList.remove(at: 0)
-            }
-        }
- 
-        savePlayedTalksData()
-        saveTalkHistoryData()
-        computeAlbumStats(album: self.UserTalkHistoryAlbum)
-    }
+         savePlayedTalksData()
+         saveTalkHistoryData()
+         computeAlbumStats(album: self.UserTalkHistoryAlbum)
+       }
+     
     
     
     func addToShareHistory(talk: TalkData) {
@@ -1329,16 +1318,13 @@ class Model {
         PlayedTalks[talk.FileName] = true
         talk.DatePlayed = datePlayed
         talk.TimePlayed = timePlayed
-        let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
-
-        
-        UserShareHistoryAlbum.talkList.append(talk)
-        UserTalkShareList.insert(talkHistory, at: 0)
+       
+        UserShareHistoryAlbum.talkList.insert(talk, at: 0)
 
         let excessTalkCount = UserShareHistoryAlbum.talkList.count - MAX_HISTORY_COUNT
         if excessTalkCount > 0 {
-            for _ in 0 ... excessTalkCount {
-                UserTalkShareList.remove(at: 0)
+            for _ in 1 ... excessTalkCount {
+                UserShareHistoryAlbum.talkList.removeLast()
             }
         }
         
@@ -1347,6 +1333,7 @@ class Model {
         computeAlbumStats(album: UserShareHistoryAlbum)
 
     }
+     
     
     
     //
@@ -1487,8 +1474,16 @@ class Model {
     //
     func saveTalkHistoryData() {
         
+        var talkHistoryList: [TalkHistoryData] = []
+    
+        for talk in UserTalkHistoryAlbum.talkList {
+            
+            let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
+            talkHistoryList.append(talkHistory)
+        }
+
         do {
-            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserTalkHistoryList, requiringSecureCoding: false) {
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: talkHistoryList, requiringSecureCoding: false) {
                 try data.write(to: TalkHistoryData.ArchiveTalkHistoryURL)
             }
         }
@@ -1498,30 +1493,40 @@ class Model {
     }
 
     
-    func loadTalkHistoryData() -> [TalkHistoryData]  {
+    func loadTalkHistoryData() -> [TalkData]  {
+        
+        var talkHistoryList: [TalkHistoryData] = []
+        var talkList: [TalkData] = []
+
         
         if let data = try? Data(contentsOf: TalkHistoryData.ArchiveTalkHistoryURL) {
             if let talkHistory = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [TalkHistoryData] {
-                return talkHistory
-            } else {
-                return [TalkHistoryData] ()
+                talkHistoryList =  talkHistory
             }
         }
-        return [TalkHistoryData] ()
+        
+        for talkHistory in talkHistoryList {
+            if let talk = FileNameToTalk[talkHistory.FileName] {
+                talkList.append(talk)
+            }
+        }
+
+        return talkList
     }
 
     
     func saveShareHistoryData() {
         
-        print("saveShareHistoryData")
+        var talkHistoryList: [TalkHistoryData] = []
+        
+        for talk in UserShareHistoryAlbum.talkList {
+            
+            let talkHistory = TalkHistoryData(fileName: talk.FileName, datePlayed: talk.DatePlayed, timePlayed: talk.TimePlayed, cityPlayed: "", statePlayed: "", countryPlayed: "")
+            talkHistoryList.append(talkHistory)
+        }
+
         do {
-            if let data = try? NSKeyedArchiver.archivedData(withRootObject: TheDataModel.UserTalkShareList, requiringSecureCoding: false) {
-                /*
-                print("writing UserTalkShareList")
-                for talk in TheDataModel.UserTalkShareList {
-                    print(talk.FileName)
-                }
-                 */
+            if let data = try? NSKeyedArchiver.archivedData(withRootObject: talkHistoryList, requiringSecureCoding: false) {
                 try data.write(to: TalkHistoryData.ArchiveShareHistoryURL)
             }
         }
@@ -1531,19 +1536,24 @@ class Model {
     }
 
     
-    func loadShareHistoryData() -> [TalkHistoryData]  {
+    func loadShareHistoryData() -> [TalkData]  {
         
-        print("loadShareHistoryData")
+        var talkHistoryList: [TalkHistoryData] = []
+        var talkList: [TalkData] = []
 
         if let data = try? Data(contentsOf: TalkHistoryData.ArchiveShareHistoryURL) {
             if let talkHistory = try? NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? [TalkHistoryData] {
 
-                return talkHistory
-            } else {
-                return [TalkHistoryData] ()
+                talkHistoryList =  talkHistory
             }
         }
-        return [TalkHistoryData] ()
+        
+        for talkHistory in talkHistoryList {
+            if let talk = FileNameToTalk[talkHistory.FileName] {
+                talkList.append(talk)
+            }
+      }
+        return talkList
     }
         
     

@@ -327,27 +327,33 @@ struct TalkPlayerView: View {
                 
             Spacer()
                 .frame(height: 30)
-                                      
-            Slider(value: $elapsedTime,
-                   in: 0...Double(self.talk.TotalSeconds),
-                   step: 1,
-                   onEditingChanged: { editing in
-                
-                        if editing == true {
-                            self.elapsedTimeUpdating = true
-                        }  else {
-                            if stateTalkPlayer == .PLAYING {
-                                self.playerTitle = getPlayerTitle()
-                                TheTalkPlayer.seekToTime(seconds: Int64(self.elapsedTime))
-                            }
-                            self.elapsedTimeUpdating = false
-                        }
-                    }  // end onEditingChanged
-            ) // end Slider
+           
+                HStack() {
+                    Text("00:00:00")
+                        .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
+                    Slider(value: $elapsedTime,
+                           in: 0...Double(self.talk.TotalSeconds),
+                           step: 1,
+                             onEditingChanged: { editing in
+                        
+                                if editing == true {
+                                    self.elapsedTimeUpdating = true
+                                }  else {
+                                    if stateTalkPlayer == .PLAYING {
+                                        self.playerTitle = getPlayerTitle()
+                                        TheTalkPlayer.seekToTime(seconds: Int64(self.elapsedTime))
+                                    }
+                                    self.elapsedTimeUpdating = false
+                                }
+                            }  // end onEditingChanged
+                    ) // end Slider
+                    .frame(height: 30)
+                    .disabled(stateTalkPlayer != .PLAYING)
+                    Text(self.talk.TotalSeconds.displayInClockFormat())
+                        .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
+                }
             .padding(.trailing, 20)
             .padding(.leading, 20)
-            .frame(height: 30)
-            .disabled(stateTalkPlayer != .PLAYING)
                 
             Spacer()
                 .frame(height: 25)
@@ -388,6 +394,7 @@ struct TalkPlayerView: View {
             
         }
         .onDisappear {
+            print("TALK DISAPPEAR")
             if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view
                 terminateTalk()
             }
