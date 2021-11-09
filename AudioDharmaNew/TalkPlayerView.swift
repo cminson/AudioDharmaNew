@@ -184,20 +184,7 @@ struct TalkPlayerView: View {
         // if talk is  underway, then stop the busy notifier and activate the display (buttons, durations etc)
         if self.elapsedTime > 0 {
 
-            // if play time exceeds reporting threshold and not previously reported, report it
-            /*
-            if self.elapsedTime > REPORT_TALK_THRESHOLD {
-                print("THRESHOLD CROSSED")
-
-                if TheDataModel.isMostRecentTalk(talk: talk) == false {
-                    print("REPORTING ACTIVITY")
-
-                }
-                
-            }
-             */
-            
-            if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
+             if self.elapsedTime > REPORT_TALK_THRESHOLD, TheDataModel.isMostRecentTalk(talk: talk) == false {
                 
                 print("REPORTING ACTIVITY")
 
@@ -394,7 +381,6 @@ struct TalkPlayerView: View {
             
         }
         .onDisappear {
-            print("TALK DISAPPEAR")
             if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view
                 terminateTalk()
             }

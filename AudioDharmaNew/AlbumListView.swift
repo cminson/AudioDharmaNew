@@ -38,6 +38,12 @@ struct AlbumRow: View {
     @ObservedObject var album: AlbumData
     @State var selection: String?  = ""
 
+    
+    init(album: AlbumData) {
+        self.album = album
+    }
+    
+    
     var body: some View {
         
         VStack(alignment: .leading) {
@@ -63,25 +69,21 @@ struct AlbumRow: View {
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                if AppUpdateRequested {
-                    
-                    selection = "UPDATE_APP"
-                } else {
-                    if KEYS_TO_ALBUMS.contains(album.Key) {
-                        selection = "ALBUMS"
-                    }
-                    else if KEYS_TO_USER_ALBUMS.contains(album.Key) {
-                        selection = "USERALBUMS"
-                    } else {
-                        selection = "TALKS"
-                    }
+
+                if KEYS_TO_ALBUMS.contains(album.Key) {
+                    selection = "ALBUMS"
                 }
+                else if KEYS_TO_USER_ALBUMS.contains(album.Key) {
+                    selection = "USERALBUMS"
+                } else {
+                    selection = "TALKS"
+                }
+
             }
         }
         .background(NavigationLink(destination: TalkListView(album: album), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: AlbumListView(album: album), tag: "ALBUMS", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: UserAlbumListView(album: album), tag: "USERALBUMS", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
 
         // Ref for the following line.  Keep for now: (https://forums.swift.org/t/14-5-beta3-navigationlink-unexpected-pop/45279)
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
@@ -119,7 +121,6 @@ struct AlbumListView: View {
            .padding(.top, 0)
         List(album.getFilteredAlbums(filter: searchText)) { album in
            AlbumRow(album: album)
-                //.listRowInsets(EdgeInsets())
         }
         .alert(isPresented: $displayNoCurrentTalk) {
             Alert(
@@ -133,7 +134,6 @@ struct AlbumListView: View {
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
 
         .navigationBarTitle(album.Title, displayMode: .inline)
         .navigationBarHidden(false)
@@ -170,7 +170,14 @@ struct AlbumListView: View {
                }
            }
        } // end toolbar
+        .onAppear() {
+            if AppRestartRequested {
+               exit(0)
+            }
+
+        }
     } // end view
+
 }
 
 

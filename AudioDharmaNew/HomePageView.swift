@@ -8,7 +8,6 @@
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 //
-
 import SwiftUI
 import UIKit
 
@@ -113,9 +112,14 @@ struct HomePageView: View {
                 }
             }
            // end toolbar
+            .onAppear() {
+                if AppRestartRequested {
+                    exit(0)
+                }
+            }
+
        }  // end NavigationView
        .navigationViewStyle(.stack)
     }
         
 }
-

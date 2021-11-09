@@ -54,13 +54,7 @@ struct TalkRow: View {
         
     }
     
-    
-    func sanghaActivityCompleted() {
-    
-        print("sanghaActivityCompleted")
-    }
-    
-    
+       
     func downloadCompleted() {
 
         stateTalkTitle = self.talk.Title
@@ -215,6 +209,7 @@ struct TalkListView: View {
     @ObservedObject var album: AlbumData
     //var album: AlbumData
 
+    
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
@@ -232,11 +227,7 @@ struct TalkListView: View {
         self.selectedAlbum = AlbumData.empty()
     }
     
-    func debug() -> String {
-        print("Calling UPDATE APP")
-        return "UPDATE_APP"
-    }
-
+    
     var body: some View {
 
         SearchBar(text: $searchText)
@@ -247,14 +238,11 @@ struct TalkListView: View {
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
-                    if AppUpdateRequested {
-                        //selection = "UPDATE_APP"
-                        selection = debug()
-                    } else {
-                        selectedTalk = talk
-                        selectedTalkTime = 0
-                        selection = "PLAY_TALK"
-                    }
+                
+                    selectedTalk = talk
+                    selectedTalkTime = 0
+                    selection = "PLAY_TALK"
+
                 }
         }
         .alert(isPresented: $displayNoCurrentTalk) {
@@ -272,7 +260,6 @@ struct TalkListView: View {
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
-        .background(NavigationLink(destination: UpdateScreen(album: album), tag: "UPDATE_APP", selection: $selection) { EmptyView() } .hidden())
 
 
         .navigationBarHidden(false)
@@ -309,11 +296,9 @@ struct TalkListView: View {
 
            }
        }
-        .onAppear {
-            
-            if AppUpdateRequested {
-                print("Update")
-                //selection = "APP_UPDATE"
+        .onAppear() {
+            if AppRestartRequested {
+                exit(0)
             }
         }
 

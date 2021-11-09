@@ -21,6 +21,8 @@ struct SplashScreen : View {
     @State var configurationFailed:Bool = false
     @State var sharedURL: String = ""
 
+    @Environment(\.presentationMode) var presentationMode
+
     
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
@@ -29,8 +31,16 @@ struct SplashScreen : View {
     init() {
         
         TheDataModel.initialize()
-        TheDataModel.downloadAndConfigure(startingApp: true)
+        TheDataModel.downloadAndConfigure()
     }
+    
+    func dismissView() -> Text {
+        
+
+        presentationMode.wrappedValue.dismiss()
+        return Text("")
+    }
+
     
 
     var body: some View {
@@ -44,7 +54,8 @@ struct SplashScreen : View {
                         }
                     }
                 } else {
-                    HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                   HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                    //HomePageView()
                 }
             } else {
                 GeometryReader { metrics in

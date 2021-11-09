@@ -24,16 +24,12 @@ struct UpdateScreen : View {
     @State var sharedURL: String = ""
 
     
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
-
     // download and configure DataModel.  WAIT on the completion semaphore in the
     // DispatchQueue timer in the body before finishing initialization
     init(album: AlbumData) {
 
         self.album = album
-        if AppUpdateRequested == false {return}
         
-        AppUpdateRequested = false
         ModelReadySemaphore = DispatchSemaphore(value: 0)
      }
     
@@ -77,7 +73,7 @@ struct UpdateScreen : View {
         .onAppear {
             
             TheDataModel.initialize()
-            TheDataModel.downloadAndConfigure(startingApp: false)
+            TheDataModel.downloadAndConfigure()
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {

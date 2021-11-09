@@ -94,14 +94,12 @@ let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes 
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
 let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the interval between talks
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
-var MAX_SHAREHISTORY_COUNT = 1000     // maximum number of shared talks showed in sangha history  over-rideable by config
+var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 10    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-//var UPDATE_MODEL_INTERVAL =  (5 * 60) + 1  // amount of time (in seconds) between each poll of the cloud for updated model info
-var UPDATE_MODEL_INTERVAL =  360 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
+var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+//var UPDATE_MODEL_INTERVAL =  6 * 60 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
+var UPDATE_MODEL_INTERVAL =  1 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
 
-//var UPDATE_MODEL_INTERVAL : TimeInterval = 120 * 60    // interval to next update model
-//var LAST_MODEL_UPDATE = NSDate().timeIntervalSince1970  // when we last updated model
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -120,14 +118,12 @@ enum INIT_CODES {          // all possible startup results
 var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
 var GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
-var AppUpdateRequested = false
-
-
-var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
-
+var AppRestartRequested = false
 
 class Model {
     
+    var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
+
     var RootAlbum: AlbumData = AlbumData(title: "ROOT", key: KEY_ALBUMROOT, section: "", imageName: "albumdefault", date: "", albumType: AlbumType.ACTIVE)
 
     var FileNameToTalk: [String: TalkData]   = [String: TalkData] ()  // dictionary keyed by talk filename, value is the talk data (used by userList code to lazily bind)
@@ -153,11 +149,10 @@ class Model {
     var ListAllTalks: [TalkData] = []
     var ListSpeakerAlbums: [AlbumData] = []
     var ListSeriesAlbums: [AlbumData] = []
-    var ListRecommenedAlbums: [AlbumData] = []
     var ListFavoriteTalls : [TalkData] = []
     var ListTranscriptTalks : [TalkData] = []
 
-        var ListAllTalksSpanish: [TalkData] = []
+    var ListAllTalksSpanish: [TalkData] = []
     var ListSpeakerAlbumsSpanish: [AlbumData] = []
     var ListSeriesAlbumsSpanish: [AlbumData] = []
 
@@ -182,8 +177,49 @@ class Model {
         
     func initialize() {
         
+        for album in ListSpeakerAlbums {
+            album.albumList = []
+            album.talkList = []
+        }
+        ListSpeakerAlbums = []
+        
+        for album in ListSeriesAlbums {
+            album.albumList = []
+            album.talkList = []
+        }
+        ListSeriesAlbums = []
+
+        for album in ListSpeakerAlbumsSpanish {
+            album.albumList = []
+            album.talkList = []
+        }
+        ListSpeakerAlbumsSpanish = []
+        
+        for album in ListSpeakerAlbumsSpanish {
+            album.albumList = []
+            album.talkList = []
+        }
+        ListSpeakerAlbumsSpanish = []
+
+        for album in RecommendedAlbum.albumList {
+            album.albumList = []
+            album.talkList = []
+        }
+        RecommendedAlbum.albumList = []
+        
         FileNameToTalk = [String: TalkData] ()
         ListAllTalks = []
+        ListFavoriteTalls = []
+        ListTranscriptTalks = []
+        ListAllTalksSpanish = []
+        ListSeriesAlbumsSpanish = []
+        
+        RootAlbum.albumList = []
+        AllTalksAlbum.talkList = []
+        RecommendedAlbum.talkList = []
+        RecommendedAlbum.albumList = []
+        TranscriptsAlbum.talkList = []
+
         
         HTTPResultCode = 0
         URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
@@ -195,10 +231,13 @@ class Model {
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
         MP3_DOWNLOADS_PATH = documentPath + "/DOWNLOADS"
         
-        do {
-            try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
-        } catch let error as NSError {
-            errorLog(error: error)
+        if !FileManager.default.fileExists(atPath: MP3_DOWNLOADS_PATH, isDirectory: nil)
+        {
+            do {
+                try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
+            } catch let error as NSError {
+                errorLog(error: error)
+            }
         }
 
         PlayedTalks = loadPlayedTalksData()
@@ -209,8 +248,8 @@ class Model {
     
     func startBackgroundTimers() {
         
-        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
-        //Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+       // Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
     }
     
 
@@ -230,8 +269,10 @@ class Model {
         if isInternetAvailable() == false {
             return
         }
-        print("Timer Invoked for Update")
-        AppUpdateRequested = true
+        print("updateDataModel")
+        initialize()
+        downloadAndConfigure()
+       //AppRestartRequested = true
     }
 
  
@@ -274,7 +315,7 @@ class Model {
     }
  
     
-    func downloadAndConfigure(startingApp: Bool)  {
+    func downloadAndConfigure()  {
         
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -352,15 +393,10 @@ class Model {
                 let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
                 self.loadConfig(jsonDict: jsonDict)
             
-                if startingApp == true {
-                    self.loadTalks(jsonDict: jsonDict)
-                    self.loadAlbums(jsonDict: jsonDict)
-                    self.loadAlbumsSpanish(jsonDict: jsonDict)
-                    self.loadLastAlbumTalkState()
-                }
-                else {
-                    self.updateWithNewTalks(jsonDict: jsonDict)
-                }
+                self.loadTalks(jsonDict: jsonDict)
+                self.loadAlbums(jsonDict: jsonDict)
+                self.loadAlbumsSpanish(jsonDict: jsonDict)
+                self.loadLastAlbumTalkState()
 
                 for album in self.RootAlbum.albumList {
                     self.computeAlbumStats(album: album)
@@ -380,6 +416,7 @@ class Model {
             // END CRITICAL SECTION
             print("MODEL SIGNALLING")
             ModelReadySemaphore.signal()
+
  
         }
         task.resume()
@@ -407,7 +444,6 @@ class Model {
     func loadTalks(jsonDict: [String: AnyObject]) {
         
         var talkCount = 0
-        var totalSeconds = 0
         
         // get all talks
         for jsonTalk in jsonDict["talks"] as? [AnyObject] ?? [] {
@@ -426,7 +462,6 @@ class Model {
                 let fileName = terms.last ?? ""
                 
                 let seconds = duration.convertDurationToSeconds()
-                totalSeconds += seconds
             
                 let talk =  TalkData(title: title,
                                          url: URL,
@@ -436,8 +471,6 @@ class Model {
                                          ln: ln,
                                          totalSeconds: seconds,
                                          pdf: pdf)
-                    
-           
                
             
                 self.FileNameToTalk[fileName] = talk
@@ -448,47 +481,50 @@ class Model {
                     ListAllTalksSpanish.append(talk)
                 }
 
-
-                var speakerAlbum : AlbumData
-                var seriesAlbum : AlbumData
-
-                if KeyToAlbum[speaker+talk.ln] == nil {
-                    speakerAlbum = AlbumData(title: speaker, key: speaker, section: "", imageName: speaker, date: date, albumType: AlbumType.ACTIVE)
-                    KeyToAlbum[speaker+talk.ln] = speakerAlbum
-                    if talk.ln == "es" {
-                        ListSpeakerAlbumsSpanish.append(speakerAlbum)
-                        ListSpeakerAlbums.append(speakerAlbum)
-                    } else {
-                        ListSpeakerAlbums.append(speakerAlbum)
-                    }
+                let speakerAlbum = getAlbumByKey(key: speaker+talk.ln, title: speaker, section: "",  imageName: speaker)
+                if ListSpeakerAlbums.contains(speakerAlbum) == false {
+                    
+                    ListSpeakerAlbums.append(speakerAlbum)
+                       if talk.ln == "es" {
+                            ListSpeakerAlbumsSpanish.append(speakerAlbum)
+                        }
                 }
-                speakerAlbum = KeyToAlbum[speaker+talk.ln]!
+            
                 speakerAlbum.talkList.append(talk)
-                speakerAlbum.totalTalks += 1
-                speakerAlbum.totalSeconds += seconds
 
-                // if a series is specified, create an album if one doesn't exist.  add talk to album
+                // if a series is specified,  add it
                 if !series.isEmpty {
                     
                     if series == "Dharmettes" {continue}
-                    let seriesKey = "SERIES" + series
-                    if KeyToAlbum[seriesKey] == nil {
-                        seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: speaker, date : date, albumType: AlbumType.ACTIVE)
-                        KeyToAlbum[seriesKey] = seriesAlbum
+                    let seriesAlbum = getAlbumByKey(key: "SERIES" + series, title: series, section: "", imageName: speaker)
+
+                    if ListSeriesAlbums.contains(seriesAlbum) == false {
+                        
+                        ListSeriesAlbums.append(seriesAlbum)
                         if talk.ln == "es" {
                             ListSeriesAlbumsSpanish.append(seriesAlbum)
-                        } else {
-                            ListSeriesAlbums.append(seriesAlbum)
                         }
-                    }
-                    seriesAlbum = KeyToAlbum[seriesKey]!
+                     }
+               
                     seriesAlbum.talkList.append(talk)
-                    seriesAlbum.totalTalks += 1
-                    seriesAlbum.totalSeconds += seconds
                  }
                 
                 talkCount += 1
         }
+        
+        for album in ListSpeakerAlbums {
+            computeAlbumStats(album: album)
+        }
+        for album in ListSeriesAlbums {
+            computeAlbumStats(album: album)
+        }
+        for album in ListSpeakerAlbumsSpanish {
+            computeAlbumStats(album: album)
+        }
+        for album in ListSeriesAlbumsSpanish {
+            computeAlbumStats(album: album)
+        }
+
         
         // sort the albums
         ListSpeakerAlbums = ListSpeakerAlbums.sorted(by: { $0.Key < $1.Key })
@@ -503,9 +539,7 @@ class Model {
         for seriesAlbum in ListSeriesAlbums {
             // dharmettes are already sorted and need to be presented with most current talks on top
             // all other series need further sorting, as the most current talks must be at bottom
-            if seriesAlbum.Key == "SERIESDharmettes" {
-                continue
-            }
+ 
             let talkList = seriesAlbum.talkList
             seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
@@ -515,60 +549,12 @@ class Model {
             seriesAlbum.talkList  = talkList.sorted(by: { $1.Date > $0.Date })
         }
 
-        
-        ListTranscriptTalks = ListTranscriptTalks.sorted(by: { $0.Date > $1.Date })
         computeAlbumStats(album: TranscriptsAlbum)
-        
+
     }
     
-    
-    func updateWithNewTalks(jsonDict: [String: AnyObject]) {
-        
-        for album in ListSpeakerAlbums {
-            album.talkList = []
-        }
-        if let album = KeyToAlbum[KEY_ALL_TALKS] {
-            album.talkList = []
-        }
-        
-        for jsonTalk in jsonDict["talks"] as? [AnyObject] ?? [] {
-            
-            let title = jsonTalk["title"] as? String ?? ""
-            let URL = (jsonTalk["url"] as? String ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            let speaker = jsonTalk["speaker"] as? String ?? ""
-            let ln = jsonTalk["ln"] as? String ?? "en"
-            var date = jsonTalk["date"] as? String ?? ""
-            date = date.replacingOccurrences(of: "-", with: ".")
-            let duration = jsonTalk["duration"] as? String ?? ""
-            let pdf = jsonTalk["pdf"] as? String ?? ""
-            
-            let terms = URL.components(separatedBy: "/")
-            let fileName = terms.last ?? ""
-            
-            if FileNameToTalk[fileName] != nil {continue} // only interested in NEW talks
-            let seconds = duration.convertDurationToSeconds()
-            let talk =  TalkData(title: title,
-                                     url: URL,
-                                     fileName: fileName,
-                                     date: date,
-                                     speaker: speaker,
-                                     ln: ln,
-                                     totalSeconds: seconds,
-                                     pdf: pdf)
-            FileNameToTalk[fileName] = talk
-        
-            if let album = KeyToAlbum[KEY_ALL_TALKS] {
-                album.talkList.append(talk)
 
-            }
-            if let album = KeyToAlbum[speaker+talk.ln] {
-                album.talkList.append(talk)
-            }
-        }
-    }
-
-    
-
+    var DEBUG: Bool = false
     func loadAlbums(jsonDict: [String: AnyObject]) {
 
         var albumList : [AlbumData] = []
@@ -581,7 +567,8 @@ class Model {
                 let key = jsonAlbum["content"] as? String ?? ""
                 let image = jsonAlbum["image"] as? String ?? ""
                 var jsonTalkList = jsonAlbum["talks"] as? [AnyObject] ?? []
-                let album: AlbumData = AlbumData(title: title, key: key, section: albumSection, imageName: image, date: "", albumType: AlbumType.ACTIVE)
+            
+                let album = getAlbumByKey(key: key, title: title, section: albumSection, imageName: image)
    
                 talkList = []
                 albumList = []
@@ -590,6 +577,7 @@ class Model {
                 case KEY_ALL_TALKS:
                     AllTalksAlbum = album
                     talkList = ListAllTalks
+                    print("LoadAlbums KEY_ALL_TALKS - first talk", talkList[0].Title)
                 case KEY_ALBUMROOT_SPANISH:
                     RootAlbumSpanish = album
                     jsonTalkList = [] // clear this.  bridge old vs new use of this album
@@ -598,6 +586,7 @@ class Model {
                 case KEY_ALL_SERIES:
                     albumList = ListSeriesAlbums
                 case KEY_RECOMMENDED_TALKS:
+                    DEBUG = true
                     RecommendedAlbum = album
                     albumList = []
                     talkList = []
@@ -675,19 +664,19 @@ class Model {
                     let fileName = URL.components(separatedBy: "/").last ?? ""
                          
                     if let talk = self.FileNameToTalk[fileName] {
+                        
                         // if series specified, these always go into RecommendedAlbum
-                        var seriesAlbum : AlbumData
                         if !series.isEmpty {
-                             let seriesKey = "RECOMMENDED" + series
-                            if KeyToAlbum[seriesKey] == nil {
-                                seriesAlbum = AlbumData(title: series, key: seriesKey, section: "", imageName: talk.Speaker, date : talk.Date, albumType: AlbumType.ACTIVE)
-                                KeyToAlbum[seriesKey] = seriesAlbum
+
+                            let seriesAlbum = getAlbumByKey(key: "RECOMMENDED" + series, title: series, section: "",  imageName: talk.Speaker)
+                            print("Creating RECOMMENDED Album", album.Title)
+                            if RecommendedAlbum.albumList.contains(seriesAlbum) == false {
+
+                                print("Adding it to RecommendedAlbum")
                                 RecommendedAlbum.albumList.append(seriesAlbum)
                             }
-                            seriesAlbum = KeyToAlbum[seriesKey]!
+                            print("Adding talk", seriesAlbum.Title, talk.Title)
                             seriesAlbum.talkList.append(talk)
-                            seriesAlbum.totalTalks += 1
-                            seriesAlbum.totalSeconds += talk.TotalSeconds
 
                         } else {
                             album.talkList.append(talk)
@@ -695,7 +684,7 @@ class Model {
                     }
                 } // end talk loop
         } // end Album loop
-        
+
     }
     
     
@@ -706,12 +695,13 @@ class Model {
         
         for jsonAlbum in jsonDict["albums_spanish"] as? [AnyObject] ?? [] {
             
-                let albumSection = jsonAlbum["section"] as? String ?? ""
+                let albumSection = jsonAlbum["albumSection"] as? String ?? ""
                 let title = jsonAlbum["title"] as? String ?? ""
                 let key = jsonAlbum["content"] as? String ?? ""
                 let image = jsonAlbum["image"] as? String ?? ""
                 let jsonTalkList = jsonAlbum["talks"] as? [AnyObject] ?? []
-                let album: AlbumData = AlbumData(title: title, key: key, section: albumSection, imageName: image, date: "", albumType: AlbumType.ACTIVE)
+            
+                let album = getAlbumByKey(key: key, title: title, section: albumSection, imageName: image)
    
                 talkList = []
                 albumList = []
@@ -757,7 +747,6 @@ class Model {
                             }
                             seriesAlbum = KeyToAlbum[seriesKey]!
                             seriesAlbum.talkList.append(talk)
-                            seriesAlbum.totalTalks += 1
                             seriesAlbum.totalSeconds += talk.TotalSeconds
 
                         } else {
@@ -767,22 +756,20 @@ class Model {
                 } // end talk loop
         } // end Album loop
         
-        /*
-        for album in RootAlbumSpanish.albumList {
-            print(RootAlbumSpanish.Title, album.Title)
-        }
-        for album in RootAlbum.albumList {
-            print(RootAlbum.Title, album.Title)
-        }
-        let rootSpanish  = RootAlbum.albumList[1]
-        for album in rootSpanish.albumList {
-            print(RootAlbum.Title, album.Title)
-        }
-         */
-
-        
    }
 
+    
+    func getAlbumByKey(key: String, title: String, section: String, imageName: String) -> AlbumData {
+        
+        if let album = KeyToAlbum[key] {
+            return album
+        }
+        
+        let album =  AlbumData(title: title, key: key, section: section, imageName: imageName, date: "", albumType: AlbumType.ACTIVE)
+        KeyToAlbum[key] = album
+        
+        return album
+    }
     
     
     func downloadSimilarityData(talk: TalkData, signalComplete: DispatchSemaphore) {
@@ -1057,8 +1044,7 @@ class Model {
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
        
         print("Report Activity: ", talk.Title, type)
-        //CJM DEV
-        /*
+
         var operation : String
         switch (type) {
         
@@ -1087,23 +1073,20 @@ class Model {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in }
         
         task.resume()
-         */
+
     }
     
     
     func computeAlbumStats(album: AlbumData) {
         
-        var totalSeconds = 0
         var totalTalks = 0
         
         for talk in album.talkList {
-            totalSeconds += talk.TotalSeconds
             totalTalks += 1
         }
 
         for childAlbum in album.albumList {
-             for talk in childAlbum.talkList {
-                totalSeconds += talk.TotalSeconds
+             for _ in childAlbum.talkList {
                 totalTalks += 1
             }
         }
@@ -1112,13 +1095,9 @@ class Model {
         // therefore need to update it via a dispatch to the main thread
         DispatchQueue.main.async {
             
-            print("In dispatch", TalkIsCurrentlyPlaying)
-           // if TalkIsCurrentlyPlaying == false {
-                print("computeAlbum", album.Title, totalTalks)
-                album.totalTalks = totalTalks
-           // }
+            album.totalTalks = totalTalks
+            
         }
-        album.totalSeconds = totalSeconds
     }
     
         
