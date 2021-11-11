@@ -151,13 +151,6 @@ struct TalkRow: View {
                     }
                 }
             }
-            .onAppear() {
-                AppCanBeRefreshed += 1
-            }
-            .onDisappear() {
-                AppCanBeRefreshed -= 1
-            }
-
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
                 let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!

@@ -120,7 +120,6 @@ enum INIT_CODES {          // all possible startup results
 var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
 var GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
-var AppCanBeRefreshed = 0
 var NewTalksAvailable = false
 
 class Model {
@@ -953,7 +952,6 @@ class Model {
                     if availableTalkCount > 0 && availableTalkCount != self.ListAllTalks.count {
                         
                         NewTalksAvailable = true
-                        print("new talks available", AppCanBeRefreshed)
                         /*
                         DispatchQueue.main.async {
                             print("refresh")
@@ -996,6 +994,8 @@ class Model {
         // local destination path for file
         localPathMP3 = MP3_DOWNLOADS_PATH + "/" + talk.FileName
         
+        print("Download URL", requestURL)
+        
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -1006,7 +1006,6 @@ class Model {
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
-
             var httpResponse: HTTPURLResponse
             if let valid_reponse = response {
                 httpResponse = valid_reponse as! HTTPURLResponse
@@ -1016,9 +1015,9 @@ class Model {
                 return
             }
             //let httpResponse = response as! HTTPURLResponse
-            let statusCode = httpResponse.statusCode
+            HTTPResultCode = httpResponse.statusCode
             
-            if (statusCode != 200) {
+            if (HTTPResultCode != 200) {
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
@@ -1034,7 +1033,10 @@ class Model {
             else {
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 HTTPResultCode = 404
+                print("404")
+
             }
+            print(HTTPResultCode)
             
             // if got a good response, store off file locally
             if HTTPResultCode == 200 {

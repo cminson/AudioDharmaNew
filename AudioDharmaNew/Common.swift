@@ -280,6 +280,7 @@ struct ShareSheet: UIViewControllerRepresentable {
     
         if successfulShare {
             
+            print("successful share")
             TheDataModel.addToShareHistory(talk: SharedTalk)
             TheDataModel.reportTalkActivity(type: .SHARE_TALK, talk: SharedTalk)
         }

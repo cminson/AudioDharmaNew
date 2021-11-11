@@ -57,13 +57,7 @@ struct HomePageView: View {
                    }
                }
             }
-           .onAppear() {
-               AppCanBeRefreshed += 1
-           }
-           .onDisappear() {
-               AppCanBeRefreshed -= 1
-           }
-           .alert(isPresented: $displayNoCurrentTalk) {
+            .alert(isPresented: $displayNoCurrentTalk) {
                Alert(
                    title: Text("No talk available"),
                    message: Text("No talk has been played yet"),
