@@ -14,6 +14,8 @@ import SystemConfiguration
 import os.log
 import ZipArchive
 
+var DEBUG = false
+
 
 var TheDataModel: Model = Model() // TheDataModel is the model for all views elsewhere in the program
 
@@ -29,12 +31,14 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 //
 //let CONFIG_JSON_NAME = "DEV.JSON"
 //let CONFIG_ZIP_NAME = "DEV.ZIP"
+
 let CONFIG_JSON_NAME = "CONFIG00.JSON"
 let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
 let CONFIG_GET_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/XGETACTIVITY.php?"           // where to get sangha activity (shares, listens)
+
 let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.php?KEY="           // where to get similar talks\
 let DEFAULT_MP3_PATH = "http://www.audiodharma.org"     // where to get talks
 let DEFAULT_DONATE_PATH = "http://audiodharma.org/donate/"       // where to donate
@@ -97,8 +101,6 @@ var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in
 var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
 var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-//var UPDATE_MODEL_INTERVAL =  6 * 60 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
-var UPDATE_MODEL_INTERVAL =  1 * 60   // amount of time (in seconds) between each poll of the cloud for updated model info
 
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
@@ -118,9 +120,11 @@ enum INIT_CODES {          // all possible startup results
 var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
 var GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
-var AppRestartRequested = false
+var AppCanBeRefreshed = 0
+var NewTalksAvailable = false
 
 class Model {
+    
     
     var KeyToAlbum : [String: AlbumData] = [:]  //  dictionary keyed by "key" which is a albumd id, value is an album
 
@@ -177,6 +181,7 @@ class Model {
         
     func initialize() {
         
+        print("initialize")
         for album in ListSpeakerAlbums {
             album.albumList = []
             album.talkList = []
@@ -248,8 +253,7 @@ class Model {
     
     func startBackgroundTimers() {
         
-       // Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
-        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_MODEL_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
     }
     
 
@@ -270,9 +274,7 @@ class Model {
             return
         }
         print("updateDataModel")
-        initialize()
         downloadAndConfigure()
-       //AppRestartRequested = true
     }
 
  
@@ -390,9 +392,11 @@ class Model {
             // BEGIN CRITICAL SECTION  CJM DEV
 
             do {
+                
                 let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
                 self.loadConfig(jsonDict: jsonDict)
             
+                self.initialize()
                 self.loadTalks(jsonDict: jsonDict)
                 self.loadAlbums(jsonDict: jsonDict)
                 self.loadAlbumsSpanish(jsonDict: jsonDict)
@@ -443,6 +447,7 @@ class Model {
     
     func loadTalks(jsonDict: [String: AnyObject]) {
         
+        print("loadTalks")
         var talkCount = 0
         
         // get all talks
@@ -554,8 +559,9 @@ class Model {
     }
     
 
-    var DEBUG: Bool = false
     func loadAlbums(jsonDict: [String: AnyObject]) {
+
+        print("loadAlbums")
 
         var albumList : [AlbumData] = []
         var talkList : [TalkData] = []
@@ -586,7 +592,6 @@ class Model {
                 case KEY_ALL_SERIES:
                     albumList = ListSeriesAlbums
                 case KEY_RECOMMENDED_TALKS:
-                    DEBUG = true
                     RecommendedAlbum = album
                     albumList = []
                     talkList = []
@@ -669,13 +674,10 @@ class Model {
                         if !series.isEmpty {
 
                             let seriesAlbum = getAlbumByKey(key: "RECOMMENDED" + series, title: series, section: "",  imageName: talk.Speaker)
-                            print("Creating RECOMMENDED Album", album.Title)
                             if RecommendedAlbum.albumList.contains(seriesAlbum) == false {
 
-                                print("Adding it to RecommendedAlbum")
                                 RecommendedAlbum.albumList.append(seriesAlbum)
                             }
-                            print("Adding talk", seriesAlbum.Title, talk.Title)
                             seriesAlbum.talkList.append(talk)
 
                         } else {
@@ -849,7 +851,6 @@ class Model {
                 httpResponse = valid_reponse as! HTTPURLResponse
             } else {
                 ModelReadySemaphore.signal()
-
                 return
             }
             //let httpResponse = response as! HTTPURLResponse
@@ -857,7 +858,6 @@ class Model {
             
             if (statusCode != 200) {
                 ModelReadySemaphore.signal()
-
                 return
             }
             
@@ -867,17 +867,18 @@ class Model {
             }
             if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
                 ModelReadySemaphore.signal()
-
                 return
             }
   
             do {
-                // get the community talk history
+                
                 var talkCount = 0
                 var totalSeconds = 0
                 var talkList: [TalkData] = []
 
                 let json =  try JSONSerialization.jsonObject(with: responseData) as! [String: AnyObject]
+                
+                 // get the community talk history
                 for talkJSON in json["sangha_history"] as? [AnyObject] ?? [] {
                     
                     let fileName = talkJSON["filename"] as? String ?? ""
@@ -909,7 +910,6 @@ class Model {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
                 self.SanghaTalkHistoryAlbum.talkList = talkList
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
-
 
                 // get the community share history
                 talkCount = 0
@@ -945,6 +945,26 @@ class Model {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
                 self.SanghaShareHistoryAlbum.talkList = talkList
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+                
+                // get total number of available talks
+                if let config = json["config"] {
+
+                    let availableTalkCount  = config["TotalTalkCount"] as? Int ?? 0
+                    if availableTalkCount > 0 && availableTalkCount != self.ListAllTalks.count {
+                        
+                        NewTalksAvailable = true
+                        print("new talks available", AppCanBeRefreshed)
+                        /*
+                        DispatchQueue.main.async {
+                            print("refresh")
+                            TheDataModel.downloadAndConfigure()
+                        }
+                         */
+                    }
+                }
+                
+                ModelReadySemaphore.signal()
+
 
             } catch {   // end do catch
             }
@@ -952,8 +972,6 @@ class Model {
             self.computeAlbumStats(album: self.SanghaTalkHistoryAlbum)
             self.computeAlbumStats(album: self.SanghaShareHistoryAlbum)
 
-            // END CRITICAL SECTION FOR LOADING
-            ModelReadySemaphore.signal()
 
             
         }
@@ -1081,7 +1099,7 @@ class Model {
         
         var totalTalks = 0
         
-        for talk in album.talkList {
+        for _ in album.talkList {
             totalTalks += 1
         }
 
@@ -1243,7 +1261,7 @@ class Model {
      
          
          if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.first {
-             print("most recent talk: ", talk.Title)
+             //print("most recent talk: ", talk.Title)
              return talk.FileName == lastTalk.FileName
          }
          return false

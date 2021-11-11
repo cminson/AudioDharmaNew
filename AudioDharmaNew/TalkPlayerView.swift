@@ -171,7 +171,6 @@ struct TalkPlayerView: View {
     // invoked every second from background timer in TheTalkPlayer
     mutating func updateView(){
         
-        print("updateView")
         if (TheTalkPlayer.Player.error != nil) {
             print("ERROR")
         }
@@ -266,6 +265,7 @@ struct TalkPlayerView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        .disabled(stateTalkPlayer != .PLAYING)
                 }
                 .disabled(stateTalkPlayer != .PLAYING)
 
@@ -303,6 +303,7 @@ struct TalkPlayerView: View {
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
                         .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        .disabled(stateTalkPlayer != .PLAYING)
                 }
                 .disabled(stateTalkPlayer != .PLAYING)
 
@@ -376,16 +377,18 @@ struct TalkPlayerView: View {
         .background(NavigationLink(destination: EmptyView()) {EmptyView()}.hidden())
         .padding(.trailing, 0)
         .onAppear {
+            
+            DEBUG = true
             TalkIsCurrentlyPlaying = true
             DisplayingBiographyOrTranscript = false
-            
+            UIApplication.shared.isIdleTimerDisabled = true
         }
         .onDisappear {
             if DisplayingBiographyOrTranscript == false {  // don't stop talk if in biography or transcript view
                 terminateTalk()
             }
             TalkIsCurrentlyPlaying = false
-
+            UIApplication.shared.isIdleTimerDisabled = false
         }
         .navigationBarTitle(Text(getPlayerTitle()))
         .navigationBarTitle(album.Title, displayMode: .inline)

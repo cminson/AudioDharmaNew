@@ -12,15 +12,15 @@ import SwiftUI
 import UIKit
 
 
-var CurrentHomePage: HomePageView? = nil
-
 /*
  * HomePageView
  * UI for the top-level display of albums.  Invoked by SplashScreen after data model is loaded.
  */
+
 struct HomePageView: View {
     
-    @ObservedObject  var parentAlbum: AlbumData
+    @ObservedObject var viewUpdater: ViewUpdater
+    @ObservedObject var parentAlbum: AlbumData
     
     @State var selectedAlbum: AlbumData
     @State var selectedTalk: TalkData
@@ -29,19 +29,22 @@ struct HomePageView: View {
     @State var searchText: String  = ""
     @State var displayNoCurrentTalk: Bool = false
     @State var sharedURL: String = ""
-    
+    @State var displayUpdater = false
     
     init(parentAlbum: AlbumData) {
         
+        self.viewUpdater = ViewUpdater()
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
-        
-        CurrentHomePage = self
-        
     }
     
+    
+    func beginUpdate() {
+        
+        self.displayUpdater = true
+    }
     
     var body: some View {
 
@@ -54,6 +57,12 @@ struct HomePageView: View {
                    }
                }
             }
+           .onAppear() {
+               AppCanBeRefreshed += 1
+           }
+           .onDisappear() {
+               AppCanBeRefreshed -= 1
+           }
            .alert(isPresented: $displayNoCurrentTalk) {
                Alert(
                    title: Text("No talk available"),
@@ -80,6 +89,20 @@ struct HomePageView: View {
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)
+            .sheet(isPresented: $displayUpdater) {
+                UpdateView()
+            }
+            .toolbar {
+                Button {
+                    displayUpdater.toggle()
+
+                } label: {
+                    Image(systemName: "goforward")
+                }
+                .disabled(NewTalksAvailable == false)
+                .fullScreenCover(isPresented: $displayUpdater, content: UpdateView.init)
+            }
+
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -112,14 +135,70 @@ struct HomePageView: View {
                 }
             }
            // end toolbar
-            .onAppear() {
-                if AppRestartRequested {
-                    exit(0)
-                }
-            }
 
        }  // end NavigationView
        .navigationViewStyle(.stack)
     }
         
 }
+
+
+
+
+var UpdateViewActive = false
+struct UpdateView: View {
+    @Environment(\.presentationMode) var presentationMode
+        
+    var body: some View {
+        
+        VStack(alignment: .center, spacing: 0) {
+            GeometryReader { metrics in
+                VStack() {
+                    Spacer()
+                    HStack() {
+                        Spacer()
+                        Image("Earth")
+                            .resizable()
+                            .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
+                        Spacer()
+                    }
+                    Spacer().frame(height: 40)
+                    Text("Updating Talks")
+                        .font(.system(size: FONT_SIZE_SECTION, weight: .bold))
+                        .foregroundColor(.white)
+
+                    Spacer()
+                }
+            }
+        }
+        .onAppear {
+            
+            if UpdateViewActive == true {return}
+            
+            UpdateViewActive = true
+            ModelReadySemaphore = DispatchSemaphore(value: 0)
+
+            TheDataModel.SystemIsConfigured = false
+            TheDataModel.downloadAndConfigure()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                withAnimation {
+                    ModelReadySemaphore.wait()
+                    TheDataModel.downloadSanghaActivity()
+                    ModelReadySemaphore.wait()
+                    print("semaphore wait finished")
+                    UpdateViewActive = false
+                    NewTalksAvailable = false
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }        
+        }
+
+        .font(.title)
+        .padding()
+        .background(Color.black)
+    }
+  
+}
+
+

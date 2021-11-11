@@ -56,6 +56,15 @@ var AppColorScheme: ColorScheme = .light
  * Structs
  *********************************************************************************
  */
+
+class ViewUpdater:  ObservableObject {
+    @Published var updateDisplay: Bool
+    
+    init() {
+        updateDisplay = false
+    }
+}
+
 struct ItemsToolbar: ToolbarContent {
     let add: () -> Void
     let sort: () -> Void
@@ -336,6 +345,7 @@ struct BiographyView: View {
         VStack(alignment: .leading, spacing: 0) {
           
            ScrollView {
+               VStack() {
                 Spacer()
                     .frame(height: 20)
                 HStack() {
@@ -353,6 +363,8 @@ struct BiographyView: View {
                     .padding(.leading, 20)
                     .padding(.trailing, 20)
         }
+        }
+        .frame(maxWidth: BIO_TEXT_MAX_WIDTH)
         .onAppear() {
             DisplayingBiographyOrTranscript = true
         }
@@ -384,7 +396,7 @@ struct HelpPageView: View {
 
                 Spacer().frame(height:25)
                     HStack() {
-                        Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nAn orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nA bullet point marks a talk that has been previously played.\nDownloaded talks are highlighted in orange.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's biography, tap the speaker's name in the Play Talks screen.")
+                        Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nAn orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nA bullet point marks a talk that has been previously played.\nDownloaded talks are highlighted in orange.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's biography, tap the speaker's name in the Play Talk screen.\n\nWhen new talks are available, the refresh icon on the top right of the Home screen activates. Tap it to update the app with new talks.")
                             .frame(alignment: .leading)
                             .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                             .multilineTextAlignment(.leading)
@@ -392,7 +404,7 @@ struct HelpPageView: View {
                     }
                     .frame(alignment: .leading)
 
-                Spacer().frame(height:40)
+                Spacer().frame(height:50)
                 HStack() {
                     Text("Custom Albums")
                         .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .heavy))
@@ -413,7 +425,7 @@ struct HelpPageView: View {
                 Spacer()
 
             }
-                .frame(maxWidth: BIO_TEXT_MAX_WIDTH)
+            .frame(maxWidth: BIO_TEXT_MAX_WIDTH)
             }
            
 

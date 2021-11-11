@@ -141,7 +141,7 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>Black</string>
+		<string>Background</string>
 	</dict>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

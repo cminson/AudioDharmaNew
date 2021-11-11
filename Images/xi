@@ -1,4 +1,4 @@
-convert -size 200x200 xc:#ff8c00   -stroke white  -fill '#ff8c00' -strokewidth 16 -draw 'circle 100,100 174,100' icon01.png
+convert -size 200x200 xc:#ff8c00   -stroke white  -fill '#ff8c00' -strokewidth 16 -draw 'circle 100,100 165,100' icon01.png
 convert -size 200x200 xc:white   -stroke '#ff8c00'  -fill transparent -strokewidth 20 -draw 'circle 100,100 160,100' invertedicon02.png
 #
 convert -resize 1024x1024! icon01.png db1024x1024.png

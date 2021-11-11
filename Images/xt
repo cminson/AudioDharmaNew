@@ -61,5 +61,10 @@ composite -gravity east -geometry +30+0  circle_orange.png sequence_orange.png s
 composite -gravity west -geometry +30+0 circle_orange.png sequence_orange.png  sequence_orange.png
 
 
+#
+convert -size 240x240 xc:black -fill black -draw 'rectangle 0,0, 240,240' black.png
+
+
+
 
 

@@ -71,8 +71,7 @@ struct TalkRow: View {
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
-                Spacer()
-                    .frame(width: 6)
+                Spacer().frame(width: 6)
                 Text(TheDataModel.hasTalkBeenPlayed(talk: talk) ? "\u{2022} " + stateTalkTitle : stateTalkTitle)
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
@@ -152,6 +151,13 @@ struct TalkRow: View {
                     }
                 }
             }
+            .onAppear() {
+                AppCanBeRefreshed += 1
+            }
+            .onDisappear() {
+                AppCanBeRefreshed -= 1
+            }
+
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
                 let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!
@@ -296,11 +302,6 @@ struct TalkListView: View {
 
            }
        }
-        .onAppear() {
-            if AppRestartRequested {
-                exit(0)
-            }
-        }
 
     }
 

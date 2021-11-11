@@ -30,8 +30,9 @@ struct SplashScreen : View {
     // DispatchQueue timer in the body before finishing initialization
     init() {
         
-        TheDataModel.initialize()
         TheDataModel.downloadAndConfigure()
+        
+        
     }
     
     func dismissView() -> Text {

@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFoundation
+import BackgroundTasks
 
 @main
 struct AudioDharmaNewApp: App {
@@ -16,9 +17,11 @@ struct AudioDharmaNewApp: App {
         configureAudioForBackground()
     }
     
+    
     // necessary to allow background playing of audio
     func configureAudioForBackground() {
         
+        print("configureAudioForBackground")
         let audioSession = AVAudioSession.sharedInstance()
         do {
           try audioSession.setCategory(.playback, mode: .moviePlayback)
@@ -29,11 +32,12 @@ struct AudioDharmaNewApp: App {
     }
     
 
-    
-    var body: some Scene {
+        var body: some Scene {
         WindowGroup {
            SplashScreen()
         }
     }
 }
+
+
   
