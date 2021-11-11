@@ -43,7 +43,6 @@ let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.p
 let DEFAULT_MP3_PATH = "http://www.audiodharma.org"     // where to get talks
 let DEFAULT_DONATE_PATH = "http://audiodharma.org/donate/"       // where to donate
 
-var HTTPResultCode: Int = 0     // global status of web access
 let MIN_EXPECTED_RESPONSE_SIZE = 300   // to filter for bogus redirect page responses
 
 var USE_NATIVE_MP3PATHS = true    // true = mp3s are in their native paths in audiodharma, false =  mp3s are in one flat directory
@@ -159,10 +158,7 @@ class Model {
     var ListSpeakerAlbumsSpanish: [AlbumData] = []
     var ListSeriesAlbumsSpanish: [AlbumData] = []
 
-
     var DownloadInProgress = false
-
-    var UpdatedTalksJSON: [String: AnyObject] = [String: AnyObject] ()
 
     static let DocumentsDirectory = FileManager().urls(for: .documentDirectory, in: .userDomainMask).first!
 
@@ -224,8 +220,6 @@ class Model {
         RecommendedAlbum.albumList = []
         TranscriptsAlbum.talkList = []
 
-        
-        HTTPResultCode = 0
         URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
         URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
         URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
@@ -318,6 +312,8 @@ class Model {
     
     func downloadAndConfigure()  {
         
+        var statusCode: Int = 0
+        
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -337,23 +333,23 @@ class Model {
             var httpResponse: HTTPURLResponse
             if let valid_reponse = response {
                 httpResponse = valid_reponse as! HTTPURLResponse
-                HTTPResultCode = httpResponse.statusCode
+                statusCode = httpResponse.statusCode
             } else {
-                HTTPResultCode = 404
+                statusCode = 404
             }
 
             if let responseData = data {
                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    HTTPResultCode = 404
+                    statusCode = 404
                 }
             }
             else {
-                HTTPResultCode = 404
+                statusCode = 404
             }
             
             // if got a good response, store off the zip file locally
             // if we DIDN'T get a good response, we will try to unzip the previously loaded config
-            if HTTPResultCode == 200 {
+            if statusCode == 200 {
             
                 do {
                     if let responseData = data {
@@ -369,7 +365,7 @@ class Model {
 
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
                 
-                HTTPResultCode = 404
+                statusCode = 404
                 ModelReadySemaphore.signal()
                 return
             }
@@ -382,7 +378,7 @@ class Model {
 
             catch let error as NSError {
                 
-                HTTPResultCode = 404
+                statusCode = 404
                 self.errorLog(error: error)
                 ModelReadySemaphore.signal()
                 return
@@ -775,6 +771,8 @@ class Model {
     
     func downloadSimilarityData(talk: TalkData, signalComplete: DispatchSemaphore) {
 
+         var statusCode : Int = 0
+        
          let config = URLSessionConfiguration.default
          config.requestCachePolicy = .reloadIgnoringLocalCacheData
          config.urlCache = nil
@@ -792,21 +790,21 @@ class Model {
              var httpResponse: HTTPURLResponse
              if let valid_reponse = response {
                  httpResponse = valid_reponse as! HTTPURLResponse
-                 HTTPResultCode = httpResponse.statusCode
+                 statusCode = httpResponse.statusCode
              } else {
-                 HTTPResultCode = 404
+                 statusCode = 404
              }
 
              if let responseData = data {
                  if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                     HTTPResultCode = 404
+                     statusCode = 404
                  }
              }
              else {
-                 HTTPResultCode = 404
+                 statusCode = 404
              }
 
-             if HTTPResultCode == 200 {
+             if statusCode == 200 {
                  do {
                      let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
                      for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
@@ -981,6 +979,7 @@ class Model {
 
         var requestURL: URL
         var localPathMP3: String
+        var statusCode : Int = 0
         
         DownloadInProgress = true
         
@@ -1015,9 +1014,9 @@ class Model {
                 return
             }
             //let httpResponse = response as! HTTPURLResponse
-            HTTPResultCode = httpResponse.statusCode
+            statusCode = httpResponse.statusCode
             
-            if (HTTPResultCode != 200) {
+            if (statusCode != 200) {
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
@@ -1027,19 +1026,19 @@ class Model {
             if let responseData = data {
                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
                     TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                    HTTPResultCode = 404
+                    statusCode = 404
                 }
             }
             else {
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                HTTPResultCode = 404
+                statusCode = 404
                 print("404")
 
             }
-            print(HTTPResultCode)
+            print(statusCode)
             
             // if got a good response, store off file locally
-            if HTTPResultCode == 200 {
+            if statusCode      == 200 {
                 
                 do {
                     if let responseData = data {

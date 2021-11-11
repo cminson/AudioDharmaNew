@@ -21,7 +21,6 @@ struct AudioDharmaNewApp: App {
     // necessary to allow background playing of audio
     func configureAudioForBackground() {
         
-        print("configureAudioForBackground")
         let audioSession = AVAudioSession.sharedInstance()
         do {
           try audioSession.setCategory(.playback, mode: .moviePlayback)

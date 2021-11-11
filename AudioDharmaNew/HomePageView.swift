@@ -46,6 +46,7 @@ struct HomePageView: View {
         self.displayUpdater = true
     }
     
+    
     var body: some View {
 
        NavigationView {
@@ -133,10 +134,7 @@ struct HomePageView: View {
        }  // end NavigationView
        .navigationViewStyle(.stack)
     }
-        
 }
-
-
 
 
 var UpdateViewActive = false
@@ -187,7 +185,6 @@ struct UpdateView: View {
                 }
             }        
         }
-
         .font(.title)
         .padding()
         .background(Color.black)
