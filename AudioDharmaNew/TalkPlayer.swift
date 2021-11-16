@@ -29,6 +29,7 @@ class TalkPlayer : NSObject {
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
         
+        print("startTalk", talkURL)
         // get notification once talk ends
         NotificationCenter.default.addObserver(self,selector:
                         #selector(self.talkHasCompleted),

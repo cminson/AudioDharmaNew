@@ -110,7 +110,15 @@ struct TalkPlayerView: View {
             TheTalkPlayer.play()
         } else {
         
-            let talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
+            var talkURL: URL
+            if USE_NATIVE_MP3PATHS == true {
+                talkURL  = URL(string: URL_MP3_HOST +  talk.URL)!
+
+            } else {
+                talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
+            }
+
+           // let talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
 
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"

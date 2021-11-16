@@ -34,6 +34,8 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 
 let CONFIG_JSON_NAME = "CONFIG00.JSON"
 let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
+
+
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
@@ -574,6 +576,7 @@ class Model {
                 talkList = []
                 albumList = []
             
+                print(key)
                 switch (key) {
                 case KEY_ALL_TALKS:
                     AllTalksAlbum = album
@@ -646,7 +649,8 @@ class Model {
                 case KEY_SANGHA_SHAREHISTORY:
                     album.albumType = AlbumType.HISTORICAL
                     SanghaShareHistoryAlbum = album
-              default:
+    
+                default:
                     albumList = []
                     talkList = []
                 }
@@ -661,11 +665,15 @@ class Model {
                     
                     let URL = jsonTalk["url"] as? String ?? ""
                     let series = jsonTalk["series"] as? String ?? ""
+                    let title = jsonTalk["title"] as? String ?? ""
+
                     let fileName = URL.components(separatedBy: "/").last ?? ""
                          
                     if let talk = self.FileNameToTalk[fileName] {
                         
                         // if series specified, these always go into RecommendedAlbum
+                        let talkHistory = talk.copy() as! TalkData
+                        talkHistory.Title = title
                         if !series.isEmpty {
 
                             let seriesAlbum = getAlbumByKey(key: "RECOMMENDED" + series, title: series, section: "",  imageName: talk.Speaker)
@@ -673,10 +681,10 @@ class Model {
 
                                 RecommendedAlbum.albumList.append(seriesAlbum)
                             }
-                            seriesAlbum.talkList.append(talk)
+                            seriesAlbum.talkList.append(talkHistory)
 
                         } else {
-                            album.talkList.append(talk)
+                            album.talkList.append(talkHistory)
                         }
                     }
                 } // end talk loop
