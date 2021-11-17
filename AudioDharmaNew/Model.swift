@@ -408,6 +408,9 @@ class Model {
                 for album in self.RootAlbumSpanish.albumList {
                     self.computeAlbumStats(album: album)
                 }
+                for album in self.RecommendedAlbum.albumList {
+                    self.computeAlbumStats(album:album)
+                }
             }
             catch {
             }
@@ -1829,46 +1832,6 @@ class Model {
         
     }
     
-    
-    func remoteTalkExists(talk: TalkData, completion:@escaping (Bool, TalkData)->()){
-        
-        var talkURL: URL    // where the MP3 lives
-        
-        if isFullURL(url: talk.URL) {
-            talkURL  = URL(string: talk.URL)!
-        }
-        else if USE_NATIVE_MP3PATHS == true {
-            talkURL  = URL(string: URL_MP3_HOST +  talk.URL)!
-            
-        } else {
-            talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
-        }
-        
-        var request: URLRequest = URLRequest(url: talkURL as URL)
-        request.httpMethod = "HEAD"
-        
-        var exists: Bool = true
-        
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            
-            if let httpResponse = response as? HTTPURLResponse {
-                
-                if httpResponse.statusCode == 404 {
-                    
-                    exists =  false
-                }else{
-                    exists  = true
-                }
-                
-            }
-            
-            DispatchQueue.main.async {
-                completion(exists, talk)
-            }
-            }.resume()
-        
-    }
-
 
     func remoteURLExists(url: URL, completion:@escaping (Bool, URL)->()){
         
@@ -1881,19 +1844,17 @@ class Model {
             
             if let httpResponse = response as? HTTPURLResponse {
                 
-                if httpResponse.statusCode == 404 {
-                    exists =  false
-                }else{
-                    exists  = true
+                if httpResponse.statusCode == 200 {
+                    exists =  true
+                } else {
+                    exists  = false
                 }
-                
             }
             
             DispatchQueue.main.async {
                 completion(exists, url)
             }
         }.resume()
-    
     }
     
     

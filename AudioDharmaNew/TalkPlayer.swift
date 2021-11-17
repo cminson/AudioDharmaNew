@@ -30,6 +30,7 @@ class TalkPlayer : NSObject {
         Player.allowsExternalPlayback = true
         
         print("startTalk", talkURL)
+
         // get notification once talk ends
         NotificationCenter.default.addObserver(self,selector:
                         #selector(self.talkHasCompleted),
@@ -39,6 +40,7 @@ class TalkPlayer : NSObject {
         Player.seek(to: CMTimeMake(value: Int64(startAtTime), timescale: 1))
         self.play()
     }
+    
         
     
     func verifyURL (urlString: String?) -> Bool {
@@ -97,7 +99,8 @@ class TalkPlayer : NSObject {
     @objc func timerUpdate() {
         
         // invoked every second.  inform parent view
-        talkPlayerView.updateView()
+        
+         talkPlayerView.updateView()
     }
     
     

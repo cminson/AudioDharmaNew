@@ -55,10 +55,12 @@ struct TalkPlayerView: View {
     @State private var displayBiographyView: Bool = false
     @State private var playTalksInSequence: Bool = false
     @State private var playerTitle: String = "Play Talk"
+    @State private var displayRemoteFileNotFound = false
     @State private var displayNoInternet = false
+
     @State private var stateTalkPlayer = TalkStates.INITIAL
     @State private var tappedUrl: String = ""
-
+    
     
     init(album: AlbumData, talk: TalkData, startTime: Double) {
         
@@ -118,7 +120,7 @@ struct TalkPlayerView: View {
                 talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
             }
 
-           // let talkURL = URL(string: URL_MP3_HOST + self.talk.URL)!
+            TheDataModel.remoteURLExists(url: talkURL, completion: remoteFileCheckCallback)
 
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"
@@ -133,6 +135,19 @@ struct TalkPlayerView: View {
         stateTalkPlayer = .PLAYING
     }
     
+    
+    // completion all invoked by remoteURLExists() in background.  report if talk not found
+    func remoteFileCheckCallback(exists: Bool, url: URL) {
+    
+        if exists == false {
+            DispatchQueue.main.async {
+                
+                self.terminateTalk()
+                self.displayRemoteFileNotFound = true
+            }
+        }
+    }
+
     
     func pauseTalk () {
         
@@ -318,6 +333,18 @@ struct TalkPlayerView: View {
             }  // end HStack
             
             }  //end group 1
+            .alert(isPresented: $displayRemoteFileNotFound) {
+                Alert(
+                    title: Text("All Things Are Transient"),
+                    message: Text("This talk is currently unreachable. Please try again later. If you suspect the talk is permanently in the Void, please contact support."),
+                    dismissButton: .default(Text("OK")) {
+                        
+                        displayNoInternet = false
+                    }
+                )
+
+             }
+
             
             Group {
                 
@@ -327,6 +354,7 @@ struct TalkPlayerView: View {
                 HStack() {
                     Text("00:00:00")
                         .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
+                        .frame(width: 60)
                     Slider(value: $elapsedTime,
                            in: 0...Double(self.talk.TotalSeconds),
                            step: 1,
@@ -347,6 +375,8 @@ struct TalkPlayerView: View {
                     .disabled(stateTalkPlayer != .PLAYING)
                     Text(self.talk.TotalSeconds.displayInClockFormat())
                         .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
+                        .frame(width: 60)
+
                 }
             .padding(.trailing, 20)
             .padding(.leading, 20)
@@ -371,9 +401,24 @@ struct TalkPlayerView: View {
             Spacer()
             VolumeSlider()
                 .frame(height: 50)
-                .padding(.horizontal)
+                .padding(.leading, 80)
+                .padding(.trailing, 60)
+
+
+                //.padding(.horizontal)
           
             } // end group 2
+            .alert(isPresented: $displayNoInternet) {
+                Alert(
+                    title: Text("Can Not Connect to AudioDharma"),
+                    message: Text("Please check your internet connection or try again in a few minutes"),
+                    dismissButton: .default(Text("OK")) {
+                        
+                        displayNoInternet = false
+                    }
+                )
+            }
+
  
         }  // end VStack
         .onOpenURL { url in
@@ -405,16 +450,6 @@ struct TalkPlayerView: View {
                 selection = "TRANSCRIPT"
             }
             .hidden(!self.talk.hasTranscript())
-        }
-        .alert(isPresented: $displayNoInternet) {
-            Alert(
-                title: Text("Can Not Connect to AudioDharma"),
-                message: Text("Please check your internet connection or try again in a few minutes"),
-                dismissButton: .default(Text("OK")) {
-                    
-                    displayNoInternet = false
-                }
-            )
         }
     }
 }
