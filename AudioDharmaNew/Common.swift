@@ -397,7 +397,7 @@ struct HelpPageView: View {
 
                 Spacer().frame(height:25)
                     HStack() {
-                        Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nAn orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nA bullet point marks a talk that has been previously played.\nDownloaded talks are highlighted in orange.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's biography, tap the speaker's name in the Play Talk screen.\n\nWhen new talks are available, the refresh icon on the top right of the Home screen activates. Tap it to update the app with new talks.")
+                        Text("All talks are organized into albums.\n\nTap an album to display all the talks it contains.\n\nLong-press a talk to display its menu. This allows you to notate, download and share the talk.\nAn orange dot marks a favorite talk.\nA blue dot marks a notated talk.\nA bullet point marks a talk that has been previously played.\nDownloaded talks are highlighted in orange.\n\nTo resume playing the last talk at the point you left it, tap the Resume button at the bottom of the screen.\n\nTo view a speaker's biography, tap the speaker's name in the Play Talk screen.")
                             .frame(alignment: .leading)
                             .font(.system(size: FONT_SIZE_HELP_TEXT, weight: .regular))
                             .multilineTextAlignment(.leading)

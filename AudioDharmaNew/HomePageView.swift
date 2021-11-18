@@ -38,6 +38,8 @@ struct HomePageView: View {
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+        
+        TheDataModel.downloadSanghaActivity()
     }
     
     
@@ -87,6 +89,8 @@ struct HomePageView: View {
             .sheet(isPresented: $displayUpdater) {
                 UpdateView()
             }
+           // CJM: keep for reference
+           /*
             .toolbar {
                 Button {
                     displayUpdater.toggle()
@@ -94,9 +98,11 @@ struct HomePageView: View {
                 } label: {
                     Image(systemName: "goforward")
                 }
-                .disabled(NewTalksAvailable == false)
+                .disabled(true)
                 .fullScreenCover(isPresented: $displayUpdater, content: UpdateView.init)
+           
             }
+            */
 
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -162,28 +168,6 @@ struct UpdateView: View {
                     Spacer()
                 }
             }
-        }
-        .onAppear {
-            
-            if UpdateViewActive == true {return}
-            
-            UpdateViewActive = true
-            ModelReadySemaphore = DispatchSemaphore(value: 0)
-
-            TheDataModel.SystemIsConfigured = false
-            TheDataModel.downloadAndConfigure()
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-                withAnimation {
-                    ModelReadySemaphore.wait()
-                    TheDataModel.downloadSanghaActivity()
-                    ModelReadySemaphore.wait()
-                    print("semaphore wait finished")
-                    UpdateViewActive = false
-                    NewTalksAvailable = false
-                    presentationMode.wrappedValue.dismiss()
-                }
-            }        
         }
         .font(.title)
         .padding()

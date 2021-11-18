@@ -35,7 +35,6 @@ var HostAccessPoint: String = HostAccessPoints[0]   // the one we're currently u
 let CONFIG_JSON_NAME = "CONFIG00.JSON"
 let CONFIG_ZIP_NAME = "CONFIG00.ZIP"
 
-
 var MP3_DOWNLOADS_PATH = ""      // where MP3s are downloaded.  this is set up in loadData()
 let CONFIG_ACCESS_PATH = "/AudioDharmaAppBackend/Config/" + CONFIG_ZIP_NAME    // remote web path to config
 let CONFIG_REPORT_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/reportactivity.php"     // where to report user activity (shares, listens)
@@ -99,10 +98,12 @@ let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes 
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
 let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the interval between talks
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
+let DEFAULT_REFRESH_TALKS_INTERVAL = 60 * 15
+var CHECK_REFRESH_TALKS_INTERVAL = DEFAULT_REFRESH_TALKS_INTERVAL  // how often check to see if need to update model with new talks
 var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-
+//var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 5   // CJM DEV
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -178,7 +179,6 @@ class Model {
         
     func initialize() {
         
-        print("initialize")
         for album in ListSpeakerAlbums {
             album.albumList = []
             album.talkList = []
@@ -246,9 +246,13 @@ class Model {
     }
     
     
+    
     func startBackgroundTimers() {
         
+        print("CHECK_REFRESH_TALKS_INTERVAL:", CHECK_REFRESH_TALKS_INTERVAL)
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
+        Timer.scheduledTimer(timeInterval: TimeInterval(CHECK_REFRESH_TALKS_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
+
     }
     
 
@@ -268,8 +272,18 @@ class Model {
         if isInternetAvailable() == false {
             return
         }
-        print("updateDataModel")
+        
+        /*
+        if NewTalksAvailable == true {
+            
+            NewTalksAvailable = false
+            downloadAndConfigure()
+        }
+         */
+        
         downloadAndConfigure()
+
+        
     }
 
  
@@ -332,6 +346,7 @@ class Model {
             let configZipPath = documentPath + "/" + CONFIG_ZIP_NAME
             let configJSONPath = documentPath + "/" + CONFIG_JSON_NAME
 
+            // get config zip file. error if failed
             var httpResponse: HTTPURLResponse
             if let valid_reponse = response {
                 httpResponse = valid_reponse as! HTTPURLResponse
@@ -340,6 +355,7 @@ class Model {
                 statusCode = 404
             }
 
+            // get no data or small data, error
             if let responseData = data {
                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
                     statusCode = 404
@@ -438,6 +454,7 @@ class Model {
 
             URL_DONATE = config["URL_DONATE"] as? String ?? URL_DONATE
         
+            CHECK_REFRESH_TALKS_INTERVAL = config["CHECK_REFRESH_TALKS_INTERVAL"] as? Int ?? DEFAULT_REFRESH_TALKS_INTERVAL
             MAX_TALKHISTORY_COUNT = config["MAX_TALKHISTORY_COUNT"] as? Int ?? MAX_TALKHISTORY_COUNT
             MAX_SHAREHISTORY_COUNT = config["MAX_SHAREHISTORY_COUNT"] as? Int ?? MAX_SHAREHISTORY_COUNT
             UPDATE_SANGHA_INTERVAL = config["UPDATE_SANGHA_INTERVAL"] as? Int ?? UPDATE_SANGHA_INTERVAL
@@ -579,12 +596,10 @@ class Model {
                 talkList = []
                 albumList = []
             
-                print(key)
                 switch (key) {
                 case KEY_ALL_TALKS:
                     AllTalksAlbum = album
                     talkList = ListAllTalks
-                    print("LoadAlbums KEY_ALL_TALKS - first talk", talkList[0].Title)
                 case KEY_ALBUMROOT_SPANISH:
                     RootAlbumSpanish = album
                     jsonTalkList = [] // clear this.  bridge old vs new use of this album
@@ -969,8 +984,6 @@ class Model {
                          */
                     }
                 }
-                
-                ModelReadySemaphore.signal()
 
 
             } catch {   // end do catch
@@ -1003,9 +1016,7 @@ class Model {
         
         // local destination path for file
         localPathMP3 = MP3_DOWNLOADS_PATH + "/" + talk.FileName
-        
-        print("Download URL", requestURL)
-        
+                
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -1043,10 +1054,8 @@ class Model {
             else {
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 statusCode = 404
-                print("404")
 
             }
-            print(statusCode)
             
             // if got a good response, store off file locally
             if statusCode      == 200 {
@@ -1073,8 +1082,6 @@ class Model {
     
     func reportTalkActivity(type: ACTIVITIES, talk: TalkData) {
        
-        print("Report Activity: ", talk.Title, type)
-
         var operation : String
         switch (type) {
         
@@ -1273,7 +1280,6 @@ class Model {
      
          
          if let lastTalk = TheDataModel.UserTalkHistoryAlbum.talkList.first {
-             //print("most recent talk: ", talk.Title)
              return talk.FileName == lastTalk.FileName
          }
          return false
@@ -1284,9 +1290,7 @@ class Model {
     // invoked in background by TalkPlayerView
     //
      func addToTalkHistory(talk: TalkData) {
-         
-         print("addToTalkHistory: ", talk.Title)
-         
+                  
          self.PlayedTalks[talk.FileName] = true
 
          let date = Date()

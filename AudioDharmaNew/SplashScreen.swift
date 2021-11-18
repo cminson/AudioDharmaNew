@@ -87,12 +87,12 @@ struct SplashScreen : View {
             AppColorScheme = colorScheme
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
                 withAnimation {
+                    print("Waiting on semaphore")
                     ModelReadySemaphore.wait()
                     
                     if TheDataModel.SystemIsConfigured {
                         // Model now loaded.  So now it's safe to get additional data (Sangha activity)
                         TheDataModel.downloadSanghaActivity()
-                        ModelReadySemaphore.wait()
                         
                         // Lastly set up background data refresh threads
                         TheDataModel.startBackgroundTimers()
