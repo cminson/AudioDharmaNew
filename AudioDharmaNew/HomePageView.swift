@@ -19,7 +19,6 @@ import UIKit
 
 struct HomePageView: View {
     
-    @ObservedObject var viewUpdater: ViewUpdater
     @ObservedObject var parentAlbum: AlbumData
     
     @State var selectedAlbum: AlbumData
@@ -29,26 +28,16 @@ struct HomePageView: View {
     @State var searchText: String  = ""
     @State var displayNoCurrentTalk: Bool = false
     @State var sharedURL: String = ""
-    @State var displayUpdater = false
     
     init(parentAlbum: AlbumData) {
         
-        self.viewUpdater = ViewUpdater()
         self.parentAlbum = parentAlbum
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
-        
-        TheDataModel.downloadSanghaActivity()
     }
     
-    
-    func beginUpdate() {
-        
-        self.displayUpdater = true
-    }
-    
-    
+     
     var body: some View {
 
        NavigationView {
@@ -86,24 +75,6 @@ struct HomePageView: View {
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)
-            .sheet(isPresented: $displayUpdater) {
-                UpdateView()
-            }
-           // CJM: keep for reference
-           /*
-            .toolbar {
-                Button {
-                    displayUpdater.toggle()
-
-                } label: {
-                    Image(systemName: "goforward")
-                }
-                .disabled(true)
-                .fullScreenCover(isPresented: $displayUpdater, content: UpdateView.init)
-           
-            }
-            */
-
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
                     Button {
@@ -142,38 +113,5 @@ struct HomePageView: View {
     }
 }
 
-
-var UpdateViewActive = false
-struct UpdateView: View {
-    @Environment(\.presentationMode) var presentationMode
-        
-    var body: some View {
-        
-        VStack(alignment: .center, spacing: 0) {
-            GeometryReader { metrics in
-                VStack() {
-                    Spacer()
-                    HStack() {
-                        Spacer()
-                        Image("Earth")
-                            .resizable()
-                            .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
-                        Spacer()
-                    }
-                    Spacer().frame(height: 40)
-                    Text("Updating Talks")
-                        .font(.system(size: FONT_SIZE_SECTION, weight: .bold))
-                        .foregroundColor(.white)
-
-                    Spacer()
-                }
-            }
-        }
-        .font(.title)
-        .padding()
-        .background(Color.black)
-    }
-  
-}
 
 

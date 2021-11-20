@@ -24,10 +24,12 @@ struct UserAlbumRow: View {
         self.album = album
         
         albumTitle = album.Title
+        /*
         print("UserAlbum: ", album.Title)
         for talk in album.talkList {
             print("Talk: ", talk.Title)
         }
+         */
     }
 
     var body: some View {

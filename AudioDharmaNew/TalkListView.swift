@@ -183,14 +183,14 @@ struct TalkRow: View {
                         noteText = ""
                         TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
                         self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
-                        displayNoteDialog = false
+                        self.displayNoteDialog = false
                     }
                     Spacer()
                         .frame(width: 60)
                     Button("OK") {
                         TheDataModel.addNoteToTalk(talk: talk, noteText: noteText)
                         self.stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
-                        displayNoteDialog = false
+                        self.displayNoteDialog = false
                     }
                 }
                 Spacer()
@@ -207,8 +207,6 @@ struct TalkRow: View {
 struct TalkListView: View {
     @ObservedObject var album: AlbumData
     //var album: AlbumData
-
-    
 
     @State var selection: String?  = nil
     @State var searchText: String  = ""
@@ -233,7 +231,6 @@ struct TalkListView: View {
            .padding(.top, 0)
        // List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
         List(album.getFilteredTalks(filter: searchText)) { talk in
-
             
             TalkRow(album: album, talk: talk)
                 .onTapGesture {
@@ -241,7 +238,6 @@ struct TalkListView: View {
                     selectedTalk = talk
                     selectedTalkTime = 0
                     selection = "PLAY_TALK"
-
                 }
         }
         .alert(isPresented: $displayNoCurrentTalk) {
@@ -262,7 +258,6 @@ struct TalkListView: View {
 
 
         .navigationBarHidden(false)
-        //.navigationViewStyle(StackNavigationViewStyle())
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {
@@ -283,7 +278,6 @@ struct TalkListView: View {
                    }
                }) {
                    Text("Resume Talk")
-                       //.hidden(resumeButtonHidden)
                }
                Spacer()
                Button(action: {

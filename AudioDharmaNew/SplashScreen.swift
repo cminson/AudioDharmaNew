@@ -22,8 +22,6 @@ struct SplashScreen : View {
     @State var sharedURL: String = ""
 
     @Environment(\.presentationMode) var presentationMode
-
-    
     @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     // download and configure DataModel.  WAIT on the completion semaphore in the
@@ -37,13 +35,11 @@ struct SplashScreen : View {
     
     func dismissView() -> Text {
         
-
         presentationMode.wrappedValue.dismiss()
         return Text("")
     }
 
     
-
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             if self.appIsReady {
@@ -56,7 +52,6 @@ struct SplashScreen : View {
                     }
                 } else {
                    HomePageView(parentAlbum: TheDataModel.RootAlbum)
-                    //HomePageView()
                 }
             } else {
                 GeometryReader { metrics in
@@ -92,7 +87,12 @@ struct SplashScreen : View {
                     
                     if TheDataModel.SystemIsConfigured {
                         // Model now loaded.  So now it's safe to get additional data (Sangha activity)
+                        print("Model loaded")
+                        
+                        //let signalComplete = DispatchSemaphore(value: 0)
+
                         TheDataModel.downloadSanghaActivity()
+                        //signalComplete.wait()
                         
                         // Lastly set up background data refresh threads
                         TheDataModel.startBackgroundTimers()

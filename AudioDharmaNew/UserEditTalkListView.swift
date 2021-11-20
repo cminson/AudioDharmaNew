@@ -152,9 +152,7 @@ struct UserEditTalkListView: View {
             }
             TheDataModel.computeAlbumStats(album: album)
             TheDataModel.saveCustomUserAlbums()
-            
 
-        
         }
     }
     

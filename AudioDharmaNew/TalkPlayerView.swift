@@ -342,7 +342,6 @@ struct TalkPlayerView: View {
                         displayNoInternet = false
                     }
                 )
-
              }
 
             
@@ -418,8 +417,6 @@ struct TalkPlayerView: View {
                     }
                 )
             }
-
- 
         }  // end VStack
         .onOpenURL { url in
           tappedUrl = url.absoluteString

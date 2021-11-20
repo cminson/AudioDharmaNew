@@ -57,66 +57,6 @@ var AppColorScheme: ColorScheme = .light
  *********************************************************************************
  */
 
-class ViewUpdater:  ObservableObject {
-    @Published var updateDisplay: Bool
-    
-    init() {
-        updateDisplay = false
-    }
-}
-
-struct ItemsToolbar: ToolbarContent {
-    let add: () -> Void
-    let sort: () -> Void
-
-    var body: some ToolbarContent {
-        ToolbarItem(placement: .primaryAction) {
-            Button("Add", action: add)
-        }
-        
-
-        ToolbarItem(placement: .bottomBar) {
-            Button("Sort", action: sort)
-        }
-    }
-}
-
-
-struct ToolBar: ToolbarContent {
- 
-    var body: some ToolbarContent {
-        
-        ToolbarItem(placement: .bottomBar) {
-            Button(action: {
-                //selection = "PLAY_TALK"
-
-            }) {
-                Image(systemName: "note")
-                    .renderingMode(.original)
-
-            }        }
-        
-        ToolbarItem(placement: .bottomBar) {
-            Button(action: {
-
-            }) {
-                Image(systemName: "note")
-                    .renderingMode(.original)
-
-            }        }
-
-        ToolbarItem(placement: .bottomBar) {
-            Button(action: {
-
-            }) {
-                Image(systemName: "note")
-                    .renderingMode(.original)
-
-            }
-        }
-    }
-}
-
 
 struct HTMLView: UIViewRepresentable {
   @Binding var text: String

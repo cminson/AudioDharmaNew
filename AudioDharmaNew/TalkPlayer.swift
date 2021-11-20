@@ -41,7 +41,6 @@ class TalkPlayer : NSObject {
         self.play()
     }
     
-        
     
     func verifyURL (urlString: String?) -> Bool {
         
@@ -99,7 +98,6 @@ class TalkPlayer : NSObject {
     @objc func timerUpdate() {
         
         // invoked every second.  inform parent view
-        
          talkPlayerView.updateView()
     }
     
@@ -165,13 +163,7 @@ class TalkPlayer : NSObject {
         return Double(seekEndPoint)
     }
     
-    
-    func currentTime()-> CMTime {
-        
-        return Player.currentTime()
-    }
-    
-    
+     
     func convertSecondsToDisplayString(timeInSeconds: Int) -> String {
         
         let seconds = Int(timeInSeconds) % 60
@@ -203,23 +195,6 @@ class TalkPlayer : NSObject {
             }
         }
         return time
-    }
-
-    
-    func getProgress()->Float {
-        
-        var theCurrentTime = 0.0
-        var theCurrentDuration = 0.0
-        
-        let currentTime = CMTimeGetSeconds(Player.currentTime())
-        
-        if let ct = Player.currentItem?.asset.duration {
-            let duration = CMTimeGetSeconds(ct)
-            theCurrentTime = currentTime
-            theCurrentDuration = duration
-        }
-        
-        return Float(theCurrentTime / theCurrentDuration)
     }
        
 }

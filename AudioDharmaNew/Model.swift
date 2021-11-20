@@ -98,12 +98,10 @@ let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes 
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
 let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the interval between talks
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
-let DEFAULT_REFRESH_TALKS_INTERVAL = 60 * 15
-var CHECK_REFRESH_TALKS_INTERVAL = DEFAULT_REFRESH_TALKS_INTERVAL  // how often check to see if need to update model with new talks
+var CHECK_REFRESH_TALKS_INTERVAL = 60 * 15  // how often check to see if need to update model with new talks
 var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-//var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
-var UPDATE_SANGHA_INTERVAL = 5   // CJM DEV
+var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -123,6 +121,7 @@ var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data load
 var GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
 var NewTalksAvailable = false
+
 
 class Model {
     
@@ -246,7 +245,6 @@ class Model {
     }
     
     
-    
     func startBackgroundTimers() {
         
         print("CHECK_REFRESH_TALKS_INTERVAL:", CHECK_REFRESH_TALKS_INTERVAL)
@@ -259,6 +257,7 @@ class Model {
     
     @objc func updateSanghaActivity() {
     
+        print("updateSanghaActivity")
         if isInternetAvailable() == false {
             return
         }
@@ -273,17 +272,11 @@ class Model {
             return
         }
         
-        /*
         if NewTalksAvailable == true {
             
             NewTalksAvailable = false
             downloadAndConfigure()
         }
-         */
-        
-        downloadAndConfigure()
-
-        
     }
 
  
@@ -328,7 +321,6 @@ class Model {
     
     func downloadAndConfigure()  {
         
-        var statusCode: Int = 0
         
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -347,43 +339,33 @@ class Model {
             let configJSONPath = documentPath + "/" + CONFIG_JSON_NAME
 
             // get config zip file. error if failed
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-                statusCode = httpResponse.statusCode
-            } else {
-                statusCode = 404
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                
+                ModelReadySemaphore.signal()
+                return
             }
-
-            // get no data or small data, error
-            if let responseData = data {
-                if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    statusCode = 404
-                }
-            }
-            else {
-                statusCode = 404
+            guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
+                
+                ModelReadySemaphore.signal()
+                return
             }
             
             // if got a good response, store off the zip file locally
             // if we DIDN'T get a good response, we will try to unzip the previously loaded config
-            if statusCode == 200 {
-            
-                do {
-                    if let responseData = data {
-                        try responseData.write(to: URL(fileURLWithPath: configZipPath))
-                    }
-                }
-                catch let error as NSError {
-                    self.errorLog(error: error)
-                    ModelReadySemaphore.signal()
-                    return
+            do {
+                if let responseData = data {
+                    try responseData.write(to: URL(fileURLWithPath: configZipPath))
                 }
             }
+            catch let error as NSError {
+                self.errorLog(error: error)
+                ModelReadySemaphore.signal()
+                return
+            }
+
 
             if SSZipArchive.unzipFile(atPath: configZipPath, toDestination: documentPath) != true {
                 
-                statusCode = 404
                 ModelReadySemaphore.signal()
                 return
             }
@@ -396,14 +378,12 @@ class Model {
 
             catch let error as NSError {
                 
-                statusCode = 404
                 self.errorLog(error: error)
                 ModelReadySemaphore.signal()
                 return
             }
                         
             // BEGIN CRITICAL SECTION  CJM DEV
-
             do {
                 
                 let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
@@ -454,7 +434,7 @@ class Model {
 
             URL_DONATE = config["URL_DONATE"] as? String ?? URL_DONATE
         
-            CHECK_REFRESH_TALKS_INTERVAL = config["CHECK_REFRESH_TALKS_INTERVAL"] as? Int ?? DEFAULT_REFRESH_TALKS_INTERVAL
+            CHECK_REFRESH_TALKS_INTERVAL = config["CHECK_REFRESH_TALKS_INTERVAL"] as? Int ?? CHECK_REFRESH_TALKS_INTERVAL
             MAX_TALKHISTORY_COUNT = config["MAX_TALKHISTORY_COUNT"] as? Int ?? MAX_TALKHISTORY_COUNT
             MAX_SHAREHISTORY_COUNT = config["MAX_SHAREHISTORY_COUNT"] as? Int ?? MAX_SHAREHISTORY_COUNT
             UPDATE_SANGHA_INTERVAL = config["UPDATE_SANGHA_INTERVAL"] as? Int ?? UPDATE_SANGHA_INTERVAL
@@ -642,7 +622,7 @@ class Model {
                     UserAlbums = TheDataModel.loadUserAlbumData()
                     for userAlbumData in self.UserAlbums {
                         let albumKey = self.randomKey()
-                        let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "sequence", date: "", albumType: AlbumType.ACTIVE)
+                        let customAlbum = AlbumData(title: userAlbumData.Title, key: self.randomKey(), section: "", imageName: "personal", date: "", albumType: AlbumType.ACTIVE)
                         KeyToAlbum[albumKey] = customAlbum
                         albumList.append(customAlbum)
                         for fileName in userAlbumData.TalkFileNames {
@@ -797,7 +777,6 @@ class Model {
     
     func downloadSimilarityData(talk: TalkData, signalComplete: DispatchSemaphore) {
 
-         var statusCode : Int = 0
         
          let config = URLSessionConfiguration.default
          config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -806,6 +785,7 @@ class Model {
 
          let similarKeyName = talk.FileName.replacingOccurrences(of: ".mp3", with: "")
          let path = URL_GET_SIMILAR + similarKeyName
+        
          let requestURL : URL? = URL(string: path)
          let urlRequest = URLRequest(url : requestURL!)
 
@@ -813,40 +793,31 @@ class Model {
          let task = session.dataTask(with: urlRequest) {
              (data, response, error) -> Void in
 
-             var httpResponse: HTTPURLResponse
-             if let valid_reponse = response {
-                 httpResponse = valid_reponse as! HTTPURLResponse
-                 statusCode = httpResponse.statusCode
-             } else {
-                 statusCode = 404
+             print("In URL Request")
+             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                 return
              }
-
-             if let responseData = data {
-                 if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                     statusCode = 404
-                 }
+             
+             guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
+                 return
              }
-             else {
-                 statusCode = 404
-             }
+ 
+             do {
+                 let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
+                 for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
 
-             if statusCode == 200 {
-                 do {
-                     let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
-                     for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
+                     let filename = similarTalk["filename"] as? String ?? ""
 
-                         let filename = similarTalk["filename"] as? String ?? ""
-
-                         if let talk = self.FileNameToTalk[filename] {
-                             talkList.append(talk)
-                         }
+                     if let talk = self.FileNameToTalk[filename] {
+                         talkList.append(talk)
                      }
                  }
-                 catch {
-                    
-                 }
-                 TheDataModel.SimilarTalksAlbum.talkList = talkList
              }
+             catch {
+                
+             }
+             
+             TheDataModel.SimilarTalksAlbum.talkList = talkList
              signalComplete.signal()
          }
          task.resume()
@@ -860,83 +831,65 @@ class Model {
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
         let session = URLSession.init(configuration: config)
-        
+       
         let requestURL : URL? = URL(string: URL_GET_ACTIVITY + "DEVICEID=" + DEVICE_ID)
-
         let urlRequest = URLRequest(url : requestURL!)
         
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
-            
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-            } else {
-                ModelReadySemaphore.signal()
-                return
-            }
-            //let httpResponse = response as! HTTPURLResponse
-            let statusCode = httpResponse.statusCode
-            
-            if (statusCode != 200) {
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 ModelReadySemaphore.signal()
                 return
             }
             
             // make sure we got data.  including cases where only partial data returned (MIN_EXPECTED_RESPONSE_SIZE is arbitrary)
-            guard let responseData = data else {
-                return
-            }
-            if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
+            guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
                 ModelReadySemaphore.signal()
                 return
             }
-  
+            
             do {
-                
                 var talkCount = 0
-                var totalSeconds = 0
                 var talkList: [TalkData] = []
 
                 let json =  try JSONSerialization.jsonObject(with: responseData) as! [String: AnyObject]
+                print("getting json")
                 
-                 // get the community talk history
-                for talkJSON in json["sangha_history"] as? [AnyObject] ?? [] {
-                    
-                    let fileName = talkJSON["filename"] as? String ?? ""
-                    let datePlayed = talkJSON["date"] as? String ?? ""
-                    var city = talkJSON["city"] as? String ?? ""
-                    var country = talkJSON["country"] as? String ?? ""
-                    
-                    if city.isEmpty {city = " "}
-                    if country.isEmpty {country = " "}
-
+                // get the community talk history
+               for talkJSON in json["sangha_history"] as? [AnyObject] ?? [] {
                    
-                    if let talk = self.FileNameToTalk[fileName] {
-                        
-                        let talkHistory = talk.copy() as! TalkData
-                        talkHistory.DatePlayed = datePlayed
-                        talkHistory.City  = city
-                        talkHistory.Country = country
+                   let fileName = talkJSON["filename"] as? String ?? ""
+                   let datePlayed = talkJSON["date"] as? String ?? ""
+                   var city = talkJSON["city"] as? String ?? ""
+                   var country = talkJSON["country"] as? String ?? ""
+                   
+                   if city.isEmpty {city = " "}
+                   if country.isEmpty {country = " "}
 
-                        talkCount += 1
-                        totalSeconds += talk.TotalSeconds
-                        talkList.append(talkHistory)
-                        
-                        if talkCount >= MAX_TALKHISTORY_COUNT {
-                            break
-                        }
-                    }
-                    
+                   if let talk = self.FileNameToTalk[fileName] {
+                       
+                       let talkHistory = talk.copy() as! TalkData
+                       talkHistory.DatePlayed = datePlayed
+                       talkHistory.City  = city
+                       talkHistory.Country = country
+
+                       talkCount += 1
+                       talkList.append(talkHistory)
+                       
+                       if talkCount >= MAX_TALKHISTORY_COUNT {
+                           break
+                       }
+                   }
                 }
+                
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
                 self.SanghaTalkHistoryAlbum.talkList = talkList
+                print("Setting,", self.SanghaTalkHistoryAlbum.talkList.count)
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
 
                 // get the community share history
                 talkCount = 0
-                totalSeconds = 0
                 talkList = []
                 for talkJSON in json["sangha_shares"] as? [AnyObject] ?? [] {
                     
@@ -956,10 +909,8 @@ class Model {
                         talkHistory.Country = country
 
                         talkList.append(talkHistory)
-                        
                         talkCount += 1
-                        totalSeconds += talk.TotalSeconds
-
+                        
                         if talkCount >= MAX_SHAREHISTORY_COUNT {
                             break
                         }
@@ -975,35 +926,30 @@ class Model {
                     let availableTalkCount  = config["TotalTalkCount"] as? Int ?? 0
                     if availableTalkCount > 0 && availableTalkCount != self.ListAllTalks.count {
                         
+                        //
+                        // the callback function updateDataModel (driven by timer at startBackgroundTimers),
+                        // will check this variable ever CHECK_REFRESH_TALKS_INTERVAL seconds.  If true, then
+                        // a full download and reconfiguration will be initiated
+                        //
                         NewTalksAvailable = true
-                        /*
-                        DispatchQueue.main.async {
-                            print("refresh")
-                            TheDataModel.downloadAndConfigure()
-                        }
-                         */
                     }
                 }
-
-
-            } catch {   // end do catch
+            } catch {
+                print("JSON error: \(error.localizedDescription)")
             }
             
             self.computeAlbumStats(album: self.SanghaTalkHistoryAlbum)
             self.computeAlbumStats(album: self.SanghaShareHistoryAlbum)
-
-
-            
         }
         task.resume()
     }
+    
     
     
     func startDownload(talk: TalkData, success: @escaping  () -> Void) {
 
         var requestURL: URL
         var localPathMP3: String
-        var statusCode : Int = 0
         
         DownloadInProgress = true
         
@@ -1027,53 +973,34 @@ class Model {
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
-            var httpResponse: HTTPURLResponse
-            if let valid_reponse = response {
-                httpResponse = valid_reponse as! HTTPURLResponse
-            } else {
-                TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                TheDataModel.DownloadInProgress = false
-                return
-            }
-            //let httpResponse = response as! HTTPURLResponse
-            statusCode = httpResponse.statusCode
-            
-            if (statusCode != 200) {
-                TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                TheDataModel.DownloadInProgress = false
-                return
-            }
-            
-            // make sure we got data
-            if let responseData = data {
-                if responseData.count < MIN_EXPECTED_RESPONSE_SIZE {
-                    TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                    statusCode = 404
-                }
-            }
-            else {
-                TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                statusCode = 404
-
-            }
-            
-            // if got a good response, store off file locally
-            if statusCode      == 200 {
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 
-                do {
-                    if let responseData = data {
-                        try responseData.write(to: URL(fileURLWithPath: localPathMP3))
-                    }
-                }
-                catch  {
-                    TheDataModel.unsetTalkAsDownloaded(talk: talk)
-                    TheDataModel.DownloadInProgress = false
-                    return
-                }
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
-                TheDataModel.setTalkAsDownloaded(talk: talk)
-                success()
+                return
             }
+            guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
+                
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
+                TheDataModel.DownloadInProgress = false
+                return
+            }
+                        
+            // if got a good response, store off file locally
+            do {
+                if let responseData = data {
+                    try responseData.write(to: URL(fileURLWithPath: localPathMP3))
+                }
+            }
+            catch  {
+                TheDataModel.unsetTalkAsDownloaded(talk: talk)
+                TheDataModel.DownloadInProgress = false
+                return
+            }
+            TheDataModel.DownloadInProgress = false
+            TheDataModel.setTalkAsDownloaded(talk: talk)
+            success()
+        
             TheDataModel.DownloadInProgress = false
         }
         task.resume()
@@ -1139,7 +1066,7 @@ class Model {
     
         
     //
-    // MARK: talk and album functions
+    // talk and album functions
     //
     func toggleTalkAsFavorite(talk: TalkData) -> Bool {
 
@@ -1318,7 +1245,6 @@ class Model {
        }
      
     
-    
     func addToShareHistory(talk: TalkData) {
         
         let date = Date()
@@ -1350,7 +1276,7 @@ class Model {
     
     
     //
-    // MARK: User Album functions
+    // User Album functions
     //
     func saveCustomUserAlbums() {
     
@@ -1483,7 +1409,7 @@ class Model {
     
     
     //
-    // MARK:  Persistent Data Functions
+    // Persistent Data Functions
     //
     func saveTalkHistoryData() {
         
@@ -1700,7 +1626,7 @@ class Model {
        
     
     //
-    // MARK: Support Functions
+    // Support Functions
     //
     func isInternetAvailable() -> Bool
     {
@@ -1884,10 +1810,6 @@ class Model {
         
         print("ERROR: ", error)
     }
-    
-
-    
-
     
 }
     

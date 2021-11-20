@@ -85,8 +85,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredAlbums(filter: String) -> [AlbumData] {
 
-        print("getfilteredalbums")
-
         var filteredAlbumList = [AlbumData] ()
 
         if filter.isEmpty {
@@ -97,8 +95,6 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                 if searchedData.contains(filter.lowercased()) {filteredAlbumList.append(album)}
             }
         }
-
-        print("return etfilteredalbums")
 
         return filteredAlbumList
     }
@@ -157,7 +153,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 //
 // TalkData describes a talk.
 //
-class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
+class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable, CustomStringConvertible {
     
     let id = UUID()
     var Title: String
@@ -182,6 +178,11 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable {
     
     static func empty () -> TalkData {
         return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 0,  pdf: "")
+    }
+    
+    var description: String {
+            return "\(id) \(Title) \(URL) \(FileName) \(Date) \(Speaker) \(ln) \(PDF) \(TotalSeconds) \(DatePlayed) \(TimePlayed) \(City) \(Country)"
+       // return "\(id) \(Title) \(URL) \(FileName) \(Date) \(Speaker)"
     }
     
     
