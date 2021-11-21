@@ -23,7 +23,7 @@ struct UserAlbumRow: View {
     init(album: AlbumData) {
         self.album = album
         
-        albumTitle = album.Title
+        albumTitle = album.title
         /*
         print("UserAlbum: ", album.Title)
         for talk in album.talkList {
@@ -36,12 +36,12 @@ struct UserAlbumRow: View {
         
         VStack(alignment: .leading) {
             HStack() {
-                album.ImageName.toImage()
+                album.imageName.toImage()
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
-                Text("\(album.Title)")
+                Text("\(album.title)")
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .padding(.leading, 0)
                 Spacer()
@@ -129,7 +129,7 @@ struct UserAlbumListView: View {
         .background(NavigationLink(destination: TalkPlayerView(album: CurrentAlbum, talk: CurrentTalk, startTime: CurrentTalkElapsedTime), tag: "RESUME_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
-        .navigationBarTitle(album.Title, displayMode: .inline)
+        .navigationBarTitle(album.title, displayMode: .inline)
         .toolbar {
             Button("New Album") {
                 selection = "NEW_ALBUM"

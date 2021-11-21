@@ -29,7 +29,7 @@ struct UserTalkRow: View {
         self.talk = talk
         self.talkSet = talkSet
         self.talkInAlbum = talkSet.contains(talk)
-        self.stateTalkTitle = talk.Title + " | " + talk.Speaker
+        self.stateTalkTitle = talk.title + " | " + talk.speaker
 
     }
     
@@ -38,7 +38,7 @@ struct UserTalkRow: View {
                 
         VStack(alignment: .leading) {
             HStack() {
-                 talk.Speaker.toImage()
+                 talk.speaker.toImage()
                     .resizable()
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
@@ -50,10 +50,10 @@ struct UserTalkRow: View {
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
                 VStack(alignment: .trailing, spacing: 8) {
-                    Text(talk.TotalSeconds.displayInClockFormat())
+                    Text(talk.totalSeconds.displayInClockFormat())
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Text(String(talk.Date))
+                    Text(String(talk.date))
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
@@ -73,11 +73,11 @@ struct UserTalkRow: View {
             .onTapGesture {
                 talkInAlbum.toggle()
                 if talkInAlbum == true {
-                    print("Adding: ", talk.Title, album.Title)
+                    print("Adding: ", talk.title, album.title)
                     EditTalkList.append(self.talk)
                 } else {
                     if let index = EditTalkList.firstIndex(of: self.talk) {
-                        print("Removing: ", talk.Title)
+                        print("Removing: ", talk.title)
                         EditTalkList.remove(at: index)
                     }
                 }
@@ -119,7 +119,7 @@ struct UserEditTalkListView: View {
             HStack() {
                 Text("Title:")
                 Spacer().frame(width:5)
-                TextField("", text: $selectedAlbum.Title)
+                TextField("", text: $selectedAlbum.title)
                     .padding(.horizontal)
                     .frame(width: 200, height: 30)
                     .border(Color.gray)
@@ -136,7 +136,7 @@ struct UserEditTalkListView: View {
 
             }
         }
-        .navigationBarTitle(album.Title, displayMode: .inline)
+        .navigationBarTitle(album.title, displayMode: .inline)
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())

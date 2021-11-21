@@ -24,7 +24,7 @@ struct TalkRow: View {
     @State private var displayNoteDialog = false
     @State private var displayDownloadDialog = false
     @State private var displayShareSheet = false
-    @State var selection: String?  = nil
+    @State private var selection: String?  = nil
     @State private var noteText = ""
     @State private var stateIsFavoriteTalk : Bool
     @State private var stateIsNotatedTalk : Bool
@@ -41,23 +41,22 @@ struct TalkRow: View {
         stateIsFavoriteTalk = TheDataModel.isFavoriteTalk(talk: talk)
         stateIsNotatedTalk = TheDataModel.isNotatedTalk(talk: talk)
 
-        if album.Key == KEY_ALL_TALKS {
-            stateTalkTitle = talk.Title + " | " + talk.Speaker
+        if album.key == KEY_ALL_TALKS {
+            stateTalkTitle = talk.title + " | " + talk.speaker
 
         } else {
-            stateTalkTitle = talk.Title
+            stateTalkTitle = talk.title
 
         }
         if TheDataModel.isDownloadInProgress(talk: talk) {
             stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
         }
-        
     }
     
        
     func downloadCompleted() {
 
-        stateTalkTitle = self.talk.Title
+        stateTalkTitle = self.talk.title
     }
     
     
@@ -65,7 +64,7 @@ struct TalkRow: View {
                 
         VStack(alignment: .leading) {
             HStack() {
-                talk.Speaker.toImage()
+                talk.speaker.toImage()
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
@@ -77,10 +76,10 @@ struct TalkRow: View {
                     .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 Spacer()
                 VStack(alignment: .trailing, spacing: 5) {
-                    Text(album.albumType == AlbumType.ACTIVE ?  talk.TotalSeconds.displayInClockFormat() : talk.City)
+                    Text(album.albumType == AlbumType.ACTIVE ?  talk.totalSeconds.displayInClockFormat() : talk.city)
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
-                    Text(String(album.albumType == AlbumType.ACTIVE ?  talk.Date : talk.Country))
+                    Text(String(album.albumType == AlbumType.ACTIVE ?  talk.date : talk.country))
                         .padding(.trailing, -5)
                         .font(.system(size: FONT_SIZE_ROW_ATTRIBUTES))
                 }
@@ -152,7 +151,7 @@ struct TalkRow: View {
                 }
             }
              .sheet(isPresented: $displayShareSheet) {
-                let shareText = "\(talk.Title) by \(talk.Speaker) \nShared from the iPhone AudioDharma app"
+                let shareText = "\(talk.title) by \(talk.speaker) \nShared from the iPhone AudioDharma app"
                 let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!
                 let sharedObjects:[AnyObject] = [objectsToShare as AnyObject, shareText as AnyObject]
 
@@ -168,7 +167,7 @@ struct TalkRow: View {
             VStack() {
                 Spacer()
                     .frame(height:20)
-                Text("Edit Notes:  " + talk.Title)
+                Text("Edit Notes:  " + talk.title)
                 Spacer()
                     .frame(height:5)
                 TextView(text: $noteText, textStyle: $textStyle)
@@ -208,13 +207,13 @@ struct TalkListView: View {
     @ObservedObject var album: AlbumData
     //var album: AlbumData
 
-    @State var selection: String?  = nil
-    @State var searchText: String  = ""
-    @State var selectedTalkTime: Double = 0
-    @State var selectedTalk: TalkData
-    @State var selectedAlbum: AlbumData
+    @State private var selection: String?  = nil
+    @State private var searchText: String  = ""
+    @State private var selectedTalkTime: Double = 0
+    @State private var selectedTalk: TalkData
+    @State private var selectedAlbum: AlbumData
     @State private var displayNoCurrentTalk = false
-    @State var sharedURL: String = ""
+    @State private var sharedURL: String = ""
 
 
     init(album: AlbumData) {
@@ -229,7 +228,6 @@ struct TalkListView: View {
 
         SearchBar(text: $searchText)
            .padding(.top, 0)
-       // List(album.getFilteredTalks(filter: searchText), id: \.self) { talk in
         List(album.getFilteredTalks(filter: searchText)) { talk in
             
             TalkRow(album: album, talk: talk)
@@ -250,7 +248,7 @@ struct TalkListView: View {
             )
         }
         .listStyle(PlainListStyle())  // ensures fills parent view
-        .navigationBarTitle(album.Title, displayMode: .inline)
+        .navigationBarTitle(album.title, displayMode: .inline)
         .background(NavigationLink(destination: TalkPlayerView(album: album, talk: selectedTalk, startTime: selectedTalkTime), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection ) { EmptyView() } .hidden())

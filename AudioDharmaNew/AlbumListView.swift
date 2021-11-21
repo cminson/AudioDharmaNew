@@ -36,7 +36,7 @@ struct SectionRow: View {
 struct AlbumRow: View {
     
     @ObservedObject var album: AlbumData
-    @State var selection: String?  = ""
+    @State private var selection: String?  = ""
 
     
     init(album: AlbumData) {
@@ -48,13 +48,13 @@ struct AlbumRow: View {
         
         VStack(alignment: .leading) {
             HStack() {
-                album.ImageName.toImage()
+                album.imageName.toImage()
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: LIST_IMAGE_WIDTH, height:LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
-                Text("\(album.Title)")
+                Text("\(album.title)")
                     .font(.system(size: FONT_SIZE_ROW_TITLE))
                     .padding(.leading, 0)
                 Spacer()
@@ -71,10 +71,10 @@ struct AlbumRow: View {
             .contentShape(Rectangle())
             .onTapGesture {
 
-                if KEYS_TO_ALBUMS.contains(album.Key) {
+                if KEYS_TO_ALBUMS.contains(album.key) {
                     selection = "ALBUMS"
                 }
-                else if KEYS_TO_USER_ALBUMS.contains(album.Key) {
+                else if KEYS_TO_USER_ALBUMS.contains(album.key) {
                     selection = "USERALBUMS"
                 } else {
                     selection = "TALKS"
@@ -98,14 +98,14 @@ struct AlbumListView: View {
     
     var album: AlbumData
     
-    @State var selectedAlbum: AlbumData
-    @State var selection: String?  = ""
-    @State var searchText: String  = ""
-    @State var noCurrentTalk: Bool = false
-    @State var selectedTalk: TalkData
-    @State var selectedTalkTime: Double
-    @State var displayNoCurrentTalk: Bool = false
-    @State var sharedURL: String = ""
+    @State private var selectedAlbum: AlbumData
+    @State private var selection: String?  = ""
+    @State private var searchText: String  = ""
+    @State private var noCurrentTalk: Bool = false
+    @State private var selectedTalk: TalkData
+    @State private var selectedTalkTime: Double
+    @State private var displayNoCurrentTalk: Bool = false
+    @State private var sharedURL: String = ""
 
     
     init(album: AlbumData) {
@@ -136,7 +136,7 @@ struct AlbumListView: View {
         .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection){ EmptyView() } .hidden())
         .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
 
-        .navigationBarTitle(album.Title, displayMode: .inline)
+        .navigationBarTitle(album.title, displayMode: .inline)
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
@@ -165,7 +165,6 @@ struct AlbumListView: View {
                Spacer()
                Button(action: {
                    selection = "DONATE"
-
               }) {
                    Image(systemName: "heart.circle")
                }

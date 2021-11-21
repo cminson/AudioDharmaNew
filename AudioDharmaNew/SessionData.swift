@@ -28,28 +28,28 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     @Published var totalTalks: Int
     let id = UUID()
-    var Title: String
-    var Key: String
-    var Section: String
-    var ImageName: String
-    var Date: String
+    var title: String
+    var key: String
+    var section: String
+    var imageName: String
+    var date: String
     var totalSeconds: Int
     var albumList: [AlbumData]
     var talkList: [TalkData]
     var albumType: AlbumType
     
     static func ==(lhs: AlbumData, rhs: AlbumData) -> Bool {
-        return lhs.Key == rhs.Key && lhs.Title == rhs.Title
+        return lhs.key == rhs.key && lhs.title == rhs.title
     }
 
 
     init(title: String, key: String, section: String, imageName: String,  date : String, albumType: AlbumType) {
         
-        self.Title = title
-        self.Key = key
-        self.Section = section
-        self.ImageName = imageName
-        self.Date = date
+        self.title = title
+        self.key = key
+        self.section = section
+        self.imageName = imageName
+        self.date = date
         
         self.albumList = []
         self.talkList = []
@@ -66,7 +66,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
     
     func isEmpty() -> Bool {
-        return self.Title.isEmpty
+        return self.title.isEmpty
     }
 
     
@@ -77,7 +77,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
         if section.isEmpty {
             return self.albumList
         } else {
-            sectionAlbumList = self.albumList.filter {$0.Section == section}
+            sectionAlbumList = self.albumList.filter {$0.section == section}
         }
         return sectionAlbumList
     }
@@ -91,7 +91,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             return self.albumList
         } else {
             for album in self.albumList {
-                let searchedData = album.Title.lowercased()
+                let searchedData = album.title.lowercased()
                 if searchedData.contains(filter.lowercased()) {filteredAlbumList.append(album)}
             }
         }
@@ -102,7 +102,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
     
     func getFilteredTalks(filter: String) -> [TalkData] {
 
-            if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
+            if self.key == TheDataModel.SanghaShareHistoryAlbum.key || self.key == TheDataModel.SanghaTalkHistoryAlbum.key {
                 GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
             }
             
@@ -111,12 +111,12 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
                 filteredTalkList = []
                 for talk in self.talkList {
                     let transcript = talk.hasTranscript() ? "transcript" : ""
-                    let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
+                    let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
                     if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
                 }
             }
 
-            if self.Key == TheDataModel.SanghaShareHistoryAlbum.Key || self.Key == TheDataModel.SanghaTalkHistoryAlbum.Key {
+            if self.key == TheDataModel.SanghaShareHistoryAlbum.key || self.key == TheDataModel.SanghaTalkHistoryAlbum.key {
                 GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
             }
             
@@ -139,7 +139,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             var filteredTalkList: [TalkData] = []
             for talk in allTalks {
                 let transcript = talk.hasTranscript() ? "transcript" : ""
-                let searchedData = talk.Title.lowercased() + talk.Speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
+                let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
                 if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
             }
             allTalks = filteredTalkList
@@ -156,38 +156,37 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable, CustomStringConvertible {
     
     let id = UUID()
-    var Title: String
+    var title: String
     var URL: String
-    var FileName: String
-    var Date: String
-    var Speaker: String
+    var fileName: String
+    var date: String
+    var speaker: String
     var ln: String
-    var PDF: String
-    var TotalSeconds: Int
-    var SpeakerPhoto: UIImage
-    var DatePlayed: String
-    var TimePlayed: String
-    var City: String
-    var Country: String
+    var transcript: String
+    var totalSeconds: Int
+    var speakerPhoto: UIImage
+    var datePlayed: String
+    var timePlayed: String
+    var city: String
+    var country: String
   
     
     static func ==(lhs: TalkData, rhs: TalkData) -> Bool {
-        return lhs.FileName == rhs.FileName && lhs.FileName == rhs.FileName
+        return lhs.fileName == rhs.fileName && lhs.fileName == rhs.fileName
     }
     
     
     static func empty () -> TalkData {
-        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 0,  pdf: "")
+        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 0,  transcript: "")
     }
     
     var description: String {
-            return "\(id) \(Title) \(URL) \(FileName) \(Date) \(Speaker) \(ln) \(PDF) \(TotalSeconds) \(DatePlayed) \(TimePlayed) \(City) \(Country)"
-       // return "\(id) \(Title) \(URL) \(FileName) \(Date) \(Speaker)"
+            return "\(id) \(title) \(URL) \(fileName) \(date) \(speaker) \(ln) \(transcript) \(totalSeconds) \(datePlayed) \(timePlayed) \(city) \(country)"
     }
     
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(FileName)
+        hasher.combine(fileName)
     }
 
         
@@ -198,51 +197,51 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable, 
          speaker: String,
          ln: String,
          totalSeconds: Int,
-         pdf: String)
+         transcript: String)
     {
-        self.Title = title
+        self.title = title
         self.URL = url
-        self.FileName = fileName
-        self.Date = date
-        self.Speaker = speaker
+        self.fileName = fileName
+        self.date = date
+        self.speaker = speaker
         self.ln = ln
-        self.TotalSeconds = totalSeconds
-        self.PDF = pdf
+        self.totalSeconds = totalSeconds
+        self.transcript = transcript
         
-        self.SpeakerPhoto = UIImage(named: Speaker) ?? UIImage(named: "defaultPhoto")!
+        self.speakerPhoto = UIImage(named: speaker) ?? UIImage(named: "defaultPhoto")!
             
-        self.DatePlayed = ""
-        self.TimePlayed = ""
-        self.City = ""
-        self.Country = ""
+        self.datePlayed = ""
+        self.timePlayed = ""
+        self.city = ""
+        self.country = ""
      }
     
     
     func copy(with zone: NSZone? = nil) -> Any {
-        let copy = TalkData(title: Title,
+        let copy = TalkData(title: title,
                             url: URL,
-                            fileName: FileName,
-                            date: Date,
-                            speaker: Speaker,
+                            fileName: fileName,
+                            date: date,
+                            speaker: speaker,
                             ln: ln,
-                            totalSeconds: TotalSeconds,
-                            pdf: PDF)
+                            totalSeconds: totalSeconds,
+                            transcript: transcript)
         
         return copy
     }
     
     
     func isEmpty() -> Bool {
-        return self.Title.isEmpty
+        return self.title.isEmpty
     }
     
      
     func hasTranscript() -> Bool {
         
-        if self.PDF.lowercased().range(of:"http:") != nil {
+        if self.transcript.lowercased().range(of:"http:") != nil {
             return true
         }
-        else if self.PDF.lowercased().range(of:"https:") != nil {
+        else if self.transcript.lowercased().range(of:"https:") != nil {
             return true
         }
         return false

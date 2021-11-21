@@ -239,7 +239,7 @@ struct TranscriptView: View {
         
         VStack () {
 
-            if let requestURL = URL(string: talk.PDF) {
+            if let requestURL = URL(string: talk.transcript) {
                 PDFKitView(url: requestURL)
             }
           
@@ -265,7 +265,7 @@ struct BiographyView: View {
         
         self.talk = talk
         
-        if let filepath = Bundle.main.path(forResource: self.talk.Speaker, ofType: "txt") {
+        if let filepath = Bundle.main.path(forResource: self.talk.speaker, ofType: "txt") {
             do {
                 text = try String(contentsOfFile: filepath)
             } catch {
@@ -291,7 +291,7 @@ struct BiographyView: View {
                     .frame(height: 20)
                 HStack() {
                     Spacer()
-                    talk.Speaker.toImage()
+                    talk.speaker.toImage()
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height: BIO_IMAGE_HEIGHT)
@@ -312,7 +312,7 @@ struct BiographyView: View {
         .onDisappear() {
             DisplayingBiographyOrTranscript = false
         }
-        .navigationBarTitle(talk.Speaker)
+        .navigationBarTitle(talk.speaker)
     }
     }
 }

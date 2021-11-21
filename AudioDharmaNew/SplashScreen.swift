@@ -27,11 +27,15 @@ struct SplashScreen : View {
     // download and configure DataModel.  WAIT on the completion semaphore in the
     // DispatchQueue timer in the body before finishing initialization
     init() {
-        
-        TheDataModel.downloadAndConfigure()
-        
-        
+        if TheDataModel.isInternetAvailable() == false {
+            configurationFailed = true
+        }
+        TheDataModel.downloadConfig()
+        print("Init Waiting")
+        ModelReadySemaphore.wait()
+        TheDataModel.installConfig()
     }
+    
     
     func dismissView() -> Text {
         
@@ -85,22 +89,21 @@ struct SplashScreen : View {
                     print("Waiting on semaphore")
                     ModelReadySemaphore.wait()
                     
+                    if TheDataModel.isInternetAvailable() == false {
+                        configurationFailed = true
+                    }
+
                     if TheDataModel.SystemIsConfigured {
                         // Model now loaded.  So now it's safe to get additional data (Sangha activity)
                         print("Model loaded")
                         
-                        //let signalComplete = DispatchSemaphore(value: 0)
-
                         TheDataModel.downloadSanghaActivity()
-                        //signalComplete.wait()
                         
                         // Lastly set up background data refresh threads
                         TheDataModel.startBackgroundTimers()
 
                         // good to go
                         self.appIsReady = true
-                    } else {
-                        self.configurationFailed = true
                     }
                 }
             }
@@ -110,9 +113,16 @@ struct SplashScreen : View {
         .background(Color.black)
         .alert(isPresented: $configurationFailed) {   
             Alert(
-                title: Text("Can Not Connect to AudioDharma"),
-                message: Text("Please enable your internet connection and restart the app"),
+                title: Text("Could Not Connect to AudioDharma"),
+                message: Text("Please check your connection. App launched in Off-Line Mode."),
                 dismissButton: .default(Text("OK")) {
+                    
+                    // no internet.  go ahead and start app, which will come up OFFLINE
+                    print("OFFLINE")
+                                        
+                    TheDataModel.startBackgroundTimers()
+                    self.appIsReady = true
+                    
                 }
             )
         }

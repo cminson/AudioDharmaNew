@@ -57,7 +57,6 @@ struct TalkPlayerView: View {
     @State private var playerTitle: String = "Play Talk"
     @State private var displayRemoteFileNotFound = false
     @State private var displayNoInternet = false
-
     @State private var stateTalkPlayer = TalkStates.INITIAL
     @State private var tappedUrl: String = ""
     
@@ -86,7 +85,7 @@ struct TalkPlayerView: View {
             TheTalkPlayer.play()
         } else {
             
-            let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.FileName)!
+            let talkURL  = URL(string: "file:////" + MP3_DOWNLOADS_PATH + "/" + self.talk.fileName)!
             
             stateTalkPlayer = .LOADING
             playerTitle = "Loading Talk"
@@ -117,7 +116,7 @@ struct TalkPlayerView: View {
                 talkURL  = URL(string: URL_MP3_HOST +  talk.URL)!
 
             } else {
-                talkURL  = URL(string: URL_MP3_HOST + "/" + talk.FileName)!
+                talkURL  = URL(string: URL_MP3_HOST + "/" + talk.fileName)!
             }
 
             TheDataModel.remoteURLExists(url: talkURL, completion: remoteFileCheckCallback)
@@ -260,14 +259,14 @@ struct TalkPlayerView: View {
             Group {
             Spacer()
                 .frame(height: 40)
-           Text(self.talk.Title)
+           Text(self.talk.title)
                 .foregroundColor(TheDataModel.hasBeenDownloaded(talk: talk) ? COLOR_DOWNLOADED_TALK : Color(UIColor.label))
                 .padding(.trailing, 15)
                 .padding(.leading, 15)
                 .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
             Spacer()
                 .frame(height: 20)
-            Text(self.talk.Speaker)
+            Text(self.talk.speaker)
                 .underline()
                 .padding(.trailing, 0)
                 .font(.system(size: FONT_SIZE_TALK_PLAYER, weight: .regular, design: .default))
@@ -355,7 +354,7 @@ struct TalkPlayerView: View {
                         .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
                         .frame(width: 60)
                     Slider(value: $elapsedTime,
-                           in: 0...Double(self.talk.TotalSeconds),
+                           in: 0...Double(self.talk.totalSeconds),
                            step: 1,
                              onEditingChanged: { editing in
                         
@@ -372,7 +371,7 @@ struct TalkPlayerView: View {
                     ) // end Slider
                     .frame(height: 30)
                     .disabled(stateTalkPlayer != .PLAYING)
-                    Text(self.talk.TotalSeconds.displayInClockFormat())
+                    Text(self.talk.totalSeconds.displayInClockFormat())
                         .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
                         .frame(width: 60)
 
@@ -441,7 +440,7 @@ struct TalkPlayerView: View {
             UIApplication.shared.isIdleTimerDisabled = false
         }
         .navigationBarTitle(Text(getPlayerTitle()))
-        .navigationBarTitle(album.Title, displayMode: .inline)
+        .navigationBarTitle(album.title, displayMode: .inline)
         .toolbar {
             Button(self.talk.hasTranscript() ? "Transcript" : "") {
                 selection = "TRANSCRIPT"
