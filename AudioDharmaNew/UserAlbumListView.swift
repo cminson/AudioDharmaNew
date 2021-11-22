@@ -131,6 +131,13 @@ struct UserAlbumListView: View {
 
         .navigationBarTitle(album.title, displayMode: .inline)
         .toolbar {
+            // to fix the back button disappeared
+            ToolbarItem(placement: .navigationBarLeading) {
+                Text("")
+            }
+        }
+
+        .toolbar {
             Button("New Album") {
                 selection = "NEW_ALBUM"
             }

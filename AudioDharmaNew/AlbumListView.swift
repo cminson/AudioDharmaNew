@@ -96,24 +96,35 @@ struct AlbumRow: View {
 
 struct AlbumListView: View {
     
+    @Environment(\.presentationMode) var mode
+
     var album: AlbumData
     
-    @State private var selectedAlbum: AlbumData
+    @State private var selectedAlbum: AlbumData = AlbumData.empty()
     @State private var selection: String?  = ""
     @State private var searchText: String  = ""
     @State private var noCurrentTalk: Bool = false
-    @State private var selectedTalk: TalkData
-    @State private var selectedTalkTime: Double
+    @State private var selectedTalk: TalkData = TalkData.empty()
+    @State private var selectedTalkTime: Double = 0
     @State private var displayNoCurrentTalk: Bool = false
     @State private var sharedURL: String = ""
 
     
     init(album: AlbumData) {
         self.album = album
+        /*
         self.selectedAlbum = AlbumData.empty()
         self.selectedTalk = TalkData.empty()
         self.selectedTalkTime = 0
+         */
     }
+    
+    func dismissView() {
+        
+        print("dismissView")
+        self.mode.wrappedValue.dismiss()
+    }
+
     
     
     var body: some View {
@@ -140,6 +151,12 @@ struct AlbumListView: View {
         .navigationBarHidden(false)
         .listStyle(PlainListStyle())  // ensures fills parent view
         .navigationViewStyle(StackNavigationViewStyle())
+        .toolbar {
+            // to fix the back button disappeared
+            ToolbarItem(placement: .navigationBarLeading) {
+                Text("")
+            }
+        }
         .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {

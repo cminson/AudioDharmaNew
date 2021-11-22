@@ -55,7 +55,9 @@ struct SplashScreen : View {
                         }
                     }
                 } else {
-                   HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                   //HomePageView(parentAlbum: TheDataModel.RootAlbum)
+                    RootView()
+
                 }
             } else {
                 GeometryReader { metrics in
@@ -97,7 +99,7 @@ struct SplashScreen : View {
                         // Model now loaded.  So now it's safe to get additional data (Sangha activity)
                         print("Model loaded")
                         
-                        TheDataModel.downloadSanghaActivity()
+                        TheDataModel.updateSanghaActivity()
                         
                         // Lastly set up background data refresh threads
                         TheDataModel.startBackgroundTimers()

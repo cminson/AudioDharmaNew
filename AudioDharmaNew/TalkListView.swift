@@ -257,6 +257,13 @@ struct TalkListView: View {
 
         .navigationBarHidden(false)
         .toolbar {
+            // to fix the back button disappeared
+            ToolbarItem(placement: .navigationBarLeading) {
+                Text("")
+            }
+        }
+
+        .toolbar {
            ToolbarItemGroup(placement: .bottomBar) {
                Button {
                    selection = "HELP"

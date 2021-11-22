@@ -19,36 +19,40 @@ import UIKit
 
 struct HomePageView: View {
     
-    @ObservedObject var parentAlbum: AlbumData
-    
-    @State var selectedAlbum: AlbumData
-    @State var selectedTalk: TalkData
-    @State var selectedTalkTime: Double
+    @Environment(\.presentationMode) var mode
+
+    @State var selectedAlbum: AlbumData = AlbumData.empty()
+    @State var selectedTalk: TalkData = TalkData.empty()
+    @State var selectedTalkTime: Double = 0
     @State var selection: String?  = ""
     @State var searchText: String  = ""
     @State var displayNoCurrentTalk: Bool = false
     @State var sharedURL: String = ""
     
-    init(parentAlbum: AlbumData) {
-        
-        self.parentAlbum = parentAlbum
-        self.selectedAlbum = AlbumData.empty()
-        self.selectedTalk = TalkData.empty()
-        self.selectedTalkTime = 0
-    }
     
+    func dismissView() {
+        
+        print("dismissView")
+        self.mode.wrappedValue.dismiss()
+    }
+
      
     var body: some View {
 
-       NavigationView {
            List() {
                ForEach(HOMEPAGE_SECTIONS, id: \.self) { section in
                    SectionRow(title: section)
-                   ForEach(parentAlbum.getAlbumSections(section: section)) { album in
+                   ForEach(TheDataModel.RootAlbum.getAlbumSections(section: section)) { album in
                        AlbumRow(album: album)
                    }
                }
             }
+           .onAppear {
+               if NewTalksAvailable {
+                   self.dismissView()
+               }
+           }
+  
             .alert(isPresented: $displayNoCurrentTalk) {
                Alert(
                    title: Text("No talk available"),
@@ -108,9 +112,9 @@ struct HomePageView: View {
             }
            // end toolbar
 
-       }  // end NavigationView
        .navigationViewStyle(.stack)
     }
+     
 }
 
 

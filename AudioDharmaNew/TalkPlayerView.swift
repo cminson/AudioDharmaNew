@@ -442,6 +442,12 @@ struct TalkPlayerView: View {
         .navigationBarTitle(Text(getPlayerTitle()))
         .navigationBarTitle(album.title, displayMode: .inline)
         .toolbar {
+            // to fix the back button disappeared
+            ToolbarItem(placement: .navigationBarLeading) {
+                Text("")
+            }
+        }
+        .toolbar {
             Button(self.talk.hasTranscript() ? "Transcript" : "") {
                 selection = "TRANSCRIPT"
             }

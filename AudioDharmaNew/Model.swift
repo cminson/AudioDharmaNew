@@ -9,7 +9,7 @@
 //            self.UserFavorites = TheDataModel.loadUserFavoriteData()
 
 import UIKit
-import Foundation
+import Foundation 
 import SystemConfiguration
 import os.log
 import ZipArchive
@@ -98,10 +98,9 @@ let MP3_BYTES_PER_SECOND = 20000    // rough (high) estimate for how many bytes 
 let REPORT_TALK_THRESHOLD : Double = 90      // how many seconds into a talk before reporting that talk that has been officially played
 let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the interval between talks
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
-var CHECK_REFRESH_TALKS_INTERVAL = 60 * 15  // how often check to see if need to update model with new talks
 var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 2 * 60    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 20    // amount of time (in seconds) between each poll of the cloud for updated sangha info
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -118,7 +117,7 @@ enum INIT_CODES {          // all possible startup results
 }
 
 var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
-var GuardCommunityAlbumSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
+var GuardUpdateSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
 var NewTalksAvailable = false
 
@@ -174,121 +173,13 @@ class Model {
     var SystemIsConfigured = false  // set to true if a config file was found and configured
     
     
-    // MARK:  Initialization and Configuration
-        
-    func initialize() {
-        
-        for album in ListSpeakerAlbums {
-            album.albumList = []
-            album.talkList = []
-        }
-        ListSpeakerAlbums = []
-        
-        for album in ListSeriesAlbums {
-            album.albumList = []
-            album.talkList = []
-        }
-        ListSeriesAlbums = []
-
-        for album in ListSpeakerAlbumsSpanish {
-            album.albumList = []
-            album.talkList = []
-        }
-        ListSpeakerAlbumsSpanish = []
-        
-        for album in ListSpeakerAlbumsSpanish {
-            album.albumList = []
-            album.talkList = []
-        }
-        ListSpeakerAlbumsSpanish = []
-
-        for album in RecommendedAlbum.albumList {
-            album.albumList = []
-            album.talkList = []
-        }
-        RecommendedAlbum.albumList = []
-        
-        FileNameToTalk = [String: TalkData] ()
-        ListAllTalks = []
-        ListFavoriteTalls = []
-        ListTranscriptTalks = []
-        ListAllTalksSpanish = []
-        ListSeriesAlbumsSpanish = []
-        
-        RootAlbum.albumList = []
-        AllTalksAlbum.talkList = []
-        RecommendedAlbum.talkList = []
-        RecommendedAlbum.albumList = []
-        TranscriptsAlbum.talkList = []
-
-        URL_CONFIGURATION = HostAccessPoint + CONFIG_ACCESS_PATH
-        URL_REPORT_ACTIVITY = HostAccessPoint + CONFIG_REPORT_ACTIVITY_PATH
-        URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
-        
-        
-        // build the data directories on device, if needed
-        let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
-        MP3_DOWNLOADS_PATH = documentPath + "/DOWNLOADS"
-        
-        if !FileManager.default.fileExists(atPath: MP3_DOWNLOADS_PATH, isDirectory: nil)
-        {
-            do {
-                try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
-            } catch let error as NSError {
-                errorLog(error: error)
-            }
-        }
-
-        PlayedTalks = loadPlayedTalksData()
-        UserDownloads = loadUserDownloadData()
-        validateUserDownloadData()
-    }
-    
-    
+       
     func startBackgroundTimers() {
         
-        print("CHECK_REFRESH_TALKS_INTERVAL:", CHECK_REFRESH_TALKS_INTERVAL)
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
-        Timer.scheduledTimer(timeInterval: TimeInterval(CHECK_REFRESH_TALKS_INTERVAL), target: self, selector: #selector(updateDataModel), userInfo: nil, repeats: true)
-
     }
+     
     
-
-    
-    @objc func updateSanghaActivity() {
-    
-        print("updateSanghaActivity")
-        if isInternetAvailable() == false {
-            return
-        }
-
-        downloadSanghaActivity()
-    }
-    
-    
-    @objc func updateDataModel() {
-    
-        if isInternetAvailable() == false {
-            return
-        }
-        
-        if NewTalksAvailable == true {
-            
-            NewTalksAvailable = false
-            
-            TheDataModel.downloadConfig()
-            print("updateDataModel Waiting 1")
-            ModelReadySemaphore.wait()
-            
-            TheDataModel.installConfig()
-            print("updateDataModel Waiting 2")
-            ModelReadySemaphore.wait()
-            print("finished install")
-
-        }
-    }
-
- 
     func currentTalkExists() -> Bool {
         
         return CurrentTalk.totalSeconds > 0
@@ -360,8 +251,6 @@ class Model {
                 return
             }
             
- 
-            
             // write the zip file to local storage
             do {
                 if let responseData = data {
@@ -410,13 +299,11 @@ class Model {
             return
         }
                     
-        // BEGIN CRITICAL SECTION  CJM DEV
         do {
             
             let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
             self.loadGlobalParameters(jsonDict: jsonDict)
         
-            self.initialize()
             self.loadTalks(jsonDict: jsonDict)
             self.loadAlbums(jsonDict: jsonDict)
             self.loadAlbumsSpanish(jsonDict: jsonDict)
@@ -457,7 +344,6 @@ class Model {
 
             URL_DONATE = config["URL_DONATE"] as? String ?? URL_DONATE
         
-            CHECK_REFRESH_TALKS_INTERVAL = config["CHECK_REFRESH_TALKS_INTERVAL"] as? Int ?? CHECK_REFRESH_TALKS_INTERVAL
             MAX_TALKHISTORY_COUNT = config["MAX_TALKHISTORY_COUNT"] as? Int ?? MAX_TALKHISTORY_COUNT
             MAX_SHAREHISTORY_COUNT = config["MAX_SHAREHISTORY_COUNT"] as? Int ?? MAX_SHAREHISTORY_COUNT
             UPDATE_SANGHA_INTERVAL = config["UPDATE_SANGHA_INTERVAL"] as? Int ?? UPDATE_SANGHA_INTERVAL
@@ -847,9 +733,14 @@ class Model {
      }
 
     
-    func downloadSanghaActivity() {
+    @objc func updateSanghaActivity() {
         
-        print("downloadSanghaActivity")
+        print("updateanghaActivity")
+        
+        if isInternetAvailable() == false {
+            return
+        }
+
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -862,13 +753,11 @@ class Model {
             (data, response, error) -> Void in
             
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                ModelReadySemaphore.signal()
                 return
             }
             
             // make sure we got data.  including cases where only partial data returned (MIN_EXPECTED_RESPONSE_SIZE is arbitrary)
             guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
-                ModelReadySemaphore.signal()
                 return
             }
             
@@ -905,9 +794,9 @@ class Model {
                    }
                 }
                 
-                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
+                GuardUpdateSemaphore.wait()  // obtain critical-section access on talkList
                 self.SanghaTalkHistoryAlbum.talkList = talkList
-                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+                GuardUpdateSemaphore.signal()  // release critical-section access on talkList
 
                 // get the community share history
                 talkCount = 0
@@ -937,9 +826,9 @@ class Model {
                         }
                     }
                  }
-                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
+                GuardUpdateSemaphore.wait()  // obtain critical-section access on talkList
                 self.SanghaShareHistoryAlbum.talkList = talkList
-                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+                GuardUpdateSemaphore.signal()  // release critical-section access on talkList
                 
                 // get total number of available talks
                 if let config = json["config"] {
@@ -947,12 +836,9 @@ class Model {
                     let availableTalkCount  = config["TotalTalkCount"] as? Int ?? 0
                     if availableTalkCount > 0 && availableTalkCount != self.ListAllTalks.count {
                         
-                        //
-                        // the callback function updateDataModel (driven by timer at startBackgroundTimers),
-                        // will check this variable ever CHECK_REFRESH_TALKS_INTERVAL seconds.  If true, then
-                        // a full download and reconfiguration will be initiated
-                        //
+                        // this flag is checked in HomePageView.  If true does a refresh of the model
                         NewTalksAvailable = true
+                        print("New talks available")
                     }
                 }
             } catch {
@@ -961,6 +847,7 @@ class Model {
             
             self.computeAlbumStats(album: self.SanghaTalkHistoryAlbum)
             self.computeAlbumStats(album: self.SanghaShareHistoryAlbum)
+            
         }
         task.resume()
     }

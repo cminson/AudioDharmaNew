@@ -87,7 +87,10 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var filteredAlbumList = [AlbumData] ()
 
+        GuardUpdateSemaphore.wait()
+
         if filter.isEmpty {
+            GuardUpdateSemaphore.signal()
             return self.albumList
         } else {
             for album in self.albumList {
@@ -96,32 +99,29 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             }
         }
 
+        GuardUpdateSemaphore.signal()
         return filteredAlbumList
     }
     
     
     func getFilteredTalks(filter: String) -> [TalkData] {
 
-            if self.key == TheDataModel.SanghaShareHistoryAlbum.key || self.key == TheDataModel.SanghaTalkHistoryAlbum.key {
-                GuardCommunityAlbumSemaphore.wait()  // obtain critical-section access on talkList
-            }
-            
-            var filteredTalkList = self.talkList
-            if !filter.isEmpty {
-                filteredTalkList = []
-                for talk in self.talkList {
-                    let transcript = talk.hasTranscript() ? "transcript" : ""
-                    let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
-                    if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
-                }
-            }
+           
+        GuardUpdateSemaphore.wait()  // obtain critical-section access on talkList
 
-            if self.key == TheDataModel.SanghaShareHistoryAlbum.key || self.key == TheDataModel.SanghaTalkHistoryAlbum.key {
-                GuardCommunityAlbumSemaphore.signal()  // release critical-section access on talkList
+        var filteredTalkList = self.talkList
+        if !filter.isEmpty {
+            filteredTalkList = []
+            for talk in self.talkList {
+                let transcript = talk.hasTranscript() ? "transcript" : ""
+                let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
+                if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
             }
-            
+        }
 
-            return filteredTalkList
+        GuardUpdateSemaphore.signal()
+        
+        return filteredTalkList
     }
 
     
@@ -129,6 +129,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
 
         var allTalks : [TalkData] = []
         
+        GuardUpdateSemaphore.wait()
 
         let talkSet = Set(self.talkList)
         var listAllTalks = TheDataModel.ListAllTalks
@@ -144,6 +145,8 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             }
             allTalks = filteredTalkList
         }
+        
+        GuardUpdateSemaphore.signal()
         
         return allTalks
     }

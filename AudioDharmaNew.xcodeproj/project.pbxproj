@@ -11,6 +11,8 @@
 		831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 831B775826E9207A0028B88E /* TalkPlayerView.swift */; };
 		8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924526EA4ECF00F9A006 /* TalkListView.swift */; };
 		8327924826EA4F6000F9A006 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8327924726EA4F6000F9A006 /* AlbumListView.swift */; };
+		833E6559274B020100C7E976 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833E6558274B020100C7E976 /* TestView.swift */; };
+		833E655B274B06FA00C7E976 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833E655A274B06FA00C7E976 /* RootView.swift */; };
 		8342478C271DED8800608543 /* Daigan Gaither.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478B271DED8800608543 /* Daigan Gaither.txt */; };
 		8342478E271DEDA100608543 /* Daniel Bowling.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478D271DEDA100608543 /* Daniel Bowling.txt */; };
 		83424790271DEDAE00608543 /* Dan Landry.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8342478F271DEDAE00608543 /* Dan Landry.txt */; };
@@ -204,6 +206,8 @@
 		831B775826E9207A0028B88E /* TalkPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkPlayerView.swift; sourceTree = "<group>"; };
 		8327924526EA4ECF00F9A006 /* TalkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkListView.swift; sourceTree = "<group>"; };
 		8327924726EA4F6000F9A006 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
+		833E6558274B020100C7E976 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+		833E655A274B06FA00C7E976 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		8342478B271DED8800608543 /* Daigan Gaither.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Daigan Gaither.txt"; sourceTree = "<group>"; };
 		8342478D271DEDA100608543 /* Daniel Bowling.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Daniel Bowling.txt"; sourceTree = "<group>"; };
 		8342478F271DEDAE00608543 /* Dan Landry.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Dan Landry.txt"; sourceTree = "<group>"; };
@@ -579,11 +583,12 @@
 			isa = PBXGroup;
 			children = (
 				83C416A3272C513800191872 /* AudioDharmaNew.entitlements */,
-				83EB0CC626F6A4E200570A48 /* SplashScreen.swift */,
+				833E655A274B06FA00C7E976 /* RootView.swift */,
 				83A2E4C026E0415700F8B531 /* HomePageView.swift */,
 				8327924726EA4F6000F9A006 /* AlbumListView.swift */,
 				8327924526EA4ECF00F9A006 /* TalkListView.swift */,
 				831B775826E9207A0028B88E /* TalkPlayerView.swift */,
+				833E6558274B020100C7E976 /* TestView.swift */,
 				8376AB1826E3EE4E000F9848 /* TalkPlayer.swift */,
 				83D65D5426E2D18200751527 /* SessionData.swift */,
 				8376AB1226E3ECAE000F9848 /* StoredData.swift */,
@@ -592,6 +597,7 @@
 				83974BC72718934A0013FF87 /* UserAlbumListView.swift */,
 				83974BC92718935D0013FF87 /* UserEditTalkListView.swift */,
 				83A2E4BE26E0415700F8B531 /* AudioDharmaNewApp.swift */,
+				83EB0CC626F6A4E200570A48 /* SplashScreen.swift */,
 				83A2E4C226E0415900F8B531 /* Assets.xcassets */,
 				83A2E4C726E0415900F8B531 /* Info.plist */,
 				8302EC2B270F381400F67EAD /* Biographies */,
@@ -867,6 +873,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				833E6559274B020100C7E976 /* TestView.swift in Sources */,
 				8327924626EA4ECF00F9A006 /* TalkListView.swift in Sources */,
 				83B9A5242710C39E00667F2B /* Model.swift in Sources */,
 				83D65D5526E2D18200751527 /* SessionData.swift in Sources */,
@@ -880,6 +887,7 @@
 				83974BC82718934A0013FF87 /* UserAlbumListView.swift in Sources */,
 				831B775926E9207A0028B88E /* TalkPlayerView.swift in Sources */,
 				8376AB1926E3EE4E000F9848 /* TalkPlayer.swift in Sources */,
+				833E655B274B06FA00C7E976 /* RootView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
