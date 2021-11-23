@@ -31,6 +31,8 @@ struct TalkRow: View {
     @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
     @State private var displayDownloadInProgress = false
+    @State private var sharedURL: String = ""
+
 
 
     init(album: AlbumData, talk: TalkData) {
@@ -163,6 +165,7 @@ struct TalkRow: View {
             }
             
         }
+
         .contentShape(Rectangle())
         .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {

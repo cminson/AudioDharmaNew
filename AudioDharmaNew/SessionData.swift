@@ -180,7 +180,7 @@ class TalkData: Identifiable, Equatable, ObservableObject, NSCopying, Hashable, 
     
     
     static func empty () -> TalkData {
-        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 0,  transcript: "")
+        return TalkData(title: "", url: "", fileName: "", date: "", speaker: "defaultPhoto", ln: "en", totalSeconds: 10000,  transcript: "")
     }
     
     var description: String {

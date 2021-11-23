@@ -66,6 +66,7 @@ struct TalkPlayerView: View {
         self.album = album
         self.talk = talk
         self.elapsedTime = startTime
+
     
     }
     
@@ -253,7 +254,7 @@ struct TalkPlayerView: View {
         return playerTitle
     }
     
-         
+            
     var body: some View {
 
         VStack(alignment: .center, spacing: 0) {
@@ -418,9 +419,6 @@ struct TalkPlayerView: View {
                 )
             }
         }  // end VStack
-        .onOpenURL { url in
-          tappedUrl = url.absoluteString
-        }
 
         .background(NavigationLink(destination: TranscriptView(talk: talk), tag: "TRANSCRIPT", selection: $selection) { EmptyView() } .hidden())
         .background(NavigationLink(destination: BiographyView(talk: talk), tag: "BIOGRAPHY", selection: $selection) { EmptyView() } .hidden())

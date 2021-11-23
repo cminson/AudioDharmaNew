@@ -48,6 +48,18 @@ struct HomePageView: View {
                    }
                }
             }
+           .onOpenURL { url in
+               print("HomePageView onOpenURL")
+               sharedURL = url.absoluteString
+               
+               if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
+                   if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                       self.selectedTalk = talk
+                       self.selection = "PLAY_TALK"
+                   }
+               }
+           }
+
            .onAppear {
                if NewTalksAvailable {
                    self.dismissView()
@@ -68,6 +80,7 @@ struct HomePageView: View {
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
             .background(NavigationLink(destination: TalkPlayerView(album: selectedAlbum, talk: selectedTalk, startTime: selectedTalkTime), tag: "RESUME_TALK", selection: $selection) {EmptyView() }.hidden())
             .background(NavigationLink(destination: DonationPageView(), tag: "DONATE", selection: $selection) { EmptyView() } .hidden())
+            .background(NavigationLink(destination: TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: selectedTalk, startTime: 0), tag: "PLAY_TALK", selection: $selection) { EmptyView() } .hidden())
             .navigationBarTitle(TheDataModel.isInternetAvailable() ? "Audio Dharma" : "Audio Dharma [Offline]", displayMode: .inline)
             .toolbar {
                 ToolbarItemGroup(placement: .bottomBar) {
@@ -103,7 +116,6 @@ struct HomePageView: View {
            // end toolbar
 
        .navigationViewStyle(.stack)
-       //.navigationBarBackButtonHidden(true)
     }
      
 }

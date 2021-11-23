@@ -181,7 +181,7 @@ class Model {
     
     func currentTalkExists() -> Bool {
         
-        return CurrentTalk.totalSeconds > 0
+        return CurrentTalk.fileName.isEmpty == false
     }
     
     

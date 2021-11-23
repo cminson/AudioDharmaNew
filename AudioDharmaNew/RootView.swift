@@ -13,7 +13,7 @@ struct RootView: View {
     @State private var selection: String?  = ""
     @State private var appIsBooting: Bool = true
     @State private var sharedURL: String = ""
-
+    @State var selectedTalk: TalkData = TalkData.empty()
 
     
     var body: some View {
@@ -22,14 +22,9 @@ struct RootView: View {
             
             VStack(alignment: .center, spacing: 0) {
                 
-                if SharedRTalkActive == true {
-                    if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
-                        if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
-                            TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: talk, startTime: 0)
-                        }
-                    }
-                } else {
-                NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {Text("x")}.isDetailLink(false)
+                NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {Text("")}.isDetailLink(false)
+                NavigationLink(destination: TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: selectedTalk, startTime: 0).navigationBarBackButtonHidden(true), tag: "PLAY_TALK", selection: $selection) { Text("") }.isDetailLink(false)
+
                 ZStack {
                     Color.black
                         .ignoresSafeArea()
@@ -53,15 +48,17 @@ struct RootView: View {
 
                     } // end geometry reader
                 } // end zstack
-                } // else test
+                
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
             .background(Color.black)
+
             .onOpenURL { url in
                 sharedURL = url.absoluteString
                 SharedRTalkActive = true
             }
+
 
             .onAppear {
                 
@@ -90,7 +87,16 @@ struct RootView: View {
 
                         }
                         
-                        selection = "START_UI"
+                        if SharedRTalkActive == true {
+                            if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
+                                if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                                    selectedTalk = talk
+                                    selection = "PLAY_TALK"
+                                }
+                            }
+                        } else {
+                            selection = "START_UI"
+                        }
 
                     }
                 } // end dispatch
