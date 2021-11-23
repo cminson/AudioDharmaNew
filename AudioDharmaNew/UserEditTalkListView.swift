@@ -40,6 +40,7 @@ struct UserTalkRow: View {
             HStack() {
                  talk.speaker.toImage()
                     .resizable()
+                    .aspectRatio(contentMode: .fill)
                     .frame(width: LIST_IMAGE_WIDTH, height: LIST_IMAGE_HEIGHT)
                     .clipShape(Circle())
                     .padding(.leading, LIST_LEFT_MARGIN_OFFSET)
