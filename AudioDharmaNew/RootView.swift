@@ -24,31 +24,32 @@ struct RootView: View {
                 ZStack {
                     Color.black
                         .ignoresSafeArea()
-                GeometryReader { metrics in
-                    VStack() {
-                       Spacer()
-                       HStack() {
-                            Spacer()
-                            Image("Earth")
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
+                    GeometryReader { metrics in
+                        VStack() {
                            Spacer()
+                           HStack() {
+                                Spacer()
+                                Image("Earth")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
+                               Spacer()
+                            }
+                            Spacer().frame(height:20)
+                            Text(self.appIsBooting ? "" : "updating talks")
+                                .font(.system(size: FONT_SIZE_UPDATE_SCREEN))
+                                .foregroundColor(Color.white)
+                            Spacer()
                         }
-                        Spacer().frame(height:20)
-                        Text(self.appIsBooting ? "" : "updating talks")
-                            .font(.system(size: FONT_SIZE_UPDATE_SCREEN))
-                            .foregroundColor(Color.white)
-                        Spacer()
 
-                    }
-                }
-                }
+                    } // end geometry reader
+                } // end zstack
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
             .background(Color.black)
             .background(NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {EmptyView() }.hidden())
+
             .onAppear {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -72,11 +73,10 @@ struct RootView: View {
                             
                             // Lastly set up background data refresh threads
                             TheDataModel.startBackgroundTimers()
-                            
                             self.appIsBooting = false
 
-
                         }
+                        
                         selection = "START_UI"
 
                     }

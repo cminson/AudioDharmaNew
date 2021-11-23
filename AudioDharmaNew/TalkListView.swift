@@ -116,7 +116,7 @@ struct TalkRow: View {
                                 if TheDataModel.DownloadInProgress == false {
                                     displayDownloadInProgress = false
                                     stateTalkTitle = "DOWNLOADING: " + stateTalkTitle
-                                    TheDataModel.startDownload(talk: talk, success: downloadCompleted)
+                                    TheDataModel.downloadTalk(talk: talk, success: downloadCompleted)
                                 }                         }
                         },
                         secondaryButton: .cancel()

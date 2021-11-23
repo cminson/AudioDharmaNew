@@ -44,7 +44,7 @@ struct AudioDharmaNewApp: App {
         WindowGroup {
 
             RootView()
-        }
+         }
     }
 }
 

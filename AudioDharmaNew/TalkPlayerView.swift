@@ -66,6 +66,7 @@ struct TalkPlayerView: View {
         self.album = album
         self.talk = talk
         self.elapsedTime = startTime
+    
     }
     
     

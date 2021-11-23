@@ -173,7 +173,6 @@ class Model {
     var SystemIsConfigured = false  // set to true if a config file was found and configured
     
     
-       
     func startBackgroundTimers() {
         
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
@@ -224,6 +223,19 @@ class Model {
     //
     func downloadConfig()  {
         
+        // build the data directories on device, if needed
+        let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+        MP3_DOWNLOADS_PATH = documentPath + "/DOWNLOADS"
+
+        if !FileManager.default.fileExists(atPath: MP3_DOWNLOADS_PATH, isDirectory: nil)
+        {
+            do {
+                try FileManager.default.createDirectory(atPath: MP3_DOWNLOADS_PATH, withIntermediateDirectories: false, attributes: nil)
+            } catch let error as NSError {
+                errorLog(error: error)
+            }
+        }
+
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
         config.urlCache = nil
@@ -282,9 +294,15 @@ class Model {
     // install all the albums and talks defined in the downloaded JSON config file
     //
     func installConfig() {
+    
         
         let documentPath = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
         let configJSONPath = documentPath + "/" + CONFIG_JSON_NAME
+        
+        PlayedTalks = loadPlayedTalksData()
+        UserDownloads = loadUserDownloadData()
+        validateUserDownloadData()
+
         
         // get our unzipped json from the local storage and process it
         var jsonData: Data!
@@ -301,6 +319,7 @@ class Model {
                     
         do {
             
+
             let jsonDict =  try JSONSerialization.jsonObject(with: jsonData) as! [String: AnyObject]
             self.loadGlobalParameters(jsonDict: jsonDict)
         
@@ -325,6 +344,7 @@ class Model {
         catch {
         }
         
+
         self.SystemIsConfigured = true
         
         // END CRITICAL SECTION
@@ -734,9 +754,7 @@ class Model {
 
     
     @objc func updateSanghaActivity() {
-        
-        print("updateanghaActivity")
-        
+                
         if isInternetAvailable() == false {
             return
         }
@@ -854,7 +872,7 @@ class Model {
     
     
     
-    func startDownload(talk: TalkData, success: @escaping  () -> Void) {
+    func downloadTalk(talk: TalkData, success: @escaping  () -> Void) {
 
         var requestURL: URL
         var localPathMP3: String
@@ -878,33 +896,47 @@ class Model {
         
         let urlRequest = URLRequest(url : requestURL)
         
+        print("requestURL", requestURL)
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
+            print("downloading")
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
+                print("failed 1")
+
                 return
             }
             guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
                 
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
+                print("failed 2")
+
                 return
             }
-                        
+            
+            print("got response")
             // if got a good response, store off file locally
             do {
                 if let responseData = data {
+                    
+                    print("writing data", localPathMP3 )
                     try responseData.write(to: URL(fileURLWithPath: localPathMP3))
                 }
             }
             catch  {
+                
+                print("failed writing data")
+
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
             }
+            print("success writing data")
+
             TheDataModel.DownloadInProgress = false
             TheDataModel.setTalkAsDownloaded(talk: talk)
             success()

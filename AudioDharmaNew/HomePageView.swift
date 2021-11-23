@@ -62,17 +62,6 @@ struct HomePageView: View {
                    }
                )
             }
-            .onOpenURL { url in
-               sharedURL = url.absoluteString
-               if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
-                   if let talk = TheDataModel.getTalkForName(name: talkFileName) {
-                       selection = "RESUME_TALK"
-                       selectedTalk = talk
-                       selectedAlbum = TheDataModel.AllTalksAlbum
-                       selectedTalkTime = 0
-                    }
-               }
-            }
             .listStyle(PlainListStyle())  // ensures fills parent view
             .environment(\.defaultMinListRowHeight, 15)
             .background(NavigationLink(destination: HelpPageView(), tag: "HELP", selection: $selection) { EmptyView() } .hidden())
