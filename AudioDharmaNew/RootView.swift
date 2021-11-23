@@ -1,4 +1,4 @@
-//
+///
 //  RootView.swift
 //
 //  Displays  splash screen as it downloads data and configures the model.
@@ -6,13 +6,14 @@
 //
 //  Created by Christopher on 11/21/21.
 //
-
 import SwiftUI
 
 struct RootView: View {
     
     @State private var selection: String?  = ""
     @State private var appIsBooting: Bool = true
+    @State private var sharedURL: String = ""
+
 
     
     var body: some View {
@@ -21,6 +22,14 @@ struct RootView: View {
             
             VStack(alignment: .center, spacing: 0) {
                 
+                if SharedRTalkActive == true {
+                    if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
+                        if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                            TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: talk, startTime: 0)
+                        }
+                    }
+                } else {
+                NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {Text("x")}.isDetailLink(false)
                 ZStack {
                     Color.black
                         .ignoresSafeArea()
@@ -44,11 +53,15 @@ struct RootView: View {
 
                     } // end geometry reader
                 } // end zstack
+                } // else test
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
             .background(Color.black)
-            .background(NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {EmptyView() }.hidden())
+            .onOpenURL { url in
+                sharedURL = url.absoluteString
+                SharedRTalkActive = true
+            }
 
             .onAppear {
                 
@@ -83,9 +96,6 @@ struct RootView: View {
                 } // end dispatch
             } // end on appear
         } // end navigation view
-
+        .navigationViewStyle(StackNavigationViewStyle())
     } // end view
-
 }
-
-

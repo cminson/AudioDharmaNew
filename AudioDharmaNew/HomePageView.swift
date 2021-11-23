@@ -30,6 +30,7 @@ struct HomePageView: View {
     @State var sharedURL: String = ""
     
     
+    
     func dismissView() {
         
         print("dismissView")
@@ -102,6 +103,7 @@ struct HomePageView: View {
            // end toolbar
 
        .navigationViewStyle(.stack)
+       //.navigationBarBackButtonHidden(true)
     }
      
 }
