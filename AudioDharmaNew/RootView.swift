@@ -56,7 +56,7 @@ struct RootView: View {
 
             .onOpenURL { url in
                 sharedURL = url.absoluteString
-                SharedRTalkActive = true
+                SharedTalkActive = true
             }
 
 
@@ -87,7 +87,7 @@ struct RootView: View {
 
                         }
                         
-                        if SharedRTalkActive == true {
+                        if SharedTalkActive == true {
                             if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
                                 if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
                                     selectedTalk = talk
