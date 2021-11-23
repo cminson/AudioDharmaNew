@@ -154,16 +154,12 @@ struct TalkRow: View {
             }
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.title) by \(talk.speaker) \nShared from the iPhone AudioDharma app"
-                //let objectsToShare: URL = URL(string: URL_MP3_HOST + talk.URL)!
-                 let objectsToShare: URL = URL(string: "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/" + talk.fileName)!
+                 let objectsToShare: URL = URL(string: SHARE_URL_MP3_HOST + talk.fileName)!
 
                 let sharedObjects:[AnyObject] = [objectsToShare as AnyObject, shareText as AnyObject]
 
                 ShareSheet(activityItems: sharedObjects)
-                 
-                 //print("Returned from Share Sheet")
             }
-            
         }
 
         .contentShape(Rectangle())

@@ -43,6 +43,7 @@ let CONFIG_GET_ACTIVITY_PATH = "/AudioDharmaAppBackend/Access/XGETACTIVITY.php?"
 let CONFIG_GET_SIMILAR_TALKS = "/AudioDharmaAppBackend/Access/XGETSIMILARTALKS.php?KEY="           // where to get similar talks\
 let DEFAULT_MP3_PATH = "http://www.audiodharma.org"     // where to get talks
 let DEFAULT_DONATE_PATH = "http://audiodharma.org/donate/"       // where to donate
+let DEFAULT_SHARE_URL_MP3_HOST =  "https://virtualdharma.org/AudioDharmaAppBackend/data/TALKS/"
 
 let MIN_EXPECTED_RESPONSE_SIZE = 300   // to filter for bogus redirect page responses
 
@@ -56,6 +57,7 @@ var URL_GET_ACTIVITY = HostAccessPoint + CONFIG_GET_ACTIVITY_PATH
 var URL_GET_SIMILAR = HostAccessPoint + CONFIG_GET_SIMILAR_TALKS
 var URL_MP3_HOST = DEFAULT_MP3_PATH
 var URL_DONATE = DEFAULT_DONATE_PATH
+var SHARE_URL_MP3_HOST = DEFAULT_SHARE_URL_MP3_HOST
 
 
 //
@@ -361,6 +363,7 @@ class Model {
             USE_NATIVE_MP3PATHS = config["USE_NATIVE_MP3PATHS"] as? Bool ?? USE_NATIVE_MP3PATHS
             URL_REPORT_ACTIVITY = config["URL_REPORT_ACTIVITY"] as? String ?? URL_REPORT_ACTIVITY
             URL_GET_ACTIVITY = config["URL_GET_ACTIVITY"] as? String ?? URL_GET_ACTIVITY
+            SHARE_URL_MP3_HOST = config["SHARE_URL_MP3_HOST"] as? String ?? DEFAULT_SHARE_URL_MP3_HOST
 
             URL_DONATE = config["URL_DONATE"] as? String ?? URL_DONATE
         
@@ -468,8 +471,7 @@ class Model {
         
         //  sort all talks in series albums
         for seriesAlbum in ListSeriesAlbums {
-            // dharmettes are already sorted and need to be presented with most current talks on top
-            // all other series need further sorting, as the most current talks must be at bottom
+
  
             let talkList = seriesAlbum.talkList
             seriesAlbum.talkList  = talkList.sorted(by: { $1.date > $0.date })
@@ -722,7 +724,6 @@ class Model {
          let task = session.dataTask(with: urlRequest) {
              (data, response, error) -> Void in
 
-             print("In URL Request")
              guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                  return
              }
@@ -856,7 +857,6 @@ class Model {
                         
                         // this flag is checked in HomePageView.  If true does a refresh of the model
                         NewTalksAvailable = true
-                        print("New talks available")
                     }
                 }
             } catch {
@@ -896,46 +896,34 @@ class Model {
         
         let urlRequest = URLRequest(url : requestURL)
         
-        print("requestURL", requestURL)
         let task = session.dataTask(with: urlRequest) {
             (data, response, error) -> Void in
             
-            print("downloading")
             guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
                 
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
-                print("failed 1")
-
                 return
             }
             guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
                 
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
-                print("failed 2")
-
                 return
             }
             
-            print("got response")
             // if got a good response, store off file locally
             do {
                 if let responseData = data {
                     
-                    print("writing data", localPathMP3 )
                     try responseData.write(to: URL(fileURLWithPath: localPathMP3))
                 }
             }
             catch  {
-                
-                print("failed writing data")
-
                 TheDataModel.unsetTalkAsDownloaded(talk: talk)
                 TheDataModel.DownloadInProgress = false
                 return
             }
-            print("success writing data")
 
             TheDataModel.DownloadInProgress = false
             TheDataModel.setTalkAsDownloaded(talk: talk)
