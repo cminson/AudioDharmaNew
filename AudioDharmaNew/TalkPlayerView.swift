@@ -95,7 +95,6 @@ struct TalkPlayerView: View {
             TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
         }
         
-        stateTalkPlayer = .PLAYING
     }
 
     
@@ -131,7 +130,6 @@ struct TalkPlayerView: View {
             TheTalkPlayer.startTalk(talkURL: talkURL, startAtTime: self.elapsedTime)
         }
     
-        stateTalkPlayer = .PLAYING
     }
     
     
@@ -215,8 +213,14 @@ struct TalkPlayerView: View {
 
             // persistent store off the current talk and position in talk
             TheDataModel.saveLastAlbumTalkState(album: album, talk: self.talk, elapsedTime: self.elapsedTime)
+            
+        }
+        if self.elapsedTime > 1 {
+            
+            stateTalkPlayer = .PLAYING
 
         }
+        
     }
     
     
