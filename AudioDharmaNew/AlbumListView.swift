@@ -111,20 +111,9 @@ struct AlbumListView: View {
 
     
     init(album: AlbumData) {
-        self.album = album
-        /*
-        self.selectedAlbum = AlbumData.empty()
-        self.selectedTalk = TalkData.empty()
-        self.selectedTalkTime = 0
-         */
-    }
-    
-    func dismissView() {
         
-        print("dismissView")
-        self.mode.wrappedValue.dismiss()
-    }
-
+        self.album = album
+     }
     
     
     var body: some View {

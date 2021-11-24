@@ -30,10 +30,8 @@ struct HomePageView: View {
     @State var sharedURL: String = ""
     
     
-    
     func dismissView() {
-        
-        print("dismissView")
+            
         self.mode.wrappedValue.dismiss()
     }
 
@@ -49,7 +47,6 @@ struct HomePageView: View {
                }
             }
            .onOpenURL { url in
-               print("HomePageView onOpenURL")
                sharedURL = url.absoluteString
                
                if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
@@ -61,6 +58,7 @@ struct HomePageView: View {
            }
 
            .onAppear {
+               
                if NewTalksAvailable {
                    self.dismissView()
                }

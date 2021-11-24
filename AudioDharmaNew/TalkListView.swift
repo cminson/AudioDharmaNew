@@ -31,8 +31,6 @@ struct TalkRow: View {
     @State private var stateTalkTitle: String
     @State private var textStyle = UIFont.TextStyle.body
     @State private var displayDownloadInProgress = false
-    @State private var sharedURL: String = ""
-
 
 
     init(album: AlbumData, talk: TalkData) {
@@ -126,32 +124,37 @@ struct TalkRow: View {
                 }
                 .padding(.trailing, -10)
                 .contextMenu {
-                    Button("Show Similar Talks") {
-                        let signalComplete = DispatchSemaphore(value: 0)
-                        TheDataModel.downloadSimilarityData(talk: talk, signalComplete: signalComplete)
-                        signalComplete.wait()
-                        selection = "TALKS"
-                    }
-                    Button("Favorite | Remove Favorite") {
-                        self.stateIsFavoriteTalk = TheDataModel.toggleTalkAsFavorite(talk: talk)
-                    }
-                    Button("Note") {
-                        noteText = TheDataModel.getNoteForTalk(talk: talk)
-                        self.displayNoteDialog = true
-                    }
-                    Button("Share Talk") {
-                        SharedTalk = self.talk
-                        self.displayShareSheet = true
-                    }
-                    Button("Download | Remove Download") {
-                        if TheDataModel.DownloadInProgress == false {
-                            self.displayDownloadDialog = true
-                        } else {
-                            self.displayDownloadInProgress = true
+                    // history albums get updated every UPDATE_SANGHA_INTERVAL seconds, interfering with menu ops
+                    // therefore we simply disable menu operations when viewing those albums
+                    if self.album.key != "KEY_SANGHA_TALKHISTORY",  self.album.key != "KEY_SANGHA_SHAREHISTORY" {
+
+                        Button("Show Similar Talks") {
+                            let signalComplete = DispatchSemaphore(value: 0)
+                            TheDataModel.downloadSimilarityData(talk: talk, signalComplete: signalComplete)
+                            signalComplete.wait()
+                            selection = "TALKS"
                         }
-                    }
-                }
-            }
+                        Button("Favorite | Remove Favorite") {
+                            self.stateIsFavoriteTalk = TheDataModel.toggleTalkAsFavorite(talk: talk)
+                        }
+                        Button("Note") {
+                            noteText = TheDataModel.getNoteForTalk(talk: talk)
+                            self.displayNoteDialog = true
+                        }
+                        Button("Share Talk") {
+                            SharedTalk = self.talk
+                            self.displayShareSheet = true
+                        }
+                        Button("Download | Remove Download") {
+                            if TheDataModel.DownloadInProgress == false {
+                                self.displayDownloadDialog = true
+                            } else {
+                                self.displayDownloadInProgress = true
+                            }
+                        }
+                    } // end if
+                } // end menu
+            } // end HStack
              .sheet(isPresented: $displayShareSheet) {
                 let shareText = "\(talk.title) by \(talk.speaker) \nShared from the iPhone AudioDharma app"
                  let objectsToShare: URL = URL(string: SHARE_URL_MP3_HOST + talk.fileName)!
@@ -206,7 +209,6 @@ struct TalkRow: View {
 
 struct TalkListView: View {
     @ObservedObject var album: AlbumData
-    //var album: AlbumData
 
     @State private var selection: String?  = nil
     @State private var searchText: String  = ""
@@ -214,7 +216,6 @@ struct TalkListView: View {
     @State private var selectedTalk: TalkData
     @State private var selectedAlbum: AlbumData
     @State private var displayNoCurrentTalk = false
-    @State private var sharedURL: String = ""
 
 
     init(album: AlbumData) {

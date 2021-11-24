@@ -22,15 +22,13 @@ class TalkPlayer : NSObject {
     var Player : AVPlayer = AVPlayer()
     var PlayerItem : AVPlayerItem?
     
-    
+
     func startTalk(talkURL: URL, startAtTime: Double){
         
         PlayerItem  = AVPlayerItem(url: talkURL)
         Player =  AVPlayer(playerItem : PlayerItem)
         Player.allowsExternalPlayback = true
         
-        print("startTalk", talkURL)
-
         // get notification once talk ends
         NotificationCenter.default.addObserver(self,selector:
                         #selector(self.talkHasCompleted),

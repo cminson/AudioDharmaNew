@@ -66,8 +66,6 @@ struct TalkPlayerView: View {
         self.album = album
         self.talk = talk
         self.elapsedTime = startTime
-
-    
     }
     
     
@@ -344,7 +342,6 @@ struct TalkPlayerView: View {
                     }
                 )
              }
-
             
             Group {
                 
@@ -403,9 +400,6 @@ struct TalkPlayerView: View {
                 .frame(height: 50)
                 .padding(.leading, 80)
                 .padding(.trailing, 60)
-
-
-                //.padding(.horizontal)
           
             } // end group 2
             .alert(isPresented: $displayNoInternet) {

@@ -58,8 +58,7 @@ struct RootView: View {
                 sharedURL = url.absoluteString
                 SharedTalkActive = true
             }
-
-
+            
             .onAppear {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

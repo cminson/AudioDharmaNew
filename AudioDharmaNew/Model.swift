@@ -102,7 +102,7 @@ let SECONDS_TO_NEXT_TALK : Double = 2   // when playing an album, this is the in
 var MAX_TALKHISTORY_COUNT = 3000     // maximum number of played talks showed in sangha history. over-rideable by config
 var MAX_SHAREHISTORY_COUNT = 100     // maximum number of shared talks showed in sangha history  over-rideable by config
 var MAX_HISTORY_COUNT = 100         // maximum number of user (not sangha) talk history displayed
-var UPDATE_SANGHA_INTERVAL = 20    // amount of time (in seconds) between each poll of the cloud for updated sangha info
+var UPDATE_SANGHA_INTERVAL = 120   // amount of time (in seconds) between each poll of the cloud for updated sangha info
 
 let KEYS_TO_ALBUMS = [KEY_ALBUMROOT, KEY_RECOMMENDED_TALKS, KEY_ALL_SERIES, KEY_ALL_SPEAKERS, KEY_ALBUMROOT_SPANISH, KEY_ALL_SERIES_SPANISH, KEY_ALL_SPEAKERS_SPANISH, KEY_RECOMMENDED_TALKS_SPANISH]
 let KEYS_TO_USER_ALBUMS = [KEY_USER_ALBUMS]
@@ -178,6 +178,7 @@ class Model {
     
     func startBackgroundTimers() {
         
+        //print("UPDATE_SANGHA_INTERVAL", UPDATE_SANGHA_INTERVAL)
         Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
     }
      
@@ -760,6 +761,8 @@ class Model {
         if isInternetAvailable() == false {
             return
         }
+        
+        print("updateSanghaActivity")
 
         let config = URLSessionConfiguration.default
         config.requestCachePolicy = .reloadIgnoringLocalCacheData
@@ -1068,14 +1071,12 @@ class Model {
         
         TheDataModel.saveUserDownloadData()
         TheDataModel.computeAlbumStats(album: TheDataModel.UserDownloadAlbum)
-        
     }
     
     
     func hasBeenDownloaded(talk: TalkData) -> Bool {
 
         return TheDataModel.UserDownloads[talk.fileName] != nil
-
     }
     
     
