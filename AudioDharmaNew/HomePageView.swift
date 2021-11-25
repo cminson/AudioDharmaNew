@@ -47,12 +47,16 @@ struct HomePageView: View {
                }
             }
            .onOpenURL { url in
+               
+               print("HomePage openURL")
                sharedURL = url.absoluteString
+               SharedURLPrevious = sharedURL    // cache to fix bug where sharedurl gets re-presented to RootView
                
                if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
                    if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
                        self.selectedTalk = talk
                        self.selection = "PLAY_TALK"
+                       print("HomePageView Open SHare")
                    }
                }
            }

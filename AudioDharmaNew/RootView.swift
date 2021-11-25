@@ -8,11 +8,14 @@
 //
 import SwiftUI
 
+var SharedURLPrevious: String = ""
+
 struct RootView: View {
     
     @State private var selection: String?  = ""
     @State private var appIsBooting: Bool = true
     @State private var sharedURL: String = ""
+    @State private var sharedTalkActive: Bool = false
     @State var selectedTalk: TalkData = TalkData.empty()
 
     
@@ -55,8 +58,14 @@ struct RootView: View {
             .background(Color.black)
 
             .onOpenURL { url in
+
                 sharedURL = url.absoluteString
-                SharedTalkActive = true
+                print("Rootview openURL", sharedTalkActive, sharedURL)
+                
+                // filter the case where same link is shared twice (an apparent bug in startup)
+                if sharedURL != SharedURLPrevious {
+                    sharedTalkActive = true
+                }
             }
             
             .onAppear {
@@ -86,11 +95,14 @@ struct RootView: View {
 
                         }
                         
-                        if SharedTalkActive == true {
+                        if self.sharedTalkActive == true {
+                            self.sharedTalkActive = false
                             if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
                                 if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
                                     selectedTalk = talk
                                     selection = "PLAY_TALK"
+                                    print("RootView Open SHare")
+                                    SharedURLPrevious = sharedURL
                                 }
                             }
                         } else {

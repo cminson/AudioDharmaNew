@@ -122,7 +122,6 @@ var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data load
 var GuardUpdateSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
 
 var NewTalksAvailable = false
-var SharedTalkActive = false
 
 
 class Model {
