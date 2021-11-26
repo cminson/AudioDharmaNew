@@ -8,7 +8,8 @@
 //
 import SwiftUI
 
-var SharedURLPrevious: String = ""
+var LinkSeenInRoot = false
+var LinkURLSeenInRoot = ""
 
 struct RootView: View {
     
@@ -26,7 +27,6 @@ struct RootView: View {
             VStack(alignment: .center, spacing: 0) {
                 
                 NavigationLink(destination: HomePageView().navigationBarBackButtonHidden(true), tag: "START_UI", selection: $selection) {Text("")}.isDetailLink(false)
-                NavigationLink(destination: TalkPlayerView(album: TheDataModel.AllTalksAlbum, talk: selectedTalk, startTime: 0).navigationBarBackButtonHidden(true), tag: "PLAY_TALK", selection: $selection) { Text("") }.isDetailLink(false)
 
                 ZStack {
                     Color.black
@@ -56,24 +56,18 @@ struct RootView: View {
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
             .edgesIgnoringSafeArea(.all)
             .background(Color.black)
-
             .onOpenURL { url in
-
-                sharedURL = url.absoluteString
-                print("Rootview openURL", sharedTalkActive, sharedURL)
-                
-                // filter the case where same link is shared twice (an apparent bug in startup)
-                if sharedURL != SharedURLPrevious {
-                    sharedTalkActive = true
-                }
-            }
+                // to avoid view conflicts, defer
+                //  opening deep link until home page displays
+                LinkSeenInRoot = true
+                LinkURLSeenInRoot = url.absoluteString
+             }
             
             .onAppear {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     withAnimation {
-                        print("root dispatch")
-                        
+
                         if NewTalksAvailable == true {
                             
                             NewTalksAvailable = false
@@ -95,20 +89,7 @@ struct RootView: View {
 
                         }
                         
-                        if self.sharedTalkActive == true {
-                            self.sharedTalkActive = false
-                            if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
-                                if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
-                                    selectedTalk = talk
-                                    selection = "PLAY_TALK"
-                                    print("RootView Open SHare")
-                                    SharedURLPrevious = sharedURL
-                                }
-                            }
-                        } else {
-                            selection = "START_UI"
-                        }
-
+                        selection = "START_UI"
                     }
                 } // end dispatch
             } // end on appear

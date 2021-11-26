@@ -1,0 +1,6 @@
+convert -resize 1242x2208! iPhone8_1.png iPhone5.5.1.png
+convert -resize 1242x2208! iPhone8_2.png iPhone5.5.2.png
+convert -resize 1242x2208! iPhone8_3.png iPhone5.5.3.png
+convert -resize 1242x2688! iPhone_12ProxMax_1.png iPhone6.5.1.png
+convert -resize 1242x2688! iPhone_12ProxMax_2.png iPhone6.5.2.png
+convert -resize 1242x2688! iPhone_12ProxMax_3.png iPhone6.5.3.png

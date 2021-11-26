@@ -34,6 +34,19 @@ struct HomePageView: View {
             
         self.mode.wrappedValue.dismiss()
     }
+    
+    
+    func executeDeepLink(linkURL: String) {
+        
+        print("execute link", linkURL)
+        if let talkFileName = URL(string: linkURL)?.lastPathComponent {
+            if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
+                self.selectedTalk = talk
+                self.selection = "PLAY_TALK"
+                print("HomePageView Open SHare")
+            }
+        }
+    }
 
      
     var body: some View {
@@ -48,23 +61,28 @@ struct HomePageView: View {
             }
            .onOpenURL { url in
                
-               print("HomePage openURL")
-               sharedURL = url.absoluteString
-               SharedURLPrevious = sharedURL    // cache to fix bug where sharedurl gets re-presented to RootView
-               
-               if let talkFileName = URL(string: sharedURL)?.lastPathComponent {
-                   if  let talk = TheDataModel.getTalkForName(name: talkFileName) {
-                       self.selectedTalk = talk
-                       self.selection = "PLAY_TALK"
-                       print("HomePageView Open SHare")
+               LinkSeenInRoot = false
+               DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                   withAnimation {
+                       executeDeepLink(linkURL: url.absoluteString)
                    }
                }
            }
-
            .onAppear {
                
                if NewTalksAvailable {
+                   NewTalksAvailable = false
                    self.dismissView()
+               }
+               // this code is executed if deep link caused app to
+               // launch, displaying a new home page
+               if LinkSeenInRoot {
+                   LinkSeenInRoot = false
+                   DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                       withAnimation {
+                           executeDeepLink(linkURL: LinkURLSeenInRoot)
+                       }
+                   }
                }
            }
   
