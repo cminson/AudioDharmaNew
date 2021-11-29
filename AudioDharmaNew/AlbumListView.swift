@@ -113,6 +113,8 @@ struct AlbumListView: View {
     init(album: AlbumData) {
         
         self.album = album
+        
+
      }
     
     

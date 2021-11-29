@@ -493,6 +493,19 @@ extension String {
         
         switch self {
         case "personal":
+            imageName =  "light_personal"
+        case "community":
+            imageName = "light_community"
+        case "sequence":
+            imageName = "light_sequence"
+        default:
+            imageName = self
+        }
+
+        // removed, as there is a bug somewhere and the images display inconsistently in dark mode.
+        /*
+        switch self {
+        case "personal":
             imageName = AppColorScheme == .light ? "light_personal" : "dark_personal"
         case "community":
             imageName = AppColorScheme == .light ? "light_community" : "dark_community"
@@ -501,6 +514,8 @@ extension String {
         default:
             imageName = self
         }
+         */
+        
        let uiImage =  (UIImage(named: imageName) ?? UIImage(named: "defaultPhoto"))!
        return Image(uiImage: uiImage)
     }

@@ -17,12 +17,10 @@ import BackgroundTasks
 @main
 struct AudioDharmaNewApp: App {
     
-    @Environment(\.colorScheme) var colorScheme: ColorScheme
 
     init() {
         
-        NewTalksAvailable = true    // forces initiali Model load in RootView
-        AppColorScheme = colorScheme    //  all other views know how to adapt to dark or light mode
+        ConfigUpdateRequired = true    // forces initiali Model load in RootView
         configureAudioForBackground()   //  audio will continue to play when app isn't current
     }
     

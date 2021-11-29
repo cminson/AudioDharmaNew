@@ -120,8 +120,8 @@ enum INIT_CODES {          // all possible startup results
 
 var ModelReadySemaphore = DispatchSemaphore(value: 0)  // signals when data loading is finished.
 var GuardUpdateSemaphore = DispatchSemaphore(value: 1) // guards album.talklist a community album is being updated
+var ConfigUpdateRequired = false
 
-var NewTalksAvailable = false
 
 
 class Model {
@@ -173,14 +173,8 @@ class Model {
     let PlayedTalks_ArchiveURL = DocumentsDirectory.appendingPathComponent("PlayedTalks")
     
     var SystemIsConfigured = false  // set to true if a config file was found and configured
-    
-    
-    func startBackgroundTimers() {
-        
-        //print("UPDATE_SANGHA_INTERVAL", UPDATE_SANGHA_INTERVAL)
-        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
-    }
-     
+    var CONFIG_UPDATED_TIME_STAMP : Date? = nil
+
     
     func currentTalkExists() -> Bool {
         
@@ -753,6 +747,49 @@ class Model {
          }
          task.resume()
      }
+    
+    
+    func checkIfUpdateRequired() -> () {
+        
+        let requestURL : URL? = URL(string: URL_CONFIGURATION)
+
+        var request = URLRequest(url: requestURL!)
+        request.httpMethod = "HEAD"
+        print("getConfigLastModifiedDate")
+        let task = URLSession.shared.dataTask(with: requestURL!) { (data, response, error) in
+
+            let headers = (response as? HTTPURLResponse)?.allHeaderFields
+            var lastModified: String?
+            if let headers = headers {
+                lastModified = headers["Last-Modified"] as? String
+            }
+
+            // cast to Date
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+            if let lastModified = lastModified {
+                if let lastModifiedDate = dateFormatter.date(from: lastModified) {
+                    
+                    print(self.CONFIG_UPDATED_TIME_STAMP, lastModifiedDate)
+                    if self.CONFIG_UPDATED_TIME_STAMP == nil {
+                        self.CONFIG_UPDATED_TIME_STAMP = lastModifiedDate
+                    }
+                    if self.CONFIG_UPDATED_TIME_STAMP != lastModifiedDate {
+                        self.CONFIG_UPDATED_TIME_STAMP = lastModifiedDate
+                        print("CONFIG UPDATE SEEN")
+                        ConfigUpdateRequired = true
+                    }
+                    print(URL_CONFIGURATION, lastModifiedDate)
+                }
+            }
+        }
+        task.resume()
+    }
+    
+    func reportLastModified(lastModified: String) {
+        
+        print(lastModified)
+    }
 
     
     @objc func updateSanghaActivity() {
@@ -782,6 +819,7 @@ class Model {
             guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
                 return
             }
+            
             
             do {
                 var talkCount = 0
@@ -852,17 +890,8 @@ class Model {
                 self.SanghaShareHistoryAlbum.talkList = talkList
                 GuardUpdateSemaphore.signal()  // release critical-section access on talkList
                 
-                // get total number of available talks
-                if let config = json["config"] {
-
-                    let availableTalkCount  = config["TotalTalkCount"] as? Int ?? 0
-                    if availableTalkCount > 0 && availableTalkCount != self.ListAllTalks.count {
-                        
-                        // this flag is checked in HomePageView.  If true does a refresh of the model
-                        NewTalksAvailable = true
-                    }
-                }
-            } catch {
+                self.checkIfUpdateRequired()
+             } catch {
                 print("JSON error: \(error.localizedDescription)")
             }
             
@@ -1009,7 +1038,6 @@ class Model {
         } else {
             TheDataModel.UserFavorites[talk.fileName] = UserFavoriteData(fileName: talk.fileName)
             TheDataModel.UserFavoritesAlbum.talkList.insert(talk, at: 0)
-            //CJM Append?
         }
 
         TheDataModel.saveUserFavoritesData()
@@ -1739,6 +1767,54 @@ class Model {
         
         print("ERROR: ", error)
     }
+    
+    
+    /*
+    func startBackgroundTimers() {
+        
+        Timer.scheduledTimer(timeInterval: TimeInterval(UPDATE_SANGHA_INTERVAL), target: self, selector: #selector(updateSanghaActivity), userInfo: nil, repeats: true)
+    }
+     */
+     
+
+    /*
+    func getConfigLastModifiedDate(completion: @escaping (_ modificatinDate: String) -> ()) {
+        
+        let requestURL : URL? = URL(string: URL_CONFIGURATION)
+
+        var request = URLRequest(url: requestURL!)
+        request.httpMethod = "HEAD"
+        print("getConfigLastModifiedDate")
+        let task = URLSession.shared.dataTask(with: requestURL!) { (data, response, error) in
+
+            let headers = (response as? HTTPURLResponse)?.allHeaderFields
+            var lastModified: String?
+            if let headers = headers {
+                lastModified = headers["Last-Modified"] as? String
+            }
+
+            // cast to Date
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"
+            if let lastModified = lastModified {
+                if let lastModifiedDate = dateFormatter.date(from: lastModified) {
+                    
+                    if self.CONFIG_UPDATED_TIME_STAMP.isEmpty {
+                        CONFIG_UPDATED_TIME_STAMP = lastModifiedDate as
+                    } else {
+                        if CONFIG_UPDATED_TIME_STAMP != lastModifiedDate as? String {
+                            
+                        }
+                    }
+                    print(URL_CONFIGURATION, lastModifiedDate)
+                }
+            }
+            completion(lastModified!)
+
+        }
+        task.resume()
+     */
+
     
 }
     

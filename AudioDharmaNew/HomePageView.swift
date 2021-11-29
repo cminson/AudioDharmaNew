@@ -70,8 +70,8 @@ struct HomePageView: View {
            }
            .onAppear {
                
-               if NewTalksAvailable {
-                   NewTalksAvailable = false
+
+               if ConfigUpdateRequired {
                    self.dismissView()
                }
                // this code is executed if deep link caused app to
@@ -84,6 +84,12 @@ struct HomePageView: View {
                        }
                    }
                }
+               
+               // Uupdate the sangha activity everytime the home screen appears.
+               // Aas a side-effect, this also checks if CONFIG00.ZIP has changed.  If any changes
+               // the ConfigUpdateRequired flag will be set true.  This will be picked up
+               // NEXT time this view appears, per the code above (AKA a lazy update)
+               TheDataModel.updateSanghaActivity()
            }
   
             .alert(isPresented: $displayNoCurrentTalk) {

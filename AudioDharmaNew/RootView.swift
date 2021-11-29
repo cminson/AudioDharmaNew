@@ -11,6 +11,7 @@ import SwiftUI
 var LinkSeenInRoot = false
 var LinkURLSeenInRoot = ""
 
+
 struct RootView: View {
     
     @State private var selection: String?  = ""
@@ -19,6 +20,46 @@ struct RootView: View {
     @State private var sharedTalkActive: Bool = false
     @State var selectedTalk: TalkData = TalkData.empty()
 
+    
+    func refreshModel() {
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            withAnimation {
+                
+                print("Root onAppearx")
+                if ConfigUpdateRequired == true {
+                    
+                    ConfigUpdateRequired = false
+                    
+                    // create and initialize a new model
+                    print("Updating Model")
+                    TheDataModel = Model()
+                    TheDataModel.downloadConfig()
+                    print("Init Waiting")
+                    ModelReadySemaphore.wait()
+                    print("Config Waiting")
+                    TheDataModel.installConfig()
+                    ModelReadySemaphore.wait()
+                    print("DONE")
+                    
+                    self.appIsBooting = false
+
+                }
+                
+                selection = "START_UI"
+            }
+        } // end dispatch
+    }
+    
+    
+    // this bit of hackery is required, as we need to initiate background processing
+    // and the usual entry points (onAppear, init, etc), are not always called!
+    func refreshHook() -> String {
+        print("Rendering RootView")
+        refreshModel()
+        return "Earth"
+    }
+    
     
     var body: some View {
         
@@ -35,8 +76,8 @@ struct RootView: View {
                         VStack() {
                            Spacer()
                            HStack() {
-                                Spacer()
-                                Image("Earth")
+                               Spacer()
+                               Image(self.refreshHook())
                                     .resizable()
                                     .scaledToFill()
                                     .frame(width: metrics.size.width * 0.4, height: metrics.size.width * 0.4)
@@ -63,36 +104,6 @@ struct RootView: View {
                 LinkURLSeenInRoot = url.absoluteString
              }
             
-            .onAppear {
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    withAnimation {
-
-                        if NewTalksAvailable == true {
-                            
-                            NewTalksAvailable = false
-                            
-                            // create and initialize a new model
-                            print("Updating Model")
-                            TheDataModel = Model()
-                            TheDataModel.downloadConfig()
-                            print("Init Waiting")
-                            ModelReadySemaphore.wait()
-                            TheDataModel.installConfig()
-                            ModelReadySemaphore.wait()
-                            
-                            TheDataModel.updateSanghaActivity()
-                            
-                            // Lastly set up background data refresh threads
-                            TheDataModel.startBackgroundTimers()
-                            self.appIsBooting = false
-
-                        }
-                        
-                        selection = "START_UI"
-                    }
-                } // end dispatch
-            } // end on appear
         } // end navigation view
         .navigationViewStyle(StackNavigationViewStyle())
     } // end view

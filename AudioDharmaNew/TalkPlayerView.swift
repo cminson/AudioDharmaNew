@@ -45,6 +45,7 @@ var CurrentAlbum : AlbumData = AlbumData.empty()    // the album for this talk b
  */
 
 struct TalkPlayerView: View {
+
     var album: AlbumData
     @State var talk: TalkData
     @State private var elapsedTime: Double
@@ -60,12 +61,16 @@ struct TalkPlayerView: View {
     @State private var stateTalkPlayer = TalkStates.INITIAL
     @State private var tappedUrl: String = ""
     
+
+    
     
     init(album: AlbumData, talk: TalkData, startTime: Double) {
         
         self.album = album
         self.talk = talk
         self.elapsedTime = startTime
+        
+
     }
     
     
@@ -290,7 +295,8 @@ struct TalkPlayerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
-                        .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        //.foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        .foregroundColor(Color(UIColor.label))
                         .disabled(stateTalkPlayer != .PLAYING)
                 }
                 .disabled(stateTalkPlayer != .PLAYING)
@@ -308,8 +314,9 @@ struct TalkPlayerView: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(height: 35)
-                                //.foregroundColor(Color(UIColor.label))
-                                .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                                //.foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                                .foregroundColor(Color(UIColor.label))
+
 
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -328,7 +335,8 @@ struct TalkPlayerView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(height:  20)
-                        .foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        //.foregroundColor(AppColorScheme == .light ? MEDIA_CONTROLS_COLOR_LIGHT : Color(UIColor.label))
+                        .foregroundColor(Color(UIColor.label))
                         .disabled(stateTalkPlayer != .PLAYING)
                 }
                 .disabled(stateTalkPlayer != .PLAYING)
