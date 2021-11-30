@@ -70,7 +70,8 @@ struct HomePageView: View {
            }
            .onAppear {
                
-
+               // dismiss ourselves (and all child view).  this brings the RootView up
+               // RootView in turn handles the model update and then rebuilds all the views
                if ConfigUpdateRequired {
                    self.dismissView()
                }
