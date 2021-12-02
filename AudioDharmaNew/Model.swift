@@ -716,17 +716,23 @@ class Model {
          let urlRequest = URLRequest(url : requestURL!)
 
          var talkList: [TalkData] = []
+        print("getsimilar", requestURL)
          let task = session.dataTask(with: urlRequest) {
              (data, response, error) -> Void in
 
              guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                 signalComplete.signal()
+
                  return
              }
              
              guard let responseData = data, responseData.count > MIN_EXPECTED_RESPONSE_SIZE else {
+                 signalComplete.signal()
+
                  return
              }
  
+                print("getting")
              do {
                  let jsonDict =  try JSONSerialization.jsonObject(with: data!) as! [String: AnyObject]
                  for similarTalk in jsonDict["SIMILAR"] as? [AnyObject] ?? [] {
@@ -743,6 +749,7 @@ class Model {
              }
              
              TheDataModel.SimilarTalksAlbum.talkList = talkList
+             print("complete")
              signalComplete.signal()
          }
          task.resume()
