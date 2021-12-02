@@ -5,8 +5,8 @@
 //  as well as all functions necessary for updating app state.
 //
 //  Created by Christopher on 6/22/17.
-//  Copyright © 2017 Christopher Minson. All rights reserved.
-//            self.UserFavorites = TheDataModel.loadUserFavoriteData()
+//  Copyright © 2022 Christopher Minson. All rights reserved.
+//
 
 import UIKit
 import Foundation 

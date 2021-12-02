@@ -4,7 +4,8 @@
 //  Displays  splash screen as it downloads data and configures the model.
 //  Once completed, it launces the main UI.
 //
-//  Created by Christopher on 11/21/21.
+//  Created by Christopher Minson on 8/31/21.
+//  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 import SwiftUI
 
