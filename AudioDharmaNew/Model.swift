@@ -4,7 +4,7 @@
 //  The data model for the app.  Here are all the functions to download and configure the app,
 //  as well as all functions necessary for updating app state.
 //
-//  Created by Christopher on 6/22/17.
+//  Created by Christopher Minson on 6/22/17.
 //  Copyright © 2022 Christopher Minson. All rights reserved.
 //
 
