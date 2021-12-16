@@ -114,7 +114,7 @@ class AlbumData: Identifiable, Equatable, ObservableObject {
             filteredTalkList = []
             for talk in self.talkList {
                 let transcript = talk.hasTranscript() ? "transcript" : ""
-                let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased()
+                let searchedData = talk.title.lowercased() + talk.speaker.lowercased() + transcript + TheDataModel.getNoteForTalk(talk: talk).lowercased() + talk.country.lowercased() + talk.city.lowercased()
                 if searchedData.contains(filter.lowercased()) {filteredTalkList.append(talk)}
             }
         }

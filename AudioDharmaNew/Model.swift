@@ -112,6 +112,8 @@ let DEVICE_ID = UIDevice.current.identifierForVendor!.uuidString
 enum ACTIVITIES {          // all possible activities that are reported back to cloud
     case SHARE_TALK
     case PLAY_TALK
+    case DOWNLOAD_TALK
+    case READ_TRANSCRIPT
 }
 enum INIT_CODES {          // all possible startup results
     case SUCCESS
@@ -964,6 +966,7 @@ class Model {
                 return
             }
 
+            self.reportTalkActivity(type: .DOWNLOAD_TALK, talk: talk)
             TheDataModel.DownloadInProgress = false
             TheDataModel.setTalkAsDownloaded(talk: talk)
             success()
@@ -984,6 +987,12 @@ class Model {
             
         case ACTIVITIES.PLAY_TALK:
             operation = "PLAYTALK"
+            
+        case ACTIVITIES.DOWNLOAD_TALK:
+            operation = "DOWNLOADTALK"
+            
+        case ACTIVITIES.READ_TRANSCRIPT:
+            operation = "READTRANSCRIPT"
             
         }
         

@@ -132,7 +132,7 @@ struct TalkRow: View {
                             let signalComplete = DispatchSemaphore(value: 0)
                             TheDataModel.downloadSimilarityData(talk: talk, signalComplete: signalComplete)
                             signalComplete.wait()
-                            selection = "TALKS"
+                            selection = "SIMILAR_TALKS"
                         }
                         Button("Favorite | Remove Favorite") {
                             self.stateIsFavoriteTalk = TheDataModel.toggleTalkAsFavorite(talk: talk)
@@ -166,7 +166,7 @@ struct TalkRow: View {
         }
 
         .contentShape(Rectangle())
-        .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "TALKS", selection: $selection) { EmptyView() } .hidden())
+        .background(NavigationLink(destination: TalkListView(album: TheDataModel.SimilarTalksAlbum), tag: "SIMILAR_TALKS", selection: $selection) { EmptyView() } .hidden())
         .popover(isPresented: $displayNoteDialog) {
             VStack() {
                 Spacer()

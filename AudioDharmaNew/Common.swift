@@ -247,6 +247,8 @@ struct TranscriptView: View {
         }
         .onAppear() {
             DisplayingBiographyOrTranscript = true
+            
+            TheDataModel.reportTalkActivity(type: .READ_TRANSCRIPT, talk: talk)
         }
         .onDisappear() {
             DisplayingBiographyOrTranscript = false
