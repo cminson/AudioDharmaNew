@@ -1,0 +1,12 @@
+
+1) Set Version/Build in Settings/General
+2) Clean build the app
+3) Select Product->Archive in menu
+4) Follow prompts and Upload to App
+5) Goto https://appstoreconnect.apple.com/apps
+6) Click the + button under IosApp (topish left)
+7) Select the version/build  under "Build" header in middle of page
+8) Fill in rest of form
+9) Save ->  Submit for Review
+
+Export compliance.  Yes use encyrption.  Then claim exemption as its all HTTP and file transfer
