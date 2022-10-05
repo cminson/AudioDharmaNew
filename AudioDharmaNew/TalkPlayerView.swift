@@ -408,10 +408,16 @@ struct TalkPlayerView: View {
             Text("play talks in sequence")
                 .font(.system(size: FONT_SIZE_TALK_PLAYER_SMALL, weight: .regular))
             Spacer()
-            VolumeSlider()
-                .frame(height: 50)
-                .padding(.leading, 80)
-                .padding(.trailing, 60)
+                ZStack() {
+                    Color.gray
+                       // .ignoresSafeArea()
+                    VolumeSlider()
+                        .frame(height: 50)
+                        .padding(.leading, 80)
+                        .padding(.trailing, 60)
+                }
+                .frame(height: 80)
+
           
             } // end group 2
             .alert(isPresented: $displayNoInternet) {
